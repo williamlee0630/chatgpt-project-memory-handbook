@@ -14,7 +14,13 @@ before(async () => {
     stdio: 'ignore'
   });
   await new Promise(resolve => setTimeout(resolve, 400));
-  try { browser = await chromium.launch({ headless: true }); }
+  const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
+  try {
+    browser = await chromium.launch({
+      headless: true,
+      ...(executablePath ? { executablePath } : {})
+    });
+  }
   catch (_) { browser = null; }
 });
 
@@ -29,8 +35,9 @@ test('桌面首頁提供 6 章、13 節與基礎進階導覽', async t => {
   await page.goto(baseURL);
   await assert.equal(await page.locator('[data-course-chapter]').count(), 6);
   await assert.equal(await page.locator('[data-course-section]').count(), 13);
-  await assert.equal(await page.locator('text=基礎篇｜40 分鐘').count(), 1);
-  await assert.equal(await page.locator('text=進階篇｜60 分鐘').count(), 1);
+  const trackBadges = page.locator('[data-course-chapter] > .badge');
+  await assert.equal(await trackBadges.filter({ hasText: '基礎篇｜40 分鐘' }).count(), 3);
+  await assert.equal(await trackBadges.filter({ hasText: '進階篇｜60 分鐘' }).count(), 3);
   await assert.equal(await page.locator('#desktop-nav').isVisible(), true);
   await page.close();
 });
@@ -46,12 +53,52 @@ test('手機可打開目錄且內容不產生水平捲動', async t => {
   await page.close();
 });
 
+test('4-3、5-1、5-2 在桌面與 390px 手機均無水平捲動', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證響應式規則');
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    const page = await browser.newPage({ viewport });
+    for (const lesson of ['04-03', '05-01', '05-02']) {
+      await page.goto(baseURL + '/chapters/' + lesson + '.html');
+      const widths = await page.evaluate(() => ({
+        scroll: document.documentElement.scrollWidth,
+        client: document.documentElement.clientWidth
+      }));
+      assert.ok(
+        widths.scroll <= widths.client + 1,
+        lesson + ' overflow at ' + viewport.width + 'px: ' + JSON.stringify(widths)
+      );
+    }
+    await page.close();
+  }
+});
+
+test('4-3 的 groups 與 messages 複製按鈕輸出正式 Tab 表頭', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證複製目標');
+  const page = await browser.newPage({
+    permissions: ['clipboard-read', 'clipboard-write']
+  });
+  await page.goto(baseURL + '/chapters/04-03.html');
+  for (const [target, expected] of [
+    ['groups-headers', 'group_id\tgroup_name\treceiver_email'],
+    ['messages-headers', 'webhook_event_id\tmessage_id\tgroup_id\tuser_id\tdisplay_name\tmessage\tcreated_at\tsent']
+  ]) {
+    const button = page.locator('[data-copy-target="' + target + '"]');
+    await button.click();
+    assert.equal((await page.evaluate(() => navigator.clipboard.readText())).trim(), expected);
+  }
+  await page.close();
+});
+
 test('複製按鈕複製完整內容並顯示成功回饋', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證複製目標');
   const page = await browser.newPage({ permissions: ['clipboard-read', 'clipboard-write'] });
   await page.goto(`${baseURL}/chapters/01-02.html`);
   const button = page.locator('[data-copy-target]').first();
   await button.click();
+  await page.waitForFunction(
+    element => element.textContent === '已複製',
+    await button.elementHandle()
+  );
   assert.equal(await button.textContent(), '已複製');
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   assert.match(copied, /meeting\.transcript/);
