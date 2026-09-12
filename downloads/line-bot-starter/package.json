@@ -1,0 +1,9 @@
+{
+  "name": "line-project-memory-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LINE 群組訊息保存至 Google Sheets 並寄送 Gmail 的課程範本",
+  "scripts": { "test": "node --test tests/*.test.js" },
+  "engines": { "node": ">=20" },
+  "dependencies": { "googleapis": "^159.0.0", "nodemailer": "^10.0.8" }
+}
