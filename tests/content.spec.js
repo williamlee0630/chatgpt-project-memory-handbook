@@ -117,20 +117,29 @@ test('4-2 使用現行 LINE OA 建立流程並揭露群組與 Token 限制', () 
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
-function assertBase64ZeroBasics(relative) {
+function assertBase64SimpleTransfer(relative) {
   const text = read(relative);
   for (const phrase of [
-    '[Convert]::ToBase64String([IO.File]::ReadAllBytes("service-account.json")) | Set-Clipboard',
-    '$b64 = Get-Clipboard',
-    '([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($b64)) | ConvertFrom-Json).type',
-    'service_account', '實際檔名', '剪貼簿', 'Base64 是編碼，不是加密',
-    '線上 Base64 converter'
+    '[Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard',
+    '實際檔名與完整路徑', '沒有顯示大量文字是正常的', '直接複製到剪貼簿',
+    '立即前往 Vercel', 'GOOGLE_SERVICE_ACCOUNT_BASE64', 'Value',
+    '貼入 Vercel 前不要再複製其他文字', '剪貼簿內容會被覆蓋',
+    '重新執行 PowerShell 指令', '顯示／遮蔽狀態', '一整串很長的 Base64 字串',
+    '不代表 Base64 有效性的技術驗證',
+    '最終是否設定正確，以部署與實際 Google Sheets 寫入測試為準',
+    'Base64 是編碼，不是加密', '不可公開', '不可提交 GitHub',
+    '不可貼到公開聊天', '線上 Base64 converter'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), `${relative}: ${phrase}`);
+  for (const obsolete of [
+    'FromBase64String', 'ConvertFrom-Json', '$b64 = Get-Clipboard',
+    'service_account', '驗證 Base64 是否轉換成功', '安全驗證格式',
+    '不洩密驗證', '產生並驗證 Base64'
+  ]) assert.doesNotMatch(text, new RegExp(escapeRegExp(obsolete)), `${relative}: ${obsolete}`);
 }
 
-test('4-3 與 5-1 各自提供完整且不洩密的 Base64 教學', () => {
-  assertBase64ZeroBasics('chapters/04-03.html');
-  assertBase64ZeroBasics('chapters/05-01.html');
+test('4-3 與 5-1 各自提供簡化且安全的 Base64 剪貼簿流程', () => {
+  assertBase64SimpleTransfer('chapters/04-03.html');
+  assertBase64SimpleTransfer('chapters/05-01.html');
   const gmail = read('chapters/04-03.html');
   for (const phrase of [
     'Security Key', '組織管理帳號', 'Advanced Protection',
@@ -138,12 +147,19 @@ test('4-3 與 5-1 各自提供完整且不洩密的 Base64 教學', () => {
   ]) assert.match(gmail, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
-test('4-3 Service Account 的第 8 步清楚說明 Base64 轉換驗證', () => {
-  const text = read('chapters/04-03.html');
-  const section = text.match(/<h2>建立 Service Account<\/h2>([\s\S]*?)<\/ol>/);
-  assert.ok(section, '建立 Service Account section missing');
-  const headings = [...section[1].matchAll(/<li><h3>(.*?)<\/h3>/g)].map(match => match[1]);
-  assert.equal(headings[7], '驗證 Base64 是否轉換成功');
+test('相關學生文件不再提供 Base64 解碼驗證，starter 使用同一簡化流程', () => {
+  const related = [
+    'chapters/04-03.html', 'chapters/05-01.html',
+    'appendices/troubleshooting.html', 'downloads/line-bot-starter/README.md'
+  ].map(read).join('\n');
+  for (const obsolete of [
+    'FromBase64String', 'ConvertFrom-Json', '$b64 = Get-Clipboard',
+    '驗證 Base64 是否轉換成功', '安全驗證格式', '不洩密驗證'
+  ]) assert.doesNotMatch(related, new RegExp(escapeRegExp(obsolete)), obsolete);
+  const starter = read('downloads/line-bot-starter/README.md');
+  const command = '[Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard';
+  assert.equal(starter.split(command).length - 1, 2);
+  assert.match(starter, /最終是否設定正確，以部署與實際 Google Sheets 寫入測試為準/);
 });
 
 test('5-1 使用官方 Drop、原 Project Redeploy 與恰好六個 Value', () => {

@@ -107,20 +107,17 @@ Service Account JSON 是敏感憑證：
 - 不要傳給其他學生。
 - 只把 JSON 轉成 Base64，放入自己 Vercel Project 的 `GOOGLE_SERVICE_ACCOUNT_BASE64`。
 
-在檔案總管進入 JSON 所在資料夾，先確認真實檔名。在資料夾空白處按右鍵 →「在終端機中開啟」，或在位址列輸入 `powershell` 後按 Enter。把下列 `service-account.json` 換成實際檔名，再執行：
+在檔案總管找到 JSON，先確認 JSON 的實際檔名與完整路徑。在檔案所在資料夾空白處按右鍵 →「在終端機中開啟」，或在位址列輸入 `powershell` 後按 Enter。把下列 `完整JSON路徑` 換成實際完整路徑，再執行：
 
 ```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("service-account.json")) | Set-Clipboard
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard
 ```
 
-執行後沒有顯示一大串文字是正常的，結果已直接複製到剪貼簿。使用以下指令驗證格式；它只輸出帳號類型，不會印出 JSON 全文：
+PowerShell 沒有顯示大量文字是正常的，因為結果已直接複製到剪貼簿。立即前往 Vercel，把剪貼簿內容貼入 `GOOGLE_SERVICE_ACCOUNT_BASE64` 的 Value。
 
-```powershell
-$b64 = Get-Clipboard
-([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($b64)) | ConvertFrom-Json).type
-```
+貼入 Vercel 前不要再複製其他文字，否則剪貼簿內容會被覆蓋；若已被覆蓋，重新執行 PowerShell 指令即可。可以自行切換 Vercel Value 的顯示／遮蔽狀態，確認已貼入一整串很長的 Base64 字串，但這不代表 Base64 有效性的技術驗證。最終是否設定正確，以部署與實際 Google Sheets 寫入測試為準。
 
-正常輸出是 `service_account`。Base64 是編碼，不是加密，必須和原始 JSON 一樣視為敏感密鑰。禁止使用線上 Base64 converter，也不要貼到 GitHub、公開 ChatGPT 對話、教材、影片或截圖。
+Base64 是編碼，不是加密，必須和原始 JSON 一樣視為敏感密鑰。不可公開、不可提交 GitHub、不可貼到公開聊天，也不可使用線上 Base64 converter；不要放進教材、影片或截圖。
 
 ## 三、建立 Gmail App Password
 
@@ -206,15 +203,15 @@ GOOGLE_SERVICE_ACCOUNT_BASE64
 
 Vercel 的 Value 欄只貼真正的值：不要貼 `NAME=value`、不要加單引號或雙引號、不要留前後空白，也不要多貼換行。`GOOGLE_SHEET_ID` 只放 `/d/` 與 `/edit` 中間字串；`GMAIL_APP_PASSWORD` 貼入前移除顯示用空格。
 
-如果在本節才準備 Base64，回到 JSON 所在資料夾開啟 PowerShell，把檔名換成實際名稱後執行：
+如果在本節才準備 Base64，先確認 JSON 的實際檔名與完整路徑，再於檔案所在資料夾開啟 PowerShell。把 `完整JSON路徑` 換成實際完整路徑後執行：
 
 ```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("service-account.json")) | Set-Clipboard
-$b64 = Get-Clipboard
-([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($b64)) | ConvertFrom-Json).type
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard
 ```
 
-正常只輸出 `service_account`。不要把真實值貼在 README、聊天訊息、程式碼或課堂截圖中。
+PowerShell 沒有顯示大量文字是正常的，因為結果已直接複製到剪貼簿。立即前往 Vercel，把剪貼簿內容貼入 `GOOGLE_SERVICE_ACCOUNT_BASE64` 的 Value。貼入 Vercel 前不要再複製其他文字，否則剪貼簿內容會被覆蓋；若已被覆蓋，重新執行 PowerShell 指令即可。
+
+可以自行切換 Vercel Value 的顯示／遮蔽狀態，確認已貼入一整串很長的 Base64 字串，但這不代表 Base64 有效性的技術驗證。最終是否設定正確，以部署與實際 Google Sheets 寫入測試為準。Base64 是編碼，不是加密；不可公開、不可提交 GitHub、不可貼到公開聊天或線上 Base64 converter，也不要放進 README、程式碼或課堂截圖。
 
 ## 七、設定完成後必須 Redeploy
 

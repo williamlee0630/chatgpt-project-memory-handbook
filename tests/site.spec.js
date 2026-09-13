@@ -98,23 +98,20 @@ test('4-3 的 groups 與 messages 複製按鈕輸出正式 Tab 表頭', async t 
   await page.close();
 });
 
-test('4-3 與 5-1 的 Base64 Copy 按鈕複製產生與安全驗證指令', async t => {
+test('4-3 與 5-1 的 Base64 Copy 按鈕只複製完整路徑轉換指令', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證複製目標');
   const page = await browser.newPage({ permissions: ['clipboard-read', 'clipboard-write'] });
-  for (const [relative, targets] of [
-    ['chapters/04-03.html', ['base64-command', 'base64-check']],
-    ['chapters/05-01.html', ['deploy-base64-command', 'deploy-base64-check']]
+  for (const [relative, target] of [
+    ['chapters/04-03.html', 'base64-command'],
+    ['chapters/05-01.html', 'deploy-base64-command']
   ]) {
     await page.goto(baseURL + '/' + relative);
-    await page.locator('[data-copy-target="' + targets[0] + '"]').click();
+    await page.locator('[data-copy-target="' + target + '"]').click();
     assert.equal(
       (await page.evaluate(() => navigator.clipboard.readText())).trim(),
-      '[Convert]::ToBase64String([IO.File]::ReadAllBytes("service-account.json")) | Set-Clipboard'
+      '[Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard'
     );
-    await page.locator('[data-copy-target="' + targets[1] + '"]').click();
-    const copied = (await page.evaluate(() => navigator.clipboard.readText())).trim();
-    assert.match(copied, /^\$b64 = Get-Clipboard/);
-    assert.match(copied, /ConvertFrom-Json\)\.type$/);
+    assert.equal(await page.locator('[data-copy-target$="base64-check"]').count(), 0);
   }
   await page.close();
 });

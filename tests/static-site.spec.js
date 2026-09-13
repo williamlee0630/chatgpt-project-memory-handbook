@@ -24,12 +24,12 @@ const formalStudentHashes = {
   'line_utils.py': 'eaec38d7a5eee7a026278e8779428cd20b446ab5f3150649c800b45b89286792',
   'main.py': 'dd410ae68333493a62c5d37ccea9288f873af5ad8e5ed25a4e7ecbf255234951',
   'message_service.py': '94659087b765cf7ab30b1e9aade1e9a573ed2b7712f1a3c94d19b8d70c2ccc27',
-  'README.md': '96a388c99122b3b25402a9a96ddc2996f9e47c44568ff9053134c09fd730cc4c',
+  'README.md': '37b821d4aa2a676efeba8c960fcc9f03add05acc321e99a9fd0d641686f1161c',
   'requirements.txt': '0df175d04ffbc50eae9ff09f9514cb81c2620f1c00801b1052d544633399cabf',
   'sheets_store.py': '8827b41ee958db3c109fcad903833ed3e632726c8dd5cf7073e2590c2caee8ab',
   'vercel.json': '99cc91956fd2ac8a511a32dee2dfff44705defc5e441793562ccdd68b359d4f6'
 };
-const formalZipHash = '00c77be8e0ec5459f6e33a3f4a9725a7f2560dea40034d47993dee2c92fb363f';
+const formalZipHash = 'ecc8a44243d2d060b18be1bc5c2515fd4e303587c252cc81b3c817faa3e36ef9';
 
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
