@@ -138,6 +138,22 @@ test('13 節都有唯一 progress id 且互動程式語法正確', () => {
   }
   assert.equal(new Set(ids).size, 13);
   new vm.Script(fs.readFileSync(path.join(root, 'assets/app.js'), 'utf8'));
+  new vm.Script(fs.readFileSync(path.join(root, 'assets/prompts.js'), 'utf8'));
+});
+
+test('使用 Prompt 的頁面先載入 prompts.js 再載入 app.js', () => {
+  for (const relative of [
+    'chapters/02-01.html', 'chapters/02-02.html',
+    'chapters/03-01.html', 'chapters/03-02.html',
+    'chapters/05-01.html', 'chapters/06-02.html',
+    'appendices/prompts.html'
+  ]) {
+    const text = fs.readFileSync(path.join(root, relative), 'utf8');
+    const promptsIndex = text.indexOf('assets/prompts.js');
+    const appIndex = text.indexOf('assets/app.js');
+    assert.ok(promptsIndex >= 0, `${relative}: prompts.js missing`);
+    assert.ok(promptsIndex < appIndex, `${relative}: prompts.js must load before app.js`);
+  }
 });
 
 test('CSS 包含桌面側欄與手機抽屜斷點且括號平衡', () => {

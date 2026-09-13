@@ -2,12 +2,24 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
+const crypto = require('node:crypto');
 
 const root = path.resolve(__dirname, '..');
 const chapterDir = path.join(root, 'chapters');
 
 function read(relative) {
   return fs.readFileSync(path.join(root, relative), 'utf8');
+}
+
+function loadCoursePrompts() {
+  const sandbox = { window: {} };
+  vm.runInNewContext(read('assets/prompts.js'), sandbox, { filename: 'assets/prompts.js' });
+  return JSON.parse(JSON.stringify(sandbox.window.COURSE_PROMPTS));
+}
+
+function sha256(value) {
+  return crypto.createHash('sha256').update(value.replace(/\r\n/g, '\n')).digest('hex');
 }
 
 function filesBelow(relative, predicate = () => true) {
@@ -58,13 +70,102 @@ test('Tactiq 主線包含已驗證 Automatic Workflow、Liquid 與四項排錯',
 });
 
 test('跨來源 Prompt 固定輸出 10 項並要求揭露實際資料來源', () => {
-  const text = read('appendices/prompts.html');
+  const text = loadCoursePrompts().find(prompt => prompt.id === '3').body;
   for (const phrase of [
     '30 秒摘要','已確認決策（決策／來源／日期）','待辦事項','未決事項',
     '決策變更（原決定／新決定／原來源／新來源）','衝突提醒',
     '需要人工確認','本次實際讀取的 Google Drive 資料','本次實際讀取的 Gmail 資料','排除的資料',
     '不可以假裝已完成跨來源整理'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)));
+});
+
+test('prompts.js 是 0～7 共 8 份正式 Prompt 的唯一完整資料來源', () => {
+  const prompts = loadCoursePrompts();
+  const expected = [
+    ['0', 'Project 固定指示'],
+    ['1', 'LINE 紀錄整理'],
+    ['2', 'Tactiq 會議整理'],
+    ['3', '跨來源工作記憶'],
+    ['4', '最新有效決策辨識'],
+    ['5', '待辦與專案進度整理'],
+    ['6', '每日工作記憶自動整理'],
+    ['7', 'Codex Vercel 部署救援 Prompt']
+  ];
+  assert.deepEqual(prompts.map(prompt => [prompt.id, prompt.name]), expected);
+  assert.equal(new Set(prompts.map(prompt => prompt.id)).size, 8);
+  for (const prompt of prompts) {
+    for (const field of ['name', 'category', 'placement', 'purpose', 'when', 'body']) {
+      assert.equal(typeof prompt[field], 'string', `${prompt.id}: ${field}`);
+      assert.ok(prompt[field].trim(), `${prompt.id}: empty ${field}`);
+    }
+  }
+  const byId = Object.fromEntries(prompts.map(prompt => [prompt.id, prompt]));
+  assert.equal(byId['3'].badge, '核心 Prompt');
+  assert.equal(byId['6'].category, 'ChatGPT 排程 Prompt');
+  assert.equal(byId['6'].placement, 'ChatGPT Scheduled Task／排程');
+  assert.equal(
+    byId['6'].notice,
+    '請建立成 ChatGPT 排程，不是放進 Project Instructions，也不是每天手動貼上。'
+  );
+  assert.equal(byId['7'].badge, '加贈工具 Prompt');
+  assert.match(byId['7'].notice, /不是完成課程的必要步驟/);
+  assert.doesNotMatch(JSON.stringify(prompts), /每週工作記憶整理/);
+});
+
+test('8 份 Prompt 本文與核准原文的 SHA-256 完全一致', () => {
+  const expected = {
+    '0': '561ed9596e0e4349e0ea9629fe0a3c097976892dda6b6093fc9df4c3fc13340b',
+    '1': '93d26185f712c66a12b7e1e3ccdd7b2dcb4b5fffc4fce85e2406fadf470e6a2d',
+    '2': '650afc236dc4fc515aec49b3ce0f8ec5b07771b238612d389e3a6e78f1125f7a',
+    '3': 'e1fd3834528bd569be327a858b9290ac9359a4e9482d63a0eb91b63a65c22f2c',
+    '4': 'e1eb09ea7310ec635539131f0b45354e772e99dc7fa780b7490f02db3ac31b49',
+    '5': '7da081a33bab5b03e8b7ef2f67d8611e2b76fa47f2ae1ba216b828a677f3c24e',
+    '6': '496ad825524556033c22fa04b9a5fee773a89965ef3cdd07a0d869a4b4269262',
+    '7': '37b53f4479f824d00683ef3596fc52da281ffdf3b87ea214403bfa96bdff62b4'
+  };
+  for (const prompt of loadCoursePrompts()) {
+    assert.equal(sha256(prompt.body), expected[prompt.id], `Prompt ${prompt.id} body changed`);
+  }
+});
+
+test('章節以 data-prompt-id 放置正式 Prompt，HTML 不再硬編碼 Prompt 本文', () => {
+  const placements = {
+    '0': 'chapters/02-01.html',
+    '1': 'chapters/02-02.html',
+    '2': 'chapters/02-01.html',
+    '3': 'chapters/03-01.html',
+    '4': 'chapters/03-02.html',
+    '5': 'chapters/03-02.html',
+    '6': 'chapters/06-02.html',
+    '7': 'chapters/05-01.html'
+  };
+  const chapterHtml = filesBelow('chapters', file => file.endsWith('.html')).map(read).join('\n');
+  for (const [id, relative] of Object.entries(placements)) {
+    assert.match(read(relative), new RegExp(`data-prompt-id="${id}"`), `${relative}: Prompt ${id}`);
+    assert.equal((chapterHtml.match(new RegExp(`data-prompt-id="${id}"`, 'g')) || []).length, 1, `Prompt ${id}`);
+  }
+  const aggregate = read('appendices/prompts.html');
+  assert.match(aggregate, /data-prompt-index/);
+  assert.match(aggregate, /data-prompt-catalog/);
+  for (const opening of [
+    '你是我的專案工作記憶整理助理。',
+    '請整理這次的 LINE 工作紀錄。',
+    '請整理指定的 Tactiq 會議逐字稿。',
+    '請建立「＿＿＿＿專案」的跨來源工作記憶',
+    '請根據目前這個專案中指定範圍的資料',
+    '請根據目前指定的專案資料，整理最新的待辦事項',
+    '每天整理一次我的 LINE 工作記憶。',
+    '我要部署老師提供的「LINE 訊息整理 Bot」課程專案。'
+  ]) {
+    assert.doesNotMatch(chapterHtml + aggregate, new RegExp(escapeRegExp(opening)), opening);
+  }
+});
+
+test('工具箱導覽統一使用課程提示詞總整理名稱', () => {
+  assert.match(read('assets/app.js'), /📋 課程提示詞總整理/);
+  assert.match(read('appendices/prompts.html'), /<h1>📋 課程提示詞總整理<\/h1>/);
+  assert.match(read('appendices/troubleshooting.html'), /課程提示詞總整理/);
+  assert.doesNotMatch(read('appendices/troubleshooting.html'), /可複製 Prompt/);
 });
 
 test('2-1 使用 Plugins／Apps、實際讀取驗證並保留三來源人工 fallback', () => {

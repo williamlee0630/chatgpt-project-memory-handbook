@@ -38,7 +38,7 @@
       html += `<a class="nav-link${lessonId === current ? ' active' : ''}" href="${root}${href}" data-search-item data-search-text="${title} ${group}">${title}</a>`;
     }
     html += `<p class="nav-group">工具箱</p>
-      <a class="nav-link" href="${root}appendices/prompts.html" data-search-item data-search-text="Prompt 提示詞 Liquid">可複製 Prompt</a>
+      <a class="nav-link" href="${root}appendices/prompts.html" data-search-item data-search-text="Prompt 提示詞 總整理 LINE Tactiq 決策 待辦 排程 Codex">📋 課程提示詞總整理</a>
       <a class="nav-link" href="${root}appendices/troubleshooting.html" data-search-item data-search-text="Tactiq LINE Vercel troubleshooting 排錯">排錯中心</a>`;
     const target = document.getElementById(id);
     if (target) target.innerHTML = html;
@@ -66,7 +66,7 @@
       if (!target) return;
       await navigator.clipboard.writeText(target.innerText || target.textContent || '');
       const old = button.textContent;
-      button.textContent = '已複製';
+      button.textContent = button.dataset.copySuccess || '已複製';
       button.classList.add('copied');
       setTimeout(() => { button.textContent = old; button.classList.remove('copied'); }, 1800);
     });
