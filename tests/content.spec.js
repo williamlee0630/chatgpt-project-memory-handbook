@@ -138,6 +138,14 @@ test('4-3 與 5-1 各自提供完整且不洩密的 Base64 教學', () => {
   ]) assert.match(gmail, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
+test('4-3 Service Account 的第 8 步清楚說明 Base64 轉換驗證', () => {
+  const text = read('chapters/04-03.html');
+  const section = text.match(/<h2>建立 Service Account<\/h2>([\s\S]*?)<\/ol>/);
+  assert.ok(section, '建立 Service Account section missing');
+  const headings = [...section[1].matchAll(/<li><h3>(.*?)<\/h3>/g)].map(match => match[1]);
+  assert.equal(headings[7], '驗證 Base64 是否轉換成功');
+});
+
 test('5-1 使用官方 Drop、原 Project Redeploy 與恰好六個 Value', () => {
   const text = read('chapters/05-01.html');
   assert.match(text, /href="https:\/\/vercel\.com\/drop"/);
