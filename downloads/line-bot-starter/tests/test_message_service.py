@@ -5,6 +5,7 @@ import pytest
 from message_service import (
     EMAIL_FAILURE_REPLY,
     create_group_command_handler,
+    create_group_welcome_handler,
     format_record_email,
     parse_record_command,
     route_text_event,
@@ -211,3 +212,24 @@ def test_email_subject_uses_group_name_and_iso_date():
         messages=[],
     )
     assert subject == "[LINE紀錄][設計組] 2026-09-12"
+
+
+def test_welcome_handler_explains_commands_for_bot_and_member_join_events():
+    line_client = ReplyingLineClient()
+    handler = create_group_welcome_handler(line_client=line_client)
+
+    handler({"type": "join", "replyToken": "one", "source": {"type": "group"}})
+    handler(
+        {
+            "type": "memberJoined",
+            "replyToken": "two",
+            "source": {"type": "group"},
+        }
+    )
+
+    assert line_client.replies[0].startswith("👋 大家好")
+    assert line_client.replies[1].startswith("👋 歡迎新成員")
+    for reply in line_client.replies:
+        assert "#設定信箱" in reply
+        assert "#查看信箱" in reply
+        assert "#寄出紀錄" in reply

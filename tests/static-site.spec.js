@@ -16,19 +16,20 @@ const htmlFiles = [
 const formalStudentHashes = {
   '.env.example': '8b1f32f6e3bb62466879a8ef83e75fc81cdd26f2166a944240d99a80185f51f6',
   '.gitignore': 'b93b6598c404c03a40eb612a176eec8a00b688042869fa6ccf50950ebc96a8ed',
-  'app.py': '7109c47e304705819a286386115fbb3a57d0277a8b5c7924bdb3965e6e9894cf',
-  'config.py': '1d9eb0e03c0d411daf1b61de05e1f4724ba984ffc8529fc1415b445b51848f59',
+  'app.py': 'b771e06575f7e22eeee976398291952c3de474421b9dd89840af29ccc48a5364',
+  'config.py': 'c18a3dd038c6c92331ea568014337190155d3f36d7394590567e257429c23843',
   'email_service.py': 'c7016886a1bb1b62a2efa0c039a79df7e59aed03ac425c95b17a6c38d74fd490',
   'index.py': 'd4fd34b5aa8277c1efced3b358aa42f72e1febfa965f7768bd61e6f8d4d99cc8',
   'line_client.py': 'c731c19970160a7b366583bed3a929d0384d5383930edebdea680c9d4f8b941d',
   'line_utils.py': 'eaec38d7a5eee7a026278e8779428cd20b446ab5f3150649c800b45b89286792',
-  'main.py': '87fef4a74dbe789735119f1149294586c2c4eeca9591553cd7b0fbde614a8a3f',
-  'message_service.py': '4ea32cc47bf330fc2f172ffd0326e2fe3f716e7af01276b2e94223321001fb13',
-  'README.md': '9458f0272f32d56a95d0cb6b654e31396e7493c89738abda27e2f7a75284b4a5',
+  'main.py': 'dd410ae68333493a62c5d37ccea9288f873af5ad8e5ed25a4e7ecbf255234951',
+  'message_service.py': '94659087b765cf7ab30b1e9aade1e9a573ed2b7712f1a3c94d19b8d70c2ccc27',
+  'README.md': '10bf90de2f536c6c93a8a70f6a9e82d101b98b32c9010ede762d07d5ed35a480',
   'requirements.txt': '0df175d04ffbc50eae9ff09f9514cb81c2620f1c00801b1052d544633399cabf',
   'sheets_store.py': '8827b41ee958db3c109fcad903833ed3e632726c8dd5cf7073e2590c2caee8ab',
   'vercel.json': '99cc91956fd2ac8a511a32dee2dfff44705defc5e441793562ccdd68b359d4f6'
 };
+const formalZipHash = '9453a5058df213d0a22d45a48719444a44c47061c8b23d100df9b361988afdbc';
 
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
@@ -100,15 +101,16 @@ test('所有本地 href 都指向存在的檔案', () => {
 test('正式學生 ZIP 是 14 個正式原檔的平鋪、安全且逐位元相同封裝', () => {
   const zipPath = path.join(root, 'downloads', 'LINE訊息整理Bot_課程正式版.zip');
   assert.ok(fs.existsSync(zipPath), 'downloads/LINE訊息整理Bot_課程正式版.zip missing');
+  assert.equal(sha256(fs.readFileSync(zipPath)), formalZipHash, 'download ZIP differs from the supplied archive');
   const entries = readZipEntries(zipPath);
   const expectedNames = Object.keys(formalStudentHashes).sort();
   assert.deepEqual([...entries.keys()].sort(), expectedNames, 'ZIP manifest must contain only the 14 root files');
 
   for (const name of expectedNames) {
     assert.equal(name.includes('/'), false, `${name}: ZIP must not contain a wrapper directory`);
-    assert.equal(sha256(entries.get(name)), formalStudentHashes[name], `${name}: ZIP differs from formal attachment`);
+    assert.equal(sha256(entries.get(name)), formalStudentHashes[name], `${name}: ZIP differs from supplied archive`);
     const starter = fs.readFileSync(path.join(root, 'downloads', 'line-bot-starter', name));
-    assert.equal(sha256(starter), formalStudentHashes[name], `${name}: starter differs from formal attachment`);
+    assert.equal(sha256(starter), formalStudentHashes[name], `${name}: starter differs from supplied archive`);
     assert.deepEqual(entries.get(name), starter, `${name}: ZIP and starter differ`);
   }
 

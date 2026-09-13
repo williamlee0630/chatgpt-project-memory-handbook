@@ -1,3 +1,8 @@
+import base64
+import hashlib
+import hmac
+import json
+
 from app import create_app
 from line_utils import verify_signature
 
@@ -54,3 +59,40 @@ def test_callback_accepts_the_formal_callback_path():
         },
     )
     assert response.status_code == 200
+
+
+def test_callback_routes_group_join_events_to_the_welcome_handler():
+    events = [
+        {
+            "type": "join",
+            "replyToken": "join-token",
+            "source": {"type": "group", "groupId": "C_A"},
+        },
+        {
+            "type": "memberJoined",
+            "replyToken": "member-token",
+            "source": {"type": "group", "groupId": "C_A"},
+        },
+    ]
+    body = json.dumps({"events": events}, separators=(",", ":")).encode()
+    signature = base64.b64encode(
+        hmac.new(b"secret", body, hashlib.sha256).digest()
+    ).decode()
+    welcomed = []
+    store = RecordingStore()
+    app = create_app(
+        channel_secret="secret",
+        message_store=store,
+        group_welcome_handler=welcomed.append,
+    )
+
+    response = app.test_client().post(
+        "/callback",
+        data=body,
+        content_type="application/json",
+        headers={"X-Line-Signature": signature},
+    )
+
+    assert response.status_code == 200
+    assert [event["type"] for event in welcomed] == ["join", "memberJoined"]
+    assert store.inserted == []

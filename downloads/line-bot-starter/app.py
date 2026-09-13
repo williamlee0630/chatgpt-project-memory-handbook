@@ -1,8 +1,8 @@
 from flask import Flask, abort, request
 
 from line_utils import verify_signature
-from message_service import GroupCommandHandler, route_text_event
-from message_service import GroupMemberNameProvider
+from message_service import GroupCommandHandler, GroupMemberNameProvider
+from message_service import GroupWelcomeHandler, route_text_event
 
 
 def create_app(
@@ -11,6 +11,7 @@ def create_app(
     message_store,
     group_command_handler: GroupCommandHandler | None = None,
     group_member_name_provider: GroupMemberNameProvider | None = None,
+    group_welcome_handler: GroupWelcomeHandler | None = None,
 ) -> Flask:
     """Create the Flask application for the LINE webhook."""
     app = Flask(__name__)
@@ -25,7 +26,15 @@ def create_app(
 
         payload = request.get_json(silent=True) or {}
         for event in payload.get("events", []):
-            if event.get("type") != "message":
+            event_type = event.get("type")
+            if event_type in ("join", "memberJoined"):
+                if (
+                    event.get("source", {}).get("type") == "group"
+                    and group_welcome_handler is not None
+                ):
+                    group_welcome_handler(event)
+                continue
+            if event_type != "message":
                 continue
             if event.get("message", {}).get("type") != "text":
                 continue

@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from app import create_app
 from config import Settings
 from line_client import LineClient
-from message_service import create_group_command_handler
+from message_service import create_group_command_handler, create_group_welcome_handler
 from sheets_store import GoogleSheetsStore
 
 
@@ -35,11 +35,13 @@ def build_app(
         gmail_app_password=settings.gmail_app_password,
         email_sender=email_sender,
     )
+    welcome_handler = create_group_welcome_handler(line_client=line_client)
     return create_app(
         channel_secret=settings.line_channel_secret,
         message_store=message_store,
         group_command_handler=group_handler,
         group_member_name_provider=line_client.get_group_member_display_name,
+        group_welcome_handler=welcome_handler,
     )
 
 

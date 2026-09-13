@@ -35,7 +35,10 @@ class Settings:
             line_channel_secret=values["LINE_CHANNEL_SECRET"].strip(),
             line_channel_access_token=values["LINE_CHANNEL_ACCESS_TOKEN"].strip(),
             gmail_address=values["GMAIL_ADDRESS"].strip(),
-            gmail_app_password=values["GMAIL_APP_PASSWORD"].strip(),
+            # Google 顯示的 App Password 常含分組空格，SMTP 登入前一律移除。
+            gmail_app_password="".join(
+                values["GMAIL_APP_PASSWORD"].split()
+            ),
             google_sheet_id=values["GOOGLE_SHEET_ID"].strip(),
             google_service_account_base64=values[
                 "GOOGLE_SERVICE_ACCOUNT_BASE64"

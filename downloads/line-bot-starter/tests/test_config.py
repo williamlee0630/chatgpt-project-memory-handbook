@@ -23,3 +23,12 @@ def test_settings_reject_a_missing_required_variable():
 
     with pytest.raises(ValueError, match="GMAIL_ADDRESS"):
         Settings.from_mapping(values)
+
+
+def test_settings_removes_display_whitespace_from_gmail_app_password():
+    values = {name: "test-value" for name in EXPECTED_VARIABLES}
+    values["GMAIL_APP_PASSWORD"] = "abcd efgh\tijkl\nmnop"
+
+    settings = Settings.from_mapping(values)
+
+    assert settings.gmail_app_password == "abcdefghijklmnop"

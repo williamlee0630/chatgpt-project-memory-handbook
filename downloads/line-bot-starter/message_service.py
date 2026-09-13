@@ -9,6 +9,46 @@ from sheets_store import TAIPEI_TIMEZONE
 
 GroupCommandHandler = Callable[[dict, str | None], None]
 GroupMemberNameProvider = Callable[[str, str], str]
+GroupWelcomeHandler = Callable[[dict], None]
+FULL_WELCOME_MESSAGE = """👋 大家好，我是「LINE 訊息整理 Bot」
+
+我會從加入這個群組後開始記錄新的文字訊息，
+並可以把尚未寄出的聊天紀錄寄到這個群組設定的 Email。
+
+可使用以下指令：
+
+📧 #設定信箱 your@gmail.com
+設定或修改這個群組的紀錄收件信箱。
+
+🔍 #查看信箱
+查看這個群組目前設定的收件信箱。
+
+📤 #寄出紀錄
+把目前尚未寄出的文字紀錄寄到設定好的 Email。
+寄送成功後，這批紀錄會標記為已寄出。
+
+注意：
+・只記錄 Bot 加入後的新文字訊息
+・不記錄加入前的歷史訊息
+・目前不處理圖片、貼圖、影片、檔案與 LINE 記事本
+・#設定信箱 後面要有一個半形空格再輸入 Email
+・一般聊天不需要標記 Bot，會自動保存"""
+MEMBER_WELCOME_MESSAGE = """👋 歡迎新成員！
+
+我是「LINE 訊息整理 Bot」，會自動記錄我加入群組後的新文字訊息。
+
+可使用以下指令：
+
+📧 #設定信箱 your@gmail.com
+設定或修改本群組的紀錄收件信箱。
+
+🔍 #查看信箱
+查看目前設定的收件信箱。
+
+📤 #寄出紀錄
+把尚未寄出的群組文字紀錄寄到設定好的 Email。
+
+一般聊天不需要標記我，我會自動保存。"""
 INVALID_EMAIL_REPLY = (
     "Email 格式不正確。\n\n請重新輸入，例如：\n#設定信箱 example@gmail.com"
 )
@@ -18,6 +58,27 @@ MISSING_EMAIL_REPLY = (
 NO_NEW_RECORDS_REPLY = "目前沒有新的 LINE 紀錄可以寄出。"
 EMAIL_FAILURE_REPLY = "LINE 紀錄寄送失敗，紀錄已保留。"
 logger = logging.getLogger(__name__)
+
+
+def create_group_welcome_handler(*, line_client) -> GroupWelcomeHandler:
+    """建立 Bot 與新成員加入群組時的介紹訊息處理函式。"""
+
+    def handle(event: dict) -> None:
+        if event.get("source", {}).get("type") != "group":
+            return
+        if event.get("type") == "join":
+            reply_text = FULL_WELCOME_MESSAGE
+        elif event.get("type") == "memberJoined":
+            reply_text = MEMBER_WELCOME_MESSAGE
+        else:
+            return
+
+        try:
+            line_client.reply_text(event["replyToken"], reply_text)
+        except Exception:
+            logger.warning("LINE welcome reply failed")
+
+    return handle
 
 
 def parse_record_command(message_text: str) -> tuple[str, str | None] | None:
@@ -151,9 +212,24 @@ def create_group_command_handler(
                 subject=subject,
                 body=body,
             )
+        except Exception as error:
+            logger.warning(
+                "LINE record email delivery failed: "
+                "stage=email_delivery error_type=%s smtp_code=%s",
+                type(error).__name__,
+                getattr(error, "smtp_code", "none"),
+            )
+            reply_safely(event, EMAIL_FAILURE_REPLY)
+            return
+
+        try:
             message_store.mark_messages_sent(group_id, message_ids)
-        except Exception:
-            logger.warning("LINE record email delivery failed")
+        except Exception as error:
+            logger.warning(
+                "LINE record email delivery failed: "
+                "stage=sheets_mark_sent error_type=%s",
+                type(error).__name__,
+            )
             reply_safely(event, EMAIL_FAILURE_REPLY)
             return
         reply_safely(event, f"LINE 紀錄已寄送至：\n{receiver_email}")
