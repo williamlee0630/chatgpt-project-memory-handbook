@@ -16,7 +16,7 @@ Windows 操作為主的純靜態教學網站：6 章、13 節、約 100 分鐘�
 - ZIP 根目錄直接包含 14 個正式檔案，不多包一層資料夾。
 - ZIP 與 starter 不含真實 .env、Service Account JSON、Token、密碼或 Gmail 憑證。
 
-學生以 Vercel Drop 上傳 ZIP 或解壓後的資料夾。一般學生不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機啟動 Flask。
+學生從 https://vercel.com/drop 直接上傳 ZIP 或 folder，不需要先解壓縮。第一次 Drop 建立 Project 後，在原 Project 設定六個變數並 Redeploy；不要重新 Drop ZIP。一般學生不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機啟動 Flask。
 
 正式環境變數只有六個：
 
@@ -39,7 +39,7 @@ messages
 webhook_event_id	message_id	group_id	user_id	display_name	message	created_at	sent
 ~~~
 
-Webhook 使用 /callback；群組控制指令為 #設定信箱、#查看信箱、#寄出紀錄。新訊息 sent 是 FALSE，Email 成功後才改為 TRUE。
+Webhook 使用 /callback；群組控制指令為 #設定信箱、#查看信箱、#寄出紀錄。群組新文字寫入 messages；join／memberJoined 只回覆歡迎訊息；私訊、room 與非文字不在正式流程。新訊息 sent 是 FALSE，Email 成功後才改為 TRUE。
 
 ## 本機開啟講義
 
@@ -72,4 +72,3 @@ node --test tests/site.spec.js
 ~~~
 
 Playwright 可用時，site.spec.js 會驗證桌面版、390px 手機版與 Copy 按鈕。
-

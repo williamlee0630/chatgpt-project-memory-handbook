@@ -4,15 +4,15 @@
   const lessons = [
     ['01-01', '1-1 成果展示與資料流', 'chapters/01-01.html', '基礎篇', 'Google Meet Tactiq Drive LINE Gmail ChatGPT 資料流'],
     ['01-02', '1-2 Tactiq 轉錄與儲存至 Google Drive', 'chapters/01-02.html', '基礎篇', 'Tactiq Transcript Automatic Workflow Liquid'],
-    ['02-01', '2-1 ChatGPT 專案與來源設定', 'chapters/02-01.html', '基礎篇', 'ChatGPT 專案 Google Drive Gmail 日期範圍'],
+    ['02-01', '2-1 ChatGPT 專案與來源設定', 'chapters/02-01.html', '基礎篇', 'ChatGPT 專案 Plugins Apps Google Drive Gmail 日期範圍'],
     ['02-02', '2-2 LINE 手動匯出', 'chapters/02-02.html', '基礎篇', 'LINE TXT 匯出 個資'],
     ['03-01', '3-1 合併會議與 LINE 紀錄', 'chapters/03-01.html', '基礎篇', '跨來源 會議當下版本 會後補充'],
     ['03-02', '3-2 辨識決策、待辦、變更與進度', 'chapters/03-02.html', '基礎篇', '決策 待辦 未決 變更 衝突 進度'],
     ['04-01', '4-1 Bot 資料流與部署架構', 'chapters/04-01.html', '進階篇', 'Python Flask Webhook Vercel gspread Sheets Gmail SMTP'],
     ['04-02', '4-2 LINE Official Account 設定', 'chapters/04-02.html', '進階篇', 'Messaging API Channel Secret Access Token Webhook'],
     ['04-03', '4-3 Google Sheets 與 Gmail 設定', 'chapters/04-03.html', '進階篇', 'groups messages group_id receiver_email Service Account Gmail App Password'],
-    ['05-01', '5-1 設定環境變數', 'chapters/05-01.html', '進階篇', 'Python ZIP Vercel Drop 六個 Environment Variables'],
-    ['05-02', '5-2 部署、Webhook 與驗證', 'chapters/05-02.html', '進階篇', 'Vercel Ready callback Verify 設定信箱 查看信箱'],
+    ['05-01', '5-1 設定環境變數', 'chapters/05-01.html', '進階篇', 'Python ZIP Vercel Drop Base64 六個 Environment Variables'],
+    ['05-02', '5-2 部署、Webhook 與驗證', 'chapters/05-02.html', '進階篇', 'Vercel Production Domain Ready callback Verify 設定信箱 查看信箱'],
     ['06-01', '6-1 多群組與收件信箱分流', 'chapters/06-01.html', '進階篇', '多聊天室 group_id receiver_email 寄出紀錄 sent'],
     ['06-02', '6-2 完整測試與常見錯誤排除', 'chapters/06-02.html', '進階篇', '完整測試 group_id message sent ChatGPT Drive Gmail']
   ];

@@ -2,7 +2,7 @@
 
 這是老師 Demo 與學生正式實作共同使用的唯一課程版本。老師與學生使用完全相同的程式、相同 ZIP、相同 Google Sheets schema，以及相同 Vercel Drop 部署流程；彼此只會填入不同帳號與憑證。
 
-Bot 的工作很單純：保存加入 LINE 群組後收到的新文字訊息，並在群組輸入指令後，將尚未寄送的紀錄放在 Email 正文寄出。
+Bot 的工作很單純：保存加入 LINE 群組後收到的新文字訊息，並在群組輸入指令後，將尚未寄送的紀錄放在 Email 正文寄出。群組的 `join`／`memberJoined` 事件只觸發歡迎訊息，不寫入 `messages`；私訊、room 與非文字訊息不在正式處理範圍。
 
 ```text
 LINE 群組
@@ -47,7 +47,7 @@ LINE Developers 設定 /callback
 ↓
 Bot 加入群組
 ↓
-#設定信箱
+#設定信箱 <你的實際 Email>
 ↓
 正常聊天
 ↓
@@ -72,7 +72,7 @@ group_id | group_name | receiver_email
 webhook_event_id | message_id | group_id | user_id | display_name | message | created_at | sent
 ```
 
-只建立表頭，不需要先輸入資料。
+只建立表頭，不需要先輸入資料。新的非重複一般群組文字會寫入 `messages`，它與相關群組控制指令都可能確保／更新 `groups` 的群組資料；只有使用者輸入 `#設定信箱` 才會設定 `receiver_email`。
 
 - `group_id`：隔離不同 LINE 群組，絕對不能用群組名稱代替。
 - `webhook_event_id`：避免相同 LINE Webhook redelivery 被重複處理。
@@ -107,13 +107,20 @@ Service Account JSON 是敏感憑證：
 - 不要傳給其他學生。
 - 只把 JSON 轉成 Base64，放入自己 Vercel Project 的 `GOOGLE_SERVICE_ACCOUNT_BASE64`。
 
-Windows 可開啟 PowerShell，將 JSON 轉成單行 Base64 並複製到剪貼簿：
+在檔案總管進入 JSON 所在資料夾，先確認真實檔名。在資料夾空白處按右鍵 →「在終端機中開啟」，或在位址列輸入 `powershell` 後按 Enter。把下列 `service-account.json` 換成實際檔名，再執行：
 
 ```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\你的路徑\service-account.json")) | Set-Clipboard
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("service-account.json")) | Set-Clipboard
 ```
 
-請勿使用不明網站轉換憑證。
+執行後沒有顯示一大串文字是正常的，結果已直接複製到剪貼簿。使用以下指令驗證格式；它只輸出帳號類型，不會印出 JSON 全文：
+
+```powershell
+$b64 = Get-Clipboard
+([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($b64)) | ConvertFrom-Json).type
+```
+
+正常輸出是 `service_account`。Base64 是編碼，不是加密，必須和原始 JSON 一樣視為敏感密鑰。禁止使用線上 Base64 converter，也不要貼到 GitHub、公開 ChatGPT 對話、教材、影片或截圖。
 
 ## 三、建立 Gmail App Password
 
@@ -121,19 +128,21 @@ Windows 可開啟 PowerShell，將 JSON 轉成單行 Base64 並複製到剪貼�
 
 - 建議使用個人 Google／Gmail 帳號。
 - 必須先開啟 Google 兩步驟驗證，才能建立 App Password。
-- 部分學校或公司管理帳號可能因管理政策無法建立 App Password。
+- 即使已開啟兩步驟驗證，Security Key-only、學校／公司組織管理政策或 Advanced Protection 也可能讓 App Password 不可用。
+- 修改 Google 一般登入密碼後，既有 App Password 可能被撤銷，必須重新建立。
 
 完成兩步驟驗證後，到 Google 帳戶安全性設定建立 App Password：
 
-- `GMAIL_ADDRESS` 填完整寄件 Gmail 地址。
+- `GMAIL_ADDRESS` 填完整寄件 Gmail 地址，且必須是建立這組 App Password 的同一個 Google 帳號。
 - `GMAIL_APP_PASSWORD` 填 Google 產生的 App Password。
 - 不得填 Gmail 一般登入密碼。
+- 貼入前移除 Google 畫面為閱讀而加入的空格。
 
 程式使用 Python 內建 `smtplib`、`smtp.gmail.com`、`SMTP_SSL` 與 Port 465。Email 內容直接放在正文，不使用附件、Gmail API 或第三方寄信平台。
 
 ## 四、準備 LINE Messaging API Bot
 
-在 LINE Developers 建立或選擇 Messaging API Channel，準備：
+依目前流程先在 LINE Official Account Manager 建立 Official Account 並啟用 Messaging API，再到 LINE Developers 開啟系統建立的 Messaging API Channel，準備：
 
 ```text
 LINE_CHANNEL_SECRET
@@ -141,6 +150,8 @@ LINE_CHANNEL_ACCESS_TOKEN
 ```
 
 先不要填 Webhook URL；等 Vercel 部署並取得公開網址後再設定。
+
+本課 Demo 使用 long-lived token 簡化操作；正式 production 應評估 short-lived、v2.1 或 stateless token。重新發行 long-lived token 會讓舊 token 失效，必須同步更新 Vercel 並 Redeploy。同一個 LINE 群組／多人聊天室同一時間只能有一個 LINE Official Account；無法加入時先檢查群組內是否已有另一個官方帳號。
 
 ## 五、使用 Vercel Drop 部署
 
@@ -153,15 +164,15 @@ LINE訊息整理Bot_課程正式版.zip
 部署方式：
 
 1. 登入 Vercel。
-2. 進入 Vercel Drop。
-3. 將老師提供的 ZIP 或解壓後的專案 folder 拖入上傳區。
+2. 進入官方 [Vercel Drop](https://vercel.com/drop)。
+3. 將老師提供的 ZIP 或專案 folder 拖入上傳區；ZIP 可以直接上傳，不用先解壓縮。
 4. 等待 Vercel 建立 Project。
 
 Vercel Drop 不需要 Git、GitHub 或 Vercel CLI，可直接上傳 ZIP 或 folder。
 
-第一次 Drop 尚未設定環境變數，第一次 Deployment 可能失敗；Project 建立後繼續完成下一節並 Redeploy 即可。
+第一次 Drop 尚未設定環境變數，第一次 Deployment 可能失敗；Project 建立後繼續完成下一節，最後 Redeploy 原 Project 即可。
 
-> Vercel Drop 每次重新 Drop 會建立新的 Project，不適合持續更新同一個 Project。未來若需要長期修改與自動部署，再使用 GitHub；一般學生課程 Demo 不需要。
+> **不要重新 Drop ZIP。** Vercel Drop 每次重新 Drop 都會建立新的 Project。環境變數錯誤時回原 Project 修正並 Redeploy。未來若需要長期修改與自動部署，再使用 GitHub；一般學生課程 Demo 不需要。
 
 ## 六、填入六個 Environment Variables
 
@@ -193,7 +204,17 @@ GOOGLE_SERVICE_ACCOUNT_BASE64
 | `GOOGLE_SHEET_ID` | Google Sheet 網址中的試算表 ID |
 | `GOOGLE_SERVICE_ACCOUNT_BASE64` | 自己的 Service Account JSON 轉成的單行 Base64 |
 
-不要把真實值貼在 README、聊天訊息、程式碼或課堂截圖中。
+Vercel 的 Value 欄只貼真正的值：不要貼 `NAME=value`、不要加單引號或雙引號、不要留前後空白，也不要多貼換行。`GOOGLE_SHEET_ID` 只放 `/d/` 與 `/edit` 中間字串；`GMAIL_APP_PASSWORD` 貼入前移除顯示用空格。
+
+如果在本節才準備 Base64，回到 JSON 所在資料夾開啟 PowerShell，把檔名換成實際名稱後執行：
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("service-account.json")) | Set-Clipboard
+$b64 = Get-Clipboard
+([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($b64)) | ConvertFrom-Json).type
+```
+
+正常只輸出 `service_account`。不要把真實值貼在 README、聊天訊息、程式碼或課堂截圖中。
 
 ## 七、設定完成後必須 Redeploy
 
@@ -206,13 +227,15 @@ Project
 → Redeploy
 ```
 
-部署完成後會取得類似網址：
+部署完成後，請使用 Project 的穩定 Production Domain，不要使用臨時 Preview／Deployment URL。Production Domain 類似：
 
 ```text
 https://你的-project.vercel.app
 ```
 
 正式 Vercel runtime 不需要執行 `python main.py`、不需要 ngrok，也不使用 SQLite、JSON 或本機文字檔保存紀錄。
+
+本程式沒有 `GET /` health page，瀏覽器打開根網址看到 404 不代表部署失敗。正式判定是 Deployment 顯示 Ready、LINE Verify 顯示 Success，且群組新文字成功寫入 Sheets。失敗時查看 Vercel 最新 Deployment 的 Logs／Deployment Logs。
 
 ## 八、設定 LINE Developers Webhook
 
@@ -232,6 +255,8 @@ https://你的-project.vercel.app/callback
 ## 自動功能介紹
 
 Bot 自己加入 LINE 群組時，會回覆以下完整功能介紹：
+
+以下訊息中的 `your@gmail.com` 僅為 Bot 內建歡迎訊息的顯示範例，實際操作必須換成實際可收信的地址；如果 Bot 因格式錯誤回覆 `example@gmail.com`，同樣不可直接照貼。
 
 ```text
 👋 大家好，我是「LINE 訊息整理 Bot」
@@ -289,8 +314,10 @@ Bot 被移除後重新加入，LINE 會送出新的 `join` event，因此會再�
 設定目前群組的收件信箱：
 
 ```text
-#設定信箱 example@gmail.com
+#設定信箱 <你的實際 Email>
 ```
+
+請把 placeholder 換成真正能收信的地址，不要連同角括號貼上；使用半形 `#`，並在 `#設定信箱` 後輸入一個一般半形空格。
 
 查看目前群組的設定：
 
@@ -321,8 +348,8 @@ LINE 對話紀錄
 
 ## 十、老師與學生共用 Demo 驗收
 
-1. 群組 A 輸入 `#設定信箱 a@example.com`。
-2. 群組 B 輸入 `#設定信箱 b@example.com`。
+1. 群組 A 輸入 `#設定信箱 <A 群實際可收信 Email>`。
+2. 群組 B 輸入 `#設定信箱 <B 群實際可收信 Email>`。
 3. A、B 各傳兩則不同的一般文字。
 4. 在 Google Sheets 確認 A、B 的 `group_id` 不同。
 5. 兩個群組各輸入 `#查看信箱`，確認信箱沒有混用。
@@ -331,18 +358,22 @@ LINE 對話紀錄
 8. 確認 A 本次訊息的 `sent` 是 `TRUE`，B 仍是 `FALSE`。
 9. A 再輸入一次 `#寄出紀錄`，應顯示目前沒有新紀錄。
 
+只有一個實際測試信箱時，A、B 可以設定同一地址，再用不同 `group_id`、Email 主旨中的群組名稱、正文與 `sent` 狀態驗證隔離。`#寄出紀錄` 處理目前 `group_id` 且 `sent = FALSE` 的全部尚未寄送紀錄，不是只寄今天。
+
 ## 十一、目前 Demo 限制
 
-- 此版本只處理 Bot 加入群組後收到的新文字 Webhook。
+- 此版本只把 `source.type == group` 且 Bot 加入群組後收到的新文字寫入 `messages`。
+- `join`／`memberJoined` 會觸發歡迎訊息，但事件本身不寫入 `messages`。
 - 無法取得加入 Bot 前的歷史訊息。
-- 不處理 LINE 記事本、圖片、貼圖、影片、音訊或檔案。
+- 不處理 LINE 私訊、room、記事本、圖片、貼圖、影片、音訊或檔案。
 - 目前不處理 LINE unsend；訊息被收回後，已保存的紀錄不會自動刪除。
-- 目前不處理 LINE 私訊內容。
 - 群組成員名稱取得失敗時使用「LINE 使用者」。
 - 群組名稱取得失敗時使用「LINE群組」。
 - Google Sheets 沒有資料庫式原子唯一約束；程式會以 `webhook_event_id` 檢查一般 redelivery，但極少數完全同時到達的相同事件仍可能競爭。
 
 `#設定信箱`、`#查看信箱`、`#寄出紀錄` 是群組內的控制指令。此版本定位為課程 Demo。正式企業環境若需要限制誰可以變更 Email 或寄送紀錄，應另外加入管理員權限驗證。
+
+如果 Email 已由 SMTP 成功送出，但後續 Google Sheets 的 `sent = TRUE` 更新失敗，該訊息可能仍是 `sent = FALSE`；此時再次執行 `#寄出紀錄` 可能造成重複 Email。先檢查收件匣與 Sheets 狀態，再決定是否重試。本課只揭露限制，不修改寄送邏輯。
 
 ## 十二、講師驗收／進階除錯
 

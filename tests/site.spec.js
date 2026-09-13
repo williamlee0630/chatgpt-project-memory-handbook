@@ -4,16 +4,18 @@ const { spawn } = require('node:child_process');
 const { chromium } = require('playwright');
 
 const root = require('node:path').resolve(__dirname, '..');
-const baseURL = 'http://127.0.0.1:4173';
+const baseURL = process.env.HANDBOOK_BASE_URL || 'http://127.0.0.1:4173';
 let server;
 let browser;
 
 before(async () => {
-  server = spawn('python', ['-m', 'http.server', '4173', '--bind', '127.0.0.1'], {
-    cwd: root,
-    stdio: 'ignore'
-  });
-  await new Promise(resolve => setTimeout(resolve, 400));
+  if (!process.env.HANDBOOK_BASE_URL) {
+    server = spawn('python', ['-m', 'http.server', '4173', '--bind', '127.0.0.1'], {
+      cwd: root,
+      stdio: 'ignore'
+    });
+    await new Promise(resolve => setTimeout(resolve, 400));
+  }
   const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
   try {
     browser = await chromium.launch({
@@ -53,19 +55,26 @@ test('手機可打開目錄且內容不產生水平捲動', async t => {
   await page.close();
 });
 
-test('4-3、5-1、5-2 在桌面與 390px 手機均無水平捲動', async t => {
+test('本輪修訂頁在桌面與 390px 手機均無水平捲動', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證響應式規則');
   for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
     const page = await browser.newPage({ viewport });
-    for (const lesson of ['04-03', '05-01', '05-02']) {
-      await page.goto(baseURL + '/chapters/' + lesson + '.html');
+    for (const relative of [
+      'index.html',
+      'chapters/02-01.html', 'chapters/02-02.html', 'chapters/03-02.html',
+      'chapters/04-01.html', 'chapters/04-02.html', 'chapters/04-03.html',
+      'chapters/05-01.html', 'chapters/05-02.html',
+      'chapters/06-01.html', 'chapters/06-02.html',
+      'appendices/prompts.html', 'appendices/troubleshooting.html'
+    ]) {
+      await page.goto(baseURL + '/' + relative);
       const widths = await page.evaluate(() => ({
         scroll: document.documentElement.scrollWidth,
         client: document.documentElement.clientWidth
       }));
       assert.ok(
         widths.scroll <= widths.client + 1,
-        lesson + ' overflow at ' + viewport.width + 'px: ' + JSON.stringify(widths)
+        relative + ' overflow at ' + viewport.width + 'px: ' + JSON.stringify(widths)
       );
     }
     await page.close();
@@ -85,6 +94,27 @@ test('4-3 的 groups 與 messages 複製按鈕輸出正式 Tab 表頭', async t 
     const button = page.locator('[data-copy-target="' + target + '"]');
     await button.click();
     assert.equal((await page.evaluate(() => navigator.clipboard.readText())).trim(), expected);
+  }
+  await page.close();
+});
+
+test('4-3 與 5-1 的 Base64 Copy 按鈕複製產生與安全驗證指令', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證複製目標');
+  const page = await browser.newPage({ permissions: ['clipboard-read', 'clipboard-write'] });
+  for (const [relative, targets] of [
+    ['chapters/04-03.html', ['base64-command', 'base64-check']],
+    ['chapters/05-01.html', ['deploy-base64-command', 'deploy-base64-check']]
+  ]) {
+    await page.goto(baseURL + '/' + relative);
+    await page.locator('[data-copy-target="' + targets[0] + '"]').click();
+    assert.equal(
+      (await page.evaluate(() => navigator.clipboard.readText())).trim(),
+      '[Convert]::ToBase64String([IO.File]::ReadAllBytes("service-account.json")) | Set-Clipboard'
+    );
+    await page.locator('[data-copy-target="' + targets[1] + '"]').click();
+    const copied = (await page.evaluate(() => navigator.clipboard.readText())).trim();
+    assert.match(copied, /^\$b64 = Get-Clipboard/);
+    assert.match(copied, /ConvertFrom-Json\)\.type$/);
   }
   await page.close();
 });

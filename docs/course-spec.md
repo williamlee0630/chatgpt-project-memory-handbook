@@ -46,15 +46,17 @@ messages
 webhook_event_id	message_id	group_id	user_id	display_name	message	created_at	sent
 ~~~
 
-只建立表頭，不手動填群組資料或假資料。Bot 會自動取得群組 ID、群組、收件信箱與一般文字訊息。三個群組控制指令是：
+只建立表頭，不手動填群組資料或假資料。一般群組文字訊息寫入 messages；新的一般群組文字與相關群組控制指令都可能建立／更新 groups；receiver_email 必須由使用者透過 #設定信箱 設定。三個群組控制指令是：
 
 ~~~text
-#設定信箱 example@gmail.com
+#設定信箱 <你的實際 Email>
 #查看信箱
 #寄出紀錄
 ~~~
 
 控制指令不寫入 messages。新訊息 sent 為 FALSE；Email 成功後才改為 TRUE，失敗維持 FALSE。多群組只依 group_id 隔離，成功寄送後只標記該次快照的 message_id。
+
+LINE 事件範圍依正式程式：群組文字訊息會寫入 messages；join / memberJoined 會觸發歡迎訊息，但事件本身不寫入 messages；私訊、room 與非文字訊息不在正式教材處理範圍。三個控制指令同樣不寫入 messages。
 
 正式六個環境變數：
 
@@ -71,7 +73,7 @@ GMAIL_APP_PASSWORD 不是一般登入密碼，貼入前必須移除顯示用空�
 
 ## 學生部署合約
 
-學生以 Vercel Drop 上傳 downloads/LINE訊息整理Bot_課程正式版.zip 或解壓後的專案資料夾。第一次因缺少環境變數而失敗是預期狀況；Project 建立後填六個變數，再到 Deployments 執行 Redeploy。
+學生以 https://vercel.com/drop 上傳 downloads/LINE訊息整理Bot_課程正式版.zip 或專案資料夾。ZIP 可以直接上傳，不必先解壓縮。第一次因缺少環境變數而失敗是預期狀況；Project 建立後填六個變數，再到 Deployments 對原 Project 執行 Redeploy，不重新 Drop ZIP。
 
 一般學生不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機 Flask。GitHub 只可出現在講師長期維護或電子講義 GitHub Pages 發布說明。
 
@@ -95,5 +97,6 @@ GMAIL_APP_PASSWORD 不是一般登入密碼，貼入前必須移除顯示用空�
 - 手動 Run 是備援；自動仍等待時手動 Run 可能造成重複文件。
 - LINE Bot 只接收加入後的新文字訊息，不補抓歷史。
 - 不處理圖片、貼圖、影片、音訊、檔案、unsend 或 LINE 私訊。
+- 若 SMTP 已成功送出、但 Sheets 的 sent 標記失敗，紀錄可能保持 FALSE，重試前必須先檢查收件匣與 Sheets，避免重複寄送。
 - 免費方案、額度與平台畫面可能變更，以當下官方頁面為準。
 - 不加入 Zoom AI、n8n、Make、Zapier、額外 API 或 ChatGPT API Key。
