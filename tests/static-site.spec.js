@@ -143,8 +143,7 @@ test('13 節都有唯一 progress id 且互動程式語法正確', () => {
 
 test('使用 Prompt 的頁面先載入 prompts.js 再載入 app.js', () => {
   for (const relative of [
-    'chapters/02-01.html', 'chapters/02-02.html',
-    'chapters/03-01.html', 'chapters/03-02.html',
+    'chapters/02-01.html', 'chapters/03-01.html', 'chapters/03-02.html',
     'chapters/05-01.html', 'chapters/06-02.html',
     'appendices/prompts.html'
   ]) {

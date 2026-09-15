@@ -81,36 +81,55 @@ test('本輪修訂頁在桌面與 390px 手機均無水平捲動', async t => {
   }
 });
 
-test('Prompt 總整理有 8 張卡片、8 個有效快速索引與章節同源本文', async t => {
+test('390px 的兩欄對照表改為可掃讀的上下區塊', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由實際手機版驗收補充');
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  for (const relative of ['chapters/05-01.html', 'chapters/06-02.html']) {
+    await page.goto(baseURL + '/' + relative);
+    const firstRowCells = page.locator('table tbody tr').first().locator('td');
+    assert.equal(await firstRowCells.count(), 2, relative + ': expected a two-column mapping table');
+    const widths = await firstRowCells.evaluateAll(cells => cells.map(cell => cell.getBoundingClientRect().width));
+    assert.ok(
+      widths.every(width => width >= 300),
+      relative + ': mobile mapping cells are too narrow: ' + JSON.stringify(widths)
+    );
+  }
+  await page.close();
+});
+
+test('Prompt 總整理有 3 張主流程卡、1 張工具卡、3 個索引與章節同源本文', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由 content.spec.js 驗證資料合約');
   const page = await browser.newPage();
   await page.goto(baseURL + '/appendices/prompts.html');
-  assert.equal(await page.locator('[data-prompt-card]').count(), 8);
-  assert.equal(await page.locator('[data-prompt-index] a').count(), 8);
+  assert.equal(await page.locator('[data-prompt-card]').count(), 3);
+  assert.equal(await page.locator('[data-prompt-tool-card]').count(), 1);
+  assert.equal(await page.locator('[data-prompt-index] a').count(), 3);
 
   const catalogBodies = {};
-  for (let id = 0; id < 8; id += 1) {
+  for (let id = 1; id <= 3; id += 1) {
     const link = page.locator(`[data-prompt-index] a[href="#prompt-${id}"]`);
     assert.equal(await link.count(), 1, `Prompt ${id} index`);
     await link.click();
     assert.equal(new URL(page.url()).hash, `#prompt-${id}`);
     assert.equal(await page.locator(`#prompt-${id}`).count(), 1);
-    catalogBodies[id] = await page.locator(`[data-prompt-card="${id}"] pre`).textContent();
+    catalogBodies[id] = await page.locator(`[data-prompt-card="${id}"] > .prompt-copy-card pre`).textContent();
   }
 
   const placements = {
-    0: 'chapters/02-01.html', 1: 'chapters/02-02.html', 2: 'chapters/02-01.html',
-    3: 'chapters/03-01.html', 4: 'chapters/03-02.html', 5: 'chapters/03-02.html',
-    6: 'chapters/06-02.html', 7: 'chapters/05-01.html'
+    1: 'chapters/02-01.html', 2: 'chapters/03-01.html', 3: 'chapters/06-02.html'
   };
   for (const [id, relative] of Object.entries(placements)) {
     await page.goto(baseURL + '/' + relative);
     assert.equal(
-      await page.locator(`[data-prompt-card="${id}"] pre`).textContent(),
+      await page.locator(`[data-prompt-card="${id}"] > .prompt-copy-card pre`).textContent(),
       catalogBodies[id],
       `Prompt ${id} differs between chapter and catalog`
     );
   }
+
+  await page.goto(baseURL + '/appendices/prompts.html');
+  assert.equal(await page.locator('[data-prompt-followup-card="2"]').count(), 1);
+  assert.equal(await page.locator('[data-prompt-tool-card="codex-vercel-rescue"]').count(), 1);
   await page.close();
 });
 
@@ -118,9 +137,9 @@ test('Prompt 複製按鈕只複製本文並在 1.8 秒後復原', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證結構');
   const page = await browser.newPage({ permissions: ['clipboard-read', 'clipboard-write'] });
   await page.goto(baseURL + '/appendices/prompts.html');
-  const card = page.locator('[data-prompt-card="3"]');
-  const expected = await card.locator('pre').textContent();
-  const button = card.locator('[data-copy-target]');
+  const card = page.locator('[data-prompt-card="2"]');
+  const expected = await card.locator(':scope > .prompt-copy-card pre').textContent();
+  const button = card.locator(':scope > .prompt-copy-card [data-copy-target]');
   assert.equal(await button.textContent(), '複製 Prompt');
   await button.click();
   const clipboard = await page.evaluate(() => navigator.clipboard.readText());
@@ -128,6 +147,19 @@ test('Prompt 複製按鈕只複製本文並在 1.8 秒後復原', async t => {
   assert.equal(await button.textContent(), '已複製 ✓');
   await page.waitForTimeout(1900);
   assert.equal(await button.textContent(), '複製 Prompt');
+  await page.close();
+});
+
+test('Prompt 2 後續更新短版可獨立複製且沒有新編號', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由 content.spec.js 驗證資料合約');
+  const page = await browser.newPage({ permissions: ['clipboard-read', 'clipboard-write'] });
+  await page.goto(baseURL + '/appendices/prompts.html');
+  const followup = page.locator('[data-prompt-followup-card="2"]');
+  assert.equal(await followup.count(), 1);
+  assert.doesNotMatch(await followup.textContent(), /Prompt\s*[34]/);
+  const expected = await followup.locator('pre').textContent();
+  await followup.locator('[data-copy-target]').click();
+  assert.equal((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n'), expected.replace(/\r\n/g, '\n'));
   await page.close();
 });
 

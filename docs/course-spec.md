@@ -3,10 +3,10 @@
 ## 依據與優先順序
 
 1. 提供的正式 Python 執行程式實際行為
-2. 正式學生版 README 流程
+2. 課程正式版 README 流程
 3. 現有電子講義內容
 
-講義必須跟隨正式程式，不得把學生版改回 Node Bot 架構。
+講義必須跟隨正式程式，不得把課程版改回 Node Bot 架構。
 
 ## 不可變更的課程核心
 
@@ -19,6 +19,15 @@
 - 整理：Google Drive + Gmail → ChatGPT → 工作記憶
 - Bot 不呼叫 ChatGPT API，也不需要 ChatGPT API Key。
 
+## Prompt 與對話合約
+
+- Prompt 1「Project 固定指示」只在 Project instructions 設定一次。
+- Prompt 2「專案主對話｜建立／更新跨來源工作記憶」第一次完整執行；後續更新留在同一對話，使用其下方不另編號的簡短版。
+- Prompt 3「跨來源週期排程」只在進階篇手動驗證 Google Drive + Gmail 成功後建立。
+- 舊的 LINE、Tactiq、合併、決策、待辦與 LINE-only 排程不保留獨立 Prompt 或隱藏別名。
+- Codex／Vercel 部署協助屬於獨立實作輔助工具，不列入 Prompt 1、2、3。
+- 排程不依賴 Project 中上傳或保存的檔案，也不承諾自動把結果寫回 Project；來源 App 不可用時回到專案主對話手動執行。
+
 ## 課程文案對照
 
 網站主目錄維持 6 章、13 節與約 100 分鐘：
@@ -30,11 +39,11 @@
 5. 部署 LINE Bot 至 Vercel（5-1、5-2，20 分鐘）
 6. 多聊天室分流與完整測試（6-1、6-2，20 分鐘）
 
-第 1–3 章為基礎篇，不要求寫程式；第 4–6 章為進階篇，提供可直接使用的 Python 正式學生版。
+第 1–3 章為基礎篇，不要求寫程式；第 4–6 章為進階篇，提供可直接使用的 Python 課程正式版。
 
 ## LINE Bot 技術合約
 
-正式學生版使用 Python、Flask、Vercel、gspread、Gmail SMTP 與 LINE Messaging API。
+課程正式版使用 Python、Flask、Vercel、gspread、Gmail SMTP 與 LINE Messaging API。
 
 Webhook 是 POST /callback。工作表名稱與表頭固定為：
 
@@ -71,11 +80,11 @@ GOOGLE_SERVICE_ACCOUNT_BASE64
 
 GMAIL_APP_PASSWORD 不是一般登入密碼，貼入前必須移除顯示用空格。GOOGLE_SHEET_ID 只填試算表網址 /d/ 與 /edit 之間的字串。Service Account JSON 不得上傳 GitHub、ZIP 或公開畫面。
 
-## 學生部署合約
+## 課程部署合約
 
-學生以 https://vercel.com/drop 上傳 downloads/LINE訊息整理Bot_課程正式版.zip 或專案資料夾。ZIP 可以直接上傳，不必先解壓縮。第一次因缺少環境變數而失敗是預期狀況；Project 建立後填六個變數，再到 Deployments 對原 Project 執行 Redeploy，不重新 Drop ZIP。
+讀者以 https://vercel.com/drop 上傳 downloads/LINE訊息整理Bot_課程正式版.zip 或專案資料夾。ZIP 可以直接上傳，不必先解壓縮。第一次因缺少環境變數而失敗是預期狀況；Project 建立後填六個變數，再到 Deployments 對原 Project 執行 Redeploy，不重新 Drop ZIP。
 
-一般學生不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機 Flask。GitHub 只可出現在講師長期維護或電子講義 GitHub Pages 發布說明。
+一般課程操作不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機 Flask。GitHub 只可出現在長期維護或電子講義 GitHub Pages 發布說明。
 
 正式驗收證據是 Deployment Ready、LINE Verify Success、群組指令正確回覆、Sheets 正確資料與 Gmail 郵件。
 

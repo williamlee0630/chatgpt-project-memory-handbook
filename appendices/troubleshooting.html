@@ -21,5 +21,5 @@
 <h3>H. Verify Success 但 Sheets 沒資料</h3><ul><li>確認 <strong>Use webhook</strong> 已開啟且 Bot 已加入群組。</li><li>傳送加入後的新文字；舊訊息、圖片、貼圖、私訊、room 或其他非文字不會寫入。</li><li>查看 Vercel Logs／Deployment Logs 的最新 Function 錯誤。</li></ul>
 <h3>I. sent = TRUE 但收件匣沒看到</h3><ul><li>檢查 Spam／Junk 與所有郵件。</li><li>SMTP 接受寄送不代表郵件一定立即出現在主要收件匣。</li></ul>
 <h3>J. ChatGPT 顯示 Drive / Gmail 已連接，但找不到資料</h3><ul><li>Connected 不代表一定有該檔案或郵件的讀取權限。</li><li>確認連接的 Google 帳號、app/plugin 可用性，以及檔案／郵件確實位於指定帳號與日期範圍。</li><li>無法存取就改走人工上傳或手動提供正文，不得假裝讀過。</li></ul>
-<h2>ChatGPT</h2><h3>答案看起來完整，但只讀到一個來源</h3><p>改用附錄完整版 Prompt，要求固定輸出「本次實際讀取的 Google Drive 資料」與「本次實際讀取的 Gmail 資料」。任一來源無法存取就停止跨來源結論。</p><h3>把候選日期當成正式決策</h3><p>要求引用原句，並重新套用規則：候選、暫定、考慮、建議、可能、預計均不得視為正式決策。</p>
+<h2>ChatGPT</h2><h3>答案看起來完整，但只讀到一個來源</h3><p>回到同一個專案主對話使用 Prompt 2，要求列出「Google Drive／會議來源」與「LINE／Gmail／TXT 來源」。任一來源無法存取就停止跨來源結論；不要為了重試另開新對話。</p><h3>把候選日期當成正式決策</h3><p>在同一對話指出錯誤並要求引用原句，重新套用規則：候選、暫定、考慮、建議、可能、預計均不得視為正式決策。</p><h3>Scheduled Task 只讀到 Drive 或 Gmail</h3><p>先確認一般專案主對話仍能實際讀取兩邊，再檢查 Scheduled Task 的 Apps 權限與工作區政策。排程不能存取其中一個來源時，暫停排程並回到專案主對話手動執行；不要宣稱已完成完整跨來源更新。</p>
 <nav class="pager"><a href="prompts.html">← 課程提示詞總整理</a><a href="../index.html">回課程首頁 →</a></nav></article></main><script src="../assets/app.js"></script></body></html>

@@ -3,7 +3,6 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const crypto = require('node:crypto');
 
 const root = path.resolve(__dirname, '..');
 const chapterDir = path.join(root, 'chapters');
@@ -18,8 +17,10 @@ function loadCoursePrompts() {
   return JSON.parse(JSON.stringify(sandbox.window.COURSE_PROMPTS));
 }
 
-function sha256(value) {
-  return crypto.createHash('sha256').update(value.replace(/\r\n/g, '\n')).digest('hex');
+function loadCoursePromptTools() {
+  const sandbox = { window: {} };
+  vm.runInNewContext(read('assets/prompts.js'), sandbox, { filename: 'assets/prompts.js' });
+  return JSON.parse(JSON.stringify(sandbox.window.COURSE_PROMPT_TOOLS));
 }
 
 function filesBelow(relative, predicate = () => true) {
@@ -69,75 +70,51 @@ test('Tactiq 主線包含已驗證 Automatic Workflow、Liquid 與四項排錯',
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)));
 });
 
-test('跨來源 Prompt 固定輸出 10 項並要求揭露實際資料來源', () => {
-  const text = loadCoursePrompts().find(prompt => prompt.id === '3').body;
+test('專案主對話固定揭露實際來源並保留人工確認', () => {
+  const text = loadCoursePrompts().find(prompt => prompt.id === '2').body;
   for (const phrase of [
-    '30 秒摘要','已確認決策（決策／來源／日期）','待辦事項','未決事項',
-    '決策變更（原決定／新決定／原來源／新來源）','衝突提醒',
-    '需要人工確認','本次實際讀取的 Google Drive 資料','本次實際讀取的 Gmail 資料','排除的資料',
-    '不可以假裝已完成跨來源整理'
+    '30 秒摘要', '已確認決策', '待辦事項', '未決事項', '決策變更',
+    '衝突提醒', '需要人工確認', '本次實際讀取的資料', 'Google Drive／會議來源',
+    'LINE／Gmail／TXT 來源', '本次排除的資料', '重要日期', '客戶承諾'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)));
 });
 
-test('prompts.js 是 0～7 共 8 份正式 Prompt 的唯一完整資料來源', () => {
+test('prompts.js 只提供三張主流程 Prompt，部署救援另列實作工具', () => {
   const prompts = loadCoursePrompts();
   const expected = [
-    ['0', 'Project 固定指示'],
-    ['1', 'LINE 紀錄整理'],
-    ['2', 'Tactiq 會議整理'],
-    ['3', '跨來源工作記憶'],
-    ['4', '最新有效決策辨識'],
-    ['5', '待辦與專案進度整理'],
-    ['6', '每日工作記憶自動整理'],
-    ['7', 'Codex Vercel 部署救援 Prompt']
+    ['1', 'Project 固定指示'],
+    ['2', '專案主對話｜建立／更新跨來源工作記憶'],
+    ['3', '跨來源週期排程']
   ];
   assert.deepEqual(prompts.map(prompt => [prompt.id, prompt.name]), expected);
-  assert.equal(new Set(prompts.map(prompt => prompt.id)).size, 8);
+  assert.equal(new Set(prompts.map(prompt => prompt.id)).size, 3);
   for (const prompt of prompts) {
-    for (const field of ['name', 'category', 'placement', 'purpose', 'when', 'body']) {
+    for (const field of ['name', 'tag', 'placement', 'purpose', 'when', 'body']) {
       assert.equal(typeof prompt[field], 'string', `${prompt.id}: ${field}`);
       assert.ok(prompt[field].trim(), `${prompt.id}: empty ${field}`);
     }
   }
   const byId = Object.fromEntries(prompts.map(prompt => [prompt.id, prompt]));
-  assert.equal(byId['3'].badge, '核心 Prompt');
-  assert.equal(byId['6'].category, 'ChatGPT 排程 Prompt');
-  assert.equal(byId['6'].placement, 'ChatGPT Scheduled Task／排程');
-  assert.equal(
-    byId['6'].notice,
-    '請建立成 ChatGPT 排程，不是放進 Project Instructions，也不是每天手動貼上。'
-  );
-  assert.equal(byId['7'].badge, '加贈工具 Prompt');
-  assert.match(byId['7'].notice, /不是完成課程的必要步驟/);
-  assert.doesNotMatch(JSON.stringify(prompts), /每週工作記憶整理/);
-});
+  assert.equal(byId['1'].tag, '只設定一次');
+  assert.equal(byId['2'].tag, '日常主要使用');
+  assert.equal(byId['3'].tag, '進階篇完成後');
+  assert.equal(byId['3'].placement, 'ChatGPT Scheduled Task／排程');
+  assert.equal(byId['2'].followup.name, '後續更新｜留在同一個主對話使用，不另開新對話');
+  assert.match(byId['2'].followup.body, /沿用目前已確認的專案脈絡/);
 
-test('8 份 Prompt 本文與核准原文的 SHA-256 完全一致', () => {
-  const expected = {
-    '0': '561ed9596e0e4349e0ea9629fe0a3c097976892dda6b6093fc9df4c3fc13340b',
-    '1': '93d26185f712c66a12b7e1e3ccdd7b2dcb4b5fffc4fce85e2406fadf470e6a2d',
-    '2': '650afc236dc4fc515aec49b3ce0f8ec5b07771b238612d389e3a6e78f1125f7a',
-    '3': 'e1fd3834528bd569be327a858b9290ac9359a4e9482d63a0eb91b63a65c22f2c',
-    '4': 'e1eb09ea7310ec635539131f0b45354e772e99dc7fa780b7490f02db3ac31b49',
-    '5': '7da081a33bab5b03e8b7ef2f67d8611e2b76fa47f2ae1ba216b828a677f3c24e',
-    '6': '496ad825524556033c22fa04b9a5fee773a89965ef3cdd07a0d869a4b4269262',
-    '7': '37b53f4479f824d00683ef3596fc52da281ffdf3b87ea214403bfa96bdff62b4'
-  };
-  for (const prompt of loadCoursePrompts()) {
-    assert.equal(sha256(prompt.body), expected[prompt.id], `Prompt ${prompt.id} body changed`);
-  }
+  const tools = loadCoursePromptTools();
+  assert.deepEqual(tools.map(tool => [tool.id, tool.name]), [
+    ['codex-vercel-rescue', 'Codex／Vercel 部署協助 Prompt']
+  ]);
+  assert.match(tools[0].notice, /不是工作記憶主流程/);
+  assert.doesNotMatch(JSON.stringify(prompts), /LINE 紀錄整理|Tactiq 會議整理|最新有效決策辨識|待辦與專案進度整理|每日工作記憶自動整理/);
 });
 
 test('章節以 data-prompt-id 放置正式 Prompt，HTML 不再硬編碼 Prompt 本文', () => {
   const placements = {
-    '0': 'chapters/02-01.html',
-    '1': 'chapters/02-02.html',
-    '2': 'chapters/02-01.html',
-    '3': 'chapters/03-01.html',
-    '4': 'chapters/03-02.html',
-    '5': 'chapters/03-02.html',
-    '6': 'chapters/06-02.html',
-    '7': 'chapters/05-01.html'
+    '1': 'chapters/02-01.html',
+    '2': 'chapters/03-01.html',
+    '3': 'chapters/06-02.html'
   };
   const chapterHtml = filesBelow('chapters', file => file.endsWith('.html')).map(read).join('\n');
   for (const [id, relative] of Object.entries(placements)) {
@@ -147,14 +124,12 @@ test('章節以 data-prompt-id 放置正式 Prompt，HTML 不再硬編碼 Prompt
   const aggregate = read('appendices/prompts.html');
   assert.match(aggregate, /data-prompt-index/);
   assert.match(aggregate, /data-prompt-catalog/);
+  assert.match(read('chapters/03-02.html'), /data-prompt-followup="2"/);
+  assert.match(read('chapters/05-01.html'), /data-prompt-tool="codex-vercel-rescue"/);
   for (const opening of [
-    '你是我的專案工作記憶整理助理。',
-    '請整理這次的 LINE 工作紀錄。',
-    '請整理指定的 Tactiq 會議逐字稿。',
-    '請建立「＿＿＿＿專案」的跨來源工作記憶',
-    '請根據目前這個專案中指定範圍的資料',
-    '請根據目前指定的專案資料，整理最新的待辦事項',
-    '每天整理一次我的 LINE 工作記憶。',
+    '你是我的「專案工作記憶助理」。',
+    '請建立或更新「＿＿＿＿專案」的工作記憶。',
+    '檢查本次排程週期內新增的工作紀錄',
     '我要部署老師提供的「LINE 訊息整理 Bot」課程專案。'
   ]) {
     assert.doesNotMatch(chapterHtml + aggregate, new RegExp(escapeRegExp(opening)), opening);
@@ -168,15 +143,14 @@ test('工具箱導覽統一使用課程提示詞總整理名稱', () => {
   assert.doesNotMatch(read('appendices/troubleshooting.html'), /可複製 Prompt/);
 });
 
-test('2-1 使用 Plugins／Apps、實際讀取驗證並保留三來源人工 fallback', () => {
+test('2-1 完成 Project、固定指示、來源連接與實際讀取驗證', () => {
   const text = read('chapters/02-01.html');
-  assert.doesNotMatch(text, /Settings／設定.{0,80}Connectors／連接器/s);
-  assert.doesNotMatch(text, /若你的方案或帳號尚未顯示 Projects/);
-  assert.doesNotMatch(text, /2026\/07 起主要整合入口/);
   for (const phrase of [
-    'Plugins／Apps', 'Google Drive', 'Gmail app', 'plan', 'region', 'workspace', 'role',
-    '管理員政策', '實際打開', '讀取內容', 'Tactiq 逐字稿', 'LINE TXT',
-    '手動提供', '不得假裝已成功'
+    'chatgpt.com', '新增專案', '專案工作記憶', 'Project instructions',
+    'Plugins／Apps', 'Google Drive', 'Gmail', 'Install', 'Connect', 'Allow',
+    'plan', 'region', 'workspace', '管理員政策', '實際打開', '讀取內容',
+    'Tactiq 逐字稿', '[LINE紀錄]', 'LINE TXT', '手動提供', '不得假裝已成功',
+    '你現在應該看到'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
@@ -189,13 +163,14 @@ test('2-2 明確揭露 LINE TXT 限制並要求零基礎檢查', () => {
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
-test('3-2 只將人工確認後的結果加入專案來源', () => {
+test('3-2 驗收結果並在同一個專案主對話持續更新', () => {
   const text = read('chapters/03-02.html');
   for (const phrase of [
-    '人工確認', '訊息選單', '儲存到專案', '加入專案來源',
-    '未人工確認的草稿', '新的日期範圍', '新的來源',
-    '已確認的前次專案狀態', '不得因為時間較晚就自動覆蓋'
+    '人工確認', '抽查', '已確認決策', '待辦', '決策變更', '候選',
+    '來源', '同一個專案主對話', '新的日期範圍', '後續更新',
+    '不得因為時間較晚就自動覆蓋', '你現在應該看到'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(text, /儲存到專案|加入專案來源|決策辨識 Prompt/);
 });
 
 test('4-1 與正式 LINE 事件範圍及 Demo 安全限制一致', () => {
@@ -209,13 +184,19 @@ test('4-1 與正式 LINE 事件範圍及 Demo 安全限制一致', () => {
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
-test('4-2 使用現行 LINE OA 建立流程並揭露群組與 Token 限制', () => {
+test('4-2 使用現行 OA Manager 主流程並逐階段自我檢查', () => {
   const text = read('chapters/04-02.html');
   for (const phrase of [
-    'LINE Official Account', '啟用 Messaging API', 'LINE Developers Channel',
-    '同一時間只能有一個 LINE Official Account', 'short-lived', 'v2.1',
-    'stateless', '重新發行 long-lived token', '舊的 long-lived token 失效'
+    'LINE Official Account Manager', '建立新的官方帳號', 'Account name',
+    'Settings', 'Messaging API', 'Use Messaging API', 'Provider',
+    '系統建立', 'LINE Developers Console', 'Basic settings', 'Channel secret',
+    'Channel access token (long-lived)', 'Issue', 'Allow bot to join group chats',
+    'Enabled', 'Greeting', 'Auto-response', 'Webhook URL', '5-2',
+    '一個 LINE 群組同一時間只能加入一個 LINE Official Account', 'short-lived', 'v2.1',
+    '重新發行 long-lived token', '舊的 long-lived token 失效'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.ok((text.match(/你現在應該看到/g) || []).length >= 4);
+  assert.doesNotMatch(text, /LINE Developers[^<]{0,100}Create Messaging API Channel/s);
 });
 
 function assertBase64SimpleTransfer(relative) {
@@ -268,7 +249,9 @@ test('5-1 使用官方 Drop、原 Project Redeploy 與恰好六個 Value', () =>
   assert.match(text, /href="https:\/\/vercel\.com\/drop"/);
   assert.doesNotMatch(text, /href="https:\/\/vercel\.com\/(?:new)?"/);
   for (const phrase of [
-    'ZIP 或 folder', '不用先解壓縮', '不要重新 Drop ZIP',
+    'ZIP 或 folder', '不用先解壓縮', '登入', 'Team', '個人帳號', 'Project name',
+    'Deploy', 'Project', 'Settings', 'Environment Variables', 'Add New',
+    'Production', 'Save', '你現在應該看到', '不要重新 Drop ZIP',
     '每次重新 Drop 都會建立新的 Project', 'Redeploy 原本 Project',
     'Value 欄只貼真正的值', 'LINE_CHANNEL_SECRET=abc123',
     '不要加雙引號', '不要加單引號', '不要帶變數名稱', '不要多貼換行'
@@ -284,6 +267,8 @@ test('5-2 使用穩定 Production Domain 並正確解釋 Preview、404 與 Logs'
   const text = read('chapters/05-02.html');
   for (const phrase of [
     '穩定 Production Domain', 'Preview', 'Deployment URL',
+    '/callback', 'LINE Developers', 'Messaging API', 'Webhook settings',
+    'Edit', 'Save', 'Verify', 'Success', 'Use webhook', 'Enabled', '你現在應該看到',
     '沒有 GET / health page', '看到 404', '不代表 Bot 部署失敗',
     'Deployment 顯示 Ready', 'Verify 顯示 Success',
     '群組新文字成功寫入', 'Logs', 'Deployment Logs'
@@ -330,11 +315,52 @@ test('排錯中心涵蓋 A～J 與 SMTP 成功但 Sheets 標記失敗的重寄�
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
-test('首頁提供單一查驗日期與跨平台維護提醒', () => {
+test('首頁提供單一查驗日期、三層 Prompt 流程與跨平台維護提醒', () => {
   const text = read('index.html');
-  assert.equal((text.match(/介面／政策最後查驗：2026-09-13/g) || []).length, 1);
-  for (const phrase of ['ChatGPT', 'LINE', 'Google', 'Vercel', 'Tactiq', '官方當下介面為準']) {
+  assert.equal((text.match(/介面／政策最後查驗：2026-09-15/g) || []).length, 1);
+  for (const phrase of [
+    'ChatGPT', 'LINE', 'Google', 'Vercel', 'Tactiq', '官方當下介面為準',
+    'Project 固定指示', '專案主對話', '跨來源週期排程'
+  ]) {
     assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  }
+});
+
+test('排程只在手動跨來源驗證成功後建立，且不依賴 Project 檔案', () => {
+  const text = read('chapters/06-02.html') + loadCoursePrompts().find(prompt => prompt.id === '3').body;
+  for (const phrase of [
+    '先手動驗證成功，再自動化', 'Google Drive', 'Gmail', '[LINE紀錄]',
+    '完整逐字稿', '上一次成功執行', '查無符合資料', '無法存取',
+    '本次週期沒有新的工作記憶需要更新', 'Project 中上傳或保存的檔案',
+    'plan', 'workspace', 'App／Plugin', '專案主對話手動執行 Prompt 2'
+  ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(text, /每天整理一次我的 LINE 工作記憶|只處理今天的紀錄/);
+});
+
+test('實作頁提供起點、連續操作路徑與成功確認點', () => {
+  const requirements = {
+    'chapters/01-02.html': ['https://meet.google.com/', 'Automatic', 'Save', '你現在應該看到'],
+    'chapters/02-01.html': ['https://chatgpt.com/', '新增專案', 'Project instructions', '你現在應該看到'],
+    'chapters/02-02.html': ['匯出聊天記錄', 'LINE TXT', '你現在應該看到'],
+    'chapters/03-01.html': ['專案主對話', '日期範圍', '實際讀取', '你現在應該看到'],
+    'chapters/03-02.html': ['抽查', '後續更新', '你現在應該看到'],
+    'chapters/04-02.html': ['https://manager.line.biz/', 'Use Messaging API', '你現在應該看到'],
+    'chapters/04-03.html': ['console.cloud.google.com', 'Create', 'JSON', 'client_email', '你現在應該看到'],
+    'chapters/05-01.html': ['https://vercel.com/drop', 'Environment Variables', 'Redeploy', '你現在應該看到'],
+    'chapters/05-02.html': ['Production Domain', 'Verify', 'Success', '你現在應該看到'],
+    'chapters/06-01.html': ['#設定信箱', '#寄出紀錄', '你現在應該看到'],
+    'chapters/06-02.html': ['Google Drive', 'Gmail', 'Scheduled Task', '你現在應該看到']
+  };
+  for (const [relative, phrases] of Object.entries(requirements)) {
+    const text = read(relative);
+    for (const phrase of phrases) assert.match(text, new RegExp(escapeRegExp(phrase)), `${relative}: ${phrase}`);
+  }
+});
+
+test('讀者操作文案不再使用講師視角指稱正在閱讀的人', () => {
+  const text = [read('index.html'), ...filesBelow('chapters', file => file.endsWith('.html')).map(read), ...filesBelow('appendices', file => file.endsWith('.html')).map(read)].join('\n');
+  for (const phrase of ['學生看到', '學生需要', '學生操作', '給學生', '老師提供', '開課方']) {
+    assert.doesNotMatch(text, new RegExp(escapeRegExp(phrase)), phrase);
   }
 });
 
@@ -422,7 +448,7 @@ test('實際操作步驟內提供對應快捷按鈕', () => {
     ['chapters/04-03.html', '命名檔案', 'https://sheets.new/'],
     ['chapters/04-03.html', '建立／選擇 Cloud Project', 'https://console.cloud.google.com/'],
     ['chapters/04-03.html', '新增 App Password', 'https://myaccount.google.com/apppasswords'],
-    ['chapters/05-01.html', '下載正式學生 ZIP', '../downloads/LINE訊息整理Bot_課程正式版.zip'],
+    ['chapters/05-01.html', '下載課程 ZIP', '../downloads/LINE訊息整理Bot_課程正式版.zip'],
     ['chapters/05-01.html', '開啟 Vercel Drop', 'https://vercel.com/drop'],
     ['chapters/05-02.html', 'Redeploy', 'https://vercel.com/']
   ]) assertStepContains(relative, heading, href);

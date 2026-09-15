@@ -8,15 +8,16 @@ Windows 操作為主的純靜態教學網站：6 章、13 節、約 100 分鐘�
 - LINE：LINE 群組 → Flask Webhook → Vercel → Google Sheets → Gmail SMTP → ChatGPT
 - LINE Bot 技術棧：Python、Flask、Vercel、gspread、Gmail SMTP、LINE Messaging API
 - ChatGPT 是唯一負責摘要、決策、待辦、變更與衝突判斷的 AI；Bot 不呼叫 ChatGPT API。
+- Prompt 主流程：Project 固定指示 → 同一個專案主對話持續更新 → 手動跨來源驗證成功後才建立 Google Drive + Gmail 週期排程。
 
-## 學生下載
+## 課程下載
 
 - 正式部署 ZIP：downloads/LINE訊息整理Bot_課程正式版.zip
 - 可閱讀原始檔：downloads/line-bot-starter/
 - ZIP 根目錄直接包含 14 個正式檔案，不多包一層資料夾。
 - ZIP 與 starter 不含真實 .env、Service Account JSON、Token、密碼或 Gmail 憑證。
 
-學生從 https://vercel.com/drop 直接上傳 ZIP 或 folder，不需要先解壓縮。第一次 Drop 建立 Project 後，在原 Project 設定六個變數並 Redeploy；不要重新 Drop ZIP。一般學生不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機啟動 Flask。
+你可以從 https://vercel.com/drop 直接上傳 ZIP 或 folder，不需要先解壓縮。第一次 Drop 建立 Project 後，在原 Project 設定六個變數並 Redeploy；不要重新 Drop ZIP。你不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機啟動 Flask。
 
 正式環境變數只有六個：
 
@@ -53,7 +54,7 @@ python -m http.server 8000
 
 ## 發布到 GitHub Pages
 
-這一節只描述電子講義網站的發布，與學生部署 LINE Bot 的 Vercel Drop 流程不同。
+這一節只描述電子講義網站的發布，與你在課程中部署 LINE Bot 的 Vercel Drop 流程不同。
 
 1. 在 GitHub 建立新的 Repository。
 2. 上傳本資料夾內全部網站檔案，index.html 必須位於 Repository 根目錄。
