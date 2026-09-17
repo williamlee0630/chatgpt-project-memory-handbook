@@ -1,6 +1,6 @@
 # LINE 訊息整理 Bot
 
-這是老師 Demo 與學生正式實作共同使用的唯一課程版本。老師與學生使用完全相同的程式、相同 ZIP、相同 Google Sheets schema，以及相同 Vercel Drop 部署流程；彼此只會填入不同帳號與憑證。
+這是本課提供的 LINE 訊息整理 Bot 部署範本。請直接使用下載包中的程式、Google Sheets schema 與 Vercel Drop 流程，只需填入你自己的帳號與憑證。
 
 Bot 的工作很單純：保存加入 LINE 群組後收到的新文字訊息，並在群組輸入指令後，將尚未寄送的紀錄放在 Email 正文寄出。群組的 `join`／`memberJoined` 事件只觸發歡迎訊息，不寫入 `messages`；私訊、room 與非文字訊息不在正式處理範圍。
 
@@ -22,7 +22,7 @@ Email
 
 ChatGPT 是後續由使用者從 Gmail 取得紀錄後自行使用；本 Bot 不會呼叫 ChatGPT API，也不需要相關 API Key。
 
-## 學生最短流程
+## 最短部署流程
 
 ```text
 建立 Google Sheet
@@ -31,13 +31,15 @@ ChatGPT 是後續由使用者從 Gmail 取得紀錄後自行使用；本 Bot 不
 ↓
 Sheet 分享給 client_email
 ↓
-Service Account JSON → Base64
+Service Account JSON 安全保存
 ↓
 建立 Gmail App Password
 ↓
 建立 LINE Messaging API Bot
 ↓
-使用 Vercel Drop 上傳老師提供的 ZIP
+使用 Vercel Drop 上傳本課下載的 ZIP
+↓
+Service Account JSON → Base64
 ↓
 填六個 Environment Variables
 ↓
@@ -54,7 +56,7 @@ Bot 加入群組
 #寄出紀錄
 ```
 
-一般學生不需要 Git、GitHub、Vercel CLI、Python、venv、pip、在本機啟動 Flask或 ngrok。
+一般操作不需要 Git、GitHub、Vercel CLI、Python、venv、pip、在本機啟動 Flask 或 ngrok。
 
 ## 一、建立 Google Sheet
 
@@ -99,25 +101,15 @@ https://docs.google.com/spreadsheets/d/這一段就是_GOOGLE_SHEET_ID/edit
 7. 回到 Google Sheet，按「共用」。
 8. 將 JSON 裡的 `client_email` 加入，權限設成「編輯者」。
 
+若目前使用學校／公司管理的 Google 帳號，而且組織政策禁止建立 JSON key，建議改用自己可管理的個人 Google Cloud Project，或洽組織管理員確認權限。不要繞過組織安全政策。
+
 Service Account JSON 是敏感憑證：
 
-- 不得放進提供學生或上傳 Vercel 的 ZIP。
+- 不得放進本課下載包或上傳 Vercel 的 ZIP。
 - 不得放進 GitHub。
 - 不得貼進 README 或程式碼。
-- 不要傳給其他學生。
-- 只把 JSON 轉成 Base64，放入自己 Vercel Project 的 `GOOGLE_SERVICE_ACCOUNT_BASE64`。
-
-在檔案總管找到 JSON，先確認 JSON 的實際檔名與完整路徑。在檔案所在資料夾空白處按右鍵 →「在終端機中開啟」，或在位址列輸入 `powershell` 後按 Enter。把下列 `完整JSON路徑` 換成實際完整路徑，再執行：
-
-```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard
-```
-
-PowerShell 沒有顯示大量文字是正常的，因為結果已直接複製到剪貼簿。立即前往 Vercel，把剪貼簿內容貼入 `GOOGLE_SERVICE_ACCOUNT_BASE64` 的 Value。
-
-貼入 Vercel 前不要再複製其他文字，否則剪貼簿內容會被覆蓋；若已被覆蓋，重新執行 PowerShell 指令即可。可以自行切換 Vercel Value 的顯示／遮蔽狀態，確認已貼入一整串很長的 Base64 字串，但這不代表 Base64 有效性的技術驗證。最終是否設定正確，以部署與實際 Google Sheets 寫入測試為準。
-
-Base64 是編碼，不是加密，必須和原始 JSON 一樣視為敏感密鑰。不可公開、不可提交 GitHub、不可貼到公開聊天，也不可使用線上 Base64 converter；不要放進教材、影片或截圖。
+- 不要傳給他人。
+- 先安全保存原始 JSON；建立 Vercel Project 後，再依第六節的唯一正式流程轉成 Base64 並貼入 `GOOGLE_SERVICE_ACCOUNT_BASE64`。
 
 ## 三、建立 Gmail App Password
 
@@ -148,11 +140,11 @@ LINE_CHANNEL_ACCESS_TOKEN
 
 先不要填 Webhook URL；等 Vercel 部署並取得公開網址後再設定。
 
-本課 Demo 使用 long-lived token 簡化操作；正式 production 應評估 short-lived、v2.1 或 stateless token。重新發行 long-lived token 會讓舊 token 失效，必須同步更新 Vercel 並 Redeploy。同一個 LINE 群組／多人聊天室同一時間只能有一個 LINE Official Account；無法加入時先檢查群組內是否已有另一個官方帳號。
+本課練習流程使用 long-lived token 簡化操作；正式工作環境應評估 short-lived、v2.1 或 stateless token。重新發行 long-lived token 會讓舊 token 失效，必須同步更新 Vercel 並 Redeploy。同一個 LINE 群組／多人聊天室同一時間只能有一個 LINE Official Account；無法加入時先檢查群組內是否已有另一個官方帳號。
 
 ## 五、使用 Vercel Drop 部署
 
-老師 Demo 與學生都使用同一份：
+請使用本課提供的下載包：
 
 ```text
 LINE訊息整理Bot_課程正式版.zip
@@ -162,14 +154,14 @@ LINE訊息整理Bot_課程正式版.zip
 
 1. 登入 Vercel。
 2. 進入官方 [Vercel Drop](https://vercel.com/drop)。
-3. 將老師提供的 ZIP 或專案 folder 拖入上傳區；ZIP 可以直接上傳，不用先解壓縮。
+3. 將下載的 ZIP 或專案 folder 拖入上傳區；ZIP 可以直接上傳，不用先解壓縮。
 4. 等待 Vercel 建立 Project。
 
 Vercel Drop 不需要 Git、GitHub 或 Vercel CLI，可直接上傳 ZIP 或 folder。
 
 第一次 Drop 尚未設定環境變數，第一次 Deployment 可能失敗；Project 建立後繼續完成下一節，最後 Redeploy 原 Project 即可。
 
-> **不要重新 Drop ZIP。** Vercel Drop 每次重新 Drop 都會建立新的 Project。環境變數錯誤時回原 Project 修正並 Redeploy。未來若需要長期修改與自動部署，再使用 GitHub；一般學生課程 Demo 不需要。
+> **不要重新 Drop ZIP。** Vercel Drop 每次重新 Drop 都會建立新的 Project。環境變數錯誤時回原 Project 修正並 Redeploy。未來若需要長期修改與自動部署，再使用 GitHub；本課一般操作不需要。
 
 ## 六、填入六個 Environment Variables
 
@@ -203,7 +195,7 @@ GOOGLE_SERVICE_ACCOUNT_BASE64
 
 Vercel 的 Value 欄只貼真正的值：不要貼 `NAME=value`、不要加單引號或雙引號、不要留前後空白，也不要多貼換行。`GOOGLE_SHEET_ID` 只放 `/d/` 與 `/edit` 中間字串；`GMAIL_APP_PASSWORD` 貼入前移除顯示用空格。
 
-如果在本節才準備 Base64，先確認 JSON 的實際檔名與完整路徑，再於檔案所在資料夾開啟 PowerShell。把 `完整JSON路徑` 換成實際完整路徑後執行：
+建立 Vercel Project 後，在本節準備 Base64。先確認 JSON 的實際檔名與完整路徑，再於檔案所在資料夾開啟 PowerShell。把 `完整JSON路徑` 換成實際完整路徑後執行：
 
 ```powershell
 [Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard
@@ -306,7 +298,7 @@ Bot 被移除後重新加入，LINE 會送出新的 `join` event，因此會再�
 
 ## 九、群組指令
 
-正式版只有三個控制指令。
+此下載版本只有三個控制指令。
 
 設定目前群組的收件信箱：
 
@@ -335,15 +327,15 @@ Email 正文範例：
 ```text
 LINE 對話紀錄
 
-聊天室：專題討論群
-日期：2026-09-10
+聊天室：活動籌備練習群
+日期：2026-04-21
 
-18:30 William：首頁星期五前完成
-18:32 小王：資料集需要重新整理
-18:40 David：模型測試由我負責
+18:30 活動窗口：場地確認期限改為 4/21
+18:32 內容窗口：邀請函仍待確認
+18:40 行政窗口：4/25 只是候選公開報名日
 ```
 
-## 十、老師與學生共用 Demo 驗收
+## 十、多群組練習驗收
 
 1. 群組 A 輸入 `#設定信箱 <A 群實際可收信 Email>`。
 2. 群組 B 輸入 `#設定信箱 <B 群實際可收信 Email>`。
@@ -357,7 +349,7 @@ LINE 對話紀錄
 
 只有一個實際測試信箱時，A、B 可以設定同一地址，再用不同 `group_id`、Email 主旨中的群組名稱、正文與 `sent` 狀態驗證隔離。`#寄出紀錄` 處理目前 `group_id` 且 `sent = FALSE` 的全部尚未寄送紀錄，不是只寄今天。
 
-## 十一、目前 Demo 限制
+## 十一、目前下載版本限制
 
 - 此版本只把 `source.type == group` 且 Bot 加入群組後收到的新文字寫入 `messages`。
 - `join`／`memberJoined` 會觸發歡迎訊息，但事件本身不寫入 `messages`。
@@ -368,18 +360,18 @@ LINE 對話紀錄
 - 群組名稱取得失敗時使用「LINE群組」。
 - Google Sheets 沒有資料庫式原子唯一約束；程式會以 `webhook_event_id` 檢查一般 redelivery，但極少數完全同時到達的相同事件仍可能競爭。
 
-`#設定信箱`、`#查看信箱`、`#寄出紀錄` 是群組內的控制指令。此版本定位為課程 Demo。正式企業環境若需要限制誰可以變更 Email 或寄送紀錄，應另外加入管理員權限驗證。
+`#設定信箱`、`#查看信箱`、`#寄出紀錄` 是群組內的控制指令。此版本定位為課程練習用下載版本。正式企業環境若需要限制誰可以變更 Email 或寄送紀錄，應另外加入管理員權限驗證。
 
 如果 Email 已由 SMTP 成功送出，但後續 Google Sheets 的 `sent = TRUE` 更新失敗，該訊息可能仍是 `sent = FALSE`；此時再次執行 `#寄出紀錄` 可能造成重複 Email。先檢查收件匣與 Sheets 狀態，再決定是否重試。本課只揭露限制，不修改寄送邏輯。
 
-## 十二、講師驗收／進階除錯
+## 十二、進階除錯（選用）
 
-以下操作不是一般學生必做流程。
+以下操作不是一般課程步驟，只有需要本機診斷時使用。
 
 ### Windows 本機測試
 
 ```powershell
-cd "C:\專案路徑\LINEBOT提供學生用"
+cd "C:\專案路徑\LINE訊息整理Bot"
 py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m pip install pytest
@@ -420,7 +412,7 @@ C = FALSE
 
 ### GitHub 長期維護
 
-若未來需要持續更新同一個 Vercel Project，可由講師將專案放入 GitHub，再讓 Vercel 連接 repository 自動部署。請確保所有秘密檔案仍未 commit。
+若未來需要持續更新同一個 Vercel Project，可將專案放入 GitHub，再讓 Vercel 連接 repository 自動部署。請確保所有秘密檔案仍未 commit。
 
 ## 十三、程式檔案導讀
 
@@ -431,8 +423,8 @@ C = FALSE
 - `line_client.py`：LINE reply、群組名稱與成員名稱查詢。
 - `line_utils.py`：LINE signature 驗證。
 - `config.py`：六個環境變數。
-- `main.py`：建立 Flask app；只供組裝與講師本機除錯。
+- `main.py`：建立 Flask app；用於程式組裝與選用的本機除錯。
 - `index.py`：Vercel Flask 入口。
 - `vercel.json`：Vercel Function 設定。
 
-老師 Demo 與學生都應使用同一個 `LINE訊息整理Bot_課程正式版.zip`。除了六個帳號與憑證值不同之外，程式、功能、schema 與部署方法完全相同。
+本課網站與下載包使用同一個 `LINE訊息整理Bot_課程正式版.zip`。除了每位學員自己的六個帳號與憑證值之外，程式、功能、schema 與部署方法都相同。

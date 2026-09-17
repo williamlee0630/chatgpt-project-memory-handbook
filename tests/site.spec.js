@@ -8,6 +8,17 @@ const baseURL = process.env.HANDBOOK_BASE_URL || 'http://127.0.0.1:4173';
 let server;
 let browser;
 
+const publicPages = [
+  'index.html', '404.html',
+  'chapters/01-01.html', 'chapters/01-02.html',
+  'chapters/02-01.html', 'chapters/02-02.html',
+  'chapters/03-01.html', 'chapters/03-02.html',
+  'chapters/04-01.html', 'chapters/04-02.html', 'chapters/04-03.html',
+  'chapters/05-01.html', 'chapters/05-02.html',
+  'chapters/06-01.html', 'chapters/06-02.html',
+  'appendices/prompts.html', 'appendices/troubleshooting.html'
+];
+
 before(async () => {
   if (!process.env.HANDBOOK_BASE_URL) {
     server = spawn('python', ['-m', 'http.server', '4173', '--bind', '127.0.0.1'], {
@@ -79,6 +90,24 @@ test('本輪修訂頁在桌面與 390px 手機均無水平捲動', async t => {
     }
     await page.close();
   }
+});
+
+test('所有公開頁面載入時沒有 console error 或 pageerror', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證語法');
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errors = [];
+  let currentPage = '';
+  page.on('console', message => {
+    if (message.type() === 'error') errors.push(`${currentPage}: console: ${message.text()}`);
+  });
+  page.on('pageerror', error => errors.push(`${currentPage}: pageerror: ${error.message}`));
+  for (const relative of publicPages) {
+    currentPage = relative;
+    await page.goto(baseURL + '/' + relative);
+    await page.waitForLoadState('networkidle');
+  }
+  assert.deepEqual(errors, []);
+  await page.close();
 });
 
 test('390px 的兩欄對照表改為可掃讀的上下區塊', async t => {
@@ -180,21 +209,18 @@ test('4-3 的 groups 與 messages 複製按鈕輸出正式 Tab 表頭', async t 
   await page.close();
 });
 
-test('4-3 與 5-1 的 Base64 Copy 按鈕只複製完整路徑轉換指令', async t => {
+test('4-3 不提供 Base64 主流程，5-1 的 Copy 按鈕複製完整路徑轉換指令', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證複製目標');
   const page = await browser.newPage({ permissions: ['clipboard-read', 'clipboard-write'] });
-  for (const [relative, target] of [
-    ['chapters/04-03.html', 'base64-command'],
-    ['chapters/05-01.html', 'deploy-base64-command']
-  ]) {
-    await page.goto(baseURL + '/' + relative);
-    await page.locator('[data-copy-target="' + target + '"]').click();
-    assert.equal(
-      (await page.evaluate(() => navigator.clipboard.readText())).trim(),
-      '[Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard'
-    );
-    assert.equal(await page.locator('[data-copy-target$="base64-check"]').count(), 0);
-  }
+  await page.goto(baseURL + '/chapters/04-03.html');
+  assert.equal(await page.locator('[data-copy-target="base64-command"]').count(), 0);
+  await page.goto(baseURL + '/chapters/05-01.html');
+  await page.locator('[data-copy-target="deploy-base64-command"]').click();
+  assert.equal(
+    (await page.evaluate(() => navigator.clipboard.readText())).trim(),
+    '[Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard'
+  );
+  assert.equal(await page.locator('[data-copy-target$="base64-check"]').count(), 0);
   await page.close();
 });
 

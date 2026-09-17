@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const crypto = require('node:crypto');
 
 const root = path.resolve(__dirname, '..');
 const chapterDir = path.join(root, 'chapters');
@@ -66,7 +67,9 @@ test('Tactiq 主線包含已驗證 Automatic Workflow、Liquid 與四項排錯',
   for (const phrase of [
     'Automatic', 'Meeting Processed', 'Share to an Integration', 'Google Drive',
     '{{ meeting.transcript }}', '實測成功', '處理延遲', 'My Meetings', 'Run Workflow',
-    'Drive 出現兩份相同文件', 'Email 無法取得完整 Tactiq Transcript'
+    'Drive 出現兩份相同文件', 'Email 無法取得完整 Tactiq Transcript',
+    '首次設定要求選擇會議平台', 'Google Meet', 'Enable', 'Fix Tactiq',
+    '檔名包含可區分會議的日期／時間或會議名稱'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)));
 });
 
@@ -98,7 +101,7 @@ test('prompts.js 只提供三張主流程 Prompt，部署救援另列實作工�
   assert.equal(byId['1'].tag, '只設定一次');
   assert.equal(byId['2'].tag, '日常主要使用');
   assert.equal(byId['3'].tag, '進階篇完成後');
-  assert.equal(byId['3'].placement, 'ChatGPT Scheduled Task／排程');
+  assert.equal(byId['3'].placement, 'ChatGPT 網頁版 → Scheduled Task／排程');
   assert.equal(byId['2'].followup.name, '後續更新｜留在同一個主對話使用，不另開新對話');
   assert.match(byId['2'].followup.body, /沿用目前已確認的專案脈絡/);
 
@@ -146,21 +149,89 @@ test('工具箱導覽統一使用課程提示詞總整理名稱', () => {
 test('2-1 完成 Project、固定指示、來源連接與實際讀取驗證', () => {
   const text = read('chapters/02-01.html');
   for (const phrase of [
-    'chatgpt.com', '新增專案', '專案工作記憶', 'Project instructions',
-    'Plugins／Apps', 'Google Drive', 'Gmail', 'Install', 'Connect', 'Allow',
+    '本課後續 ChatGPT 操作統一以網頁版示範', 'Chrome 或 Edge',
+    '準備用於本課的 ChatGPT 帳號', '左側欄收起', 'chatgpt.com',
+    '建立「工作訊息整理」專案並加入固定指示',
+    '專案總覽頁面', '右上角', '新增', '建立專案', '專案名稱',
+    '工作訊息整理', '只是本課程的示範名稱', '不是系統規定名稱',
+    '行銷專案整理', '畢業專題', '產品開發紀錄',
+    '僅限專案的記憶（Project-only memory）',
+    '讓這個 Project 的工作脈絡集中在專案內',
+    '避免其他聊天的內容影響整理結果',
+    'ChatGPT Project 容器',
+    '你現在是在 Project 裡，而不是一般 ChatGPT 對話',
+    '進入專案後，點右上角', '⋯',
+    '專案設定（Project settings）', '專案指示（Project instructions）',
+    '不是一般聊天訊息', '聊天輸入框',
+    'Plugins／Apps（依目前介面顯示名稱為準）', 'Settings／設定',
+    'Google Drive', 'Gmail', 'Install', 'Connect', 'Allow',
     'plan', 'region', 'workspace', '管理員政策', '實際打開', '讀取內容',
     'Tactiq 逐字稿', '[LINE紀錄]', 'LINE TXT', '手動提供', '不得假裝已成功',
+    '在這個 Project 裡建立新的 Chat', '不要從一般 ChatGPT 首頁建立普通聊天',
+    '網站改版專案｜工作記憶', 'Rename／重新命名', '範例名稱',
     '你現在應該看到'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(text, /專案名稱旁的選單|Edit project|編輯專案/);
+  assert.doesNotMatch(text, /維持[^。<]{0,20}預設記憶|Default memory/);
+  assert.doesNotMatch(text, /Project-only memory[^。<]{0,40}(自動整理|永久資料庫|保證)/);
 });
 
-test('2-2 明確揭露 LINE TXT 限制並要求零基礎檢查', () => {
+test('3-1 從網頁版開啟 2-1 已建立的主對話，不重教建立 Project', () => {
+  const text = read('chapters/03-01.html');
+  for (const phrase of [
+    '開啟 ChatGPT 網頁版', 'Projects／專案', '工作訊息整理',
+    '網站改版專案｜工作記憶', '目前實際專案的主對話', '輸入框旁的', '+／工具選單', 'Prompt 2'
+  ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(text, /課程宣傳專案｜工作記憶/);
+  assert.doesNotMatch(text, /New project／新增專案/);
+});
+
+test('Project 範例名稱與設定入口在後續教材保持一致', () => {
+  const projectText = [
+    read('chapters/02-01.html'), read('chapters/03-01.html'),
+    read('chapters/03-02.html'), read('chapters/06-02.html'),
+    read('appendices/troubleshooting.html'), JSON.stringify(loadCoursePrompts())
+  ].join('\n');
+  assert.match(projectText, /工作訊息整理/);
+  for (const obsolete of [
+    '專案名稱旁的選單', 'Edit project', '編輯專案',
+    '第一次建立「專案工作記憶」Project',
+    'Projects／專案</strong> → <strong>專案工作記憶',
+    '在「專案工作記憶」內', '目前的「專案工作記憶」',
+    '「專案工作記憶」已建立'
+  ]) assert.doesNotMatch(projectText, new RegExp(escapeRegExp(obsolete)), obsolete);
+});
+
+test('Prompt 1、2、3 本文維持核准版本', () => {
+  const expected = {
+    '1': '3e33912914f0beedf2fd5c4af0441ec7fbd6a78c97835e1c212d303fead65093',
+    '2': 'b798a7dc1bdfafc90447939c2e952898c745b2b056ca37923d1ea969f497443f',
+    '3': '742a8f7105e5d574804089c5f760dfcb47b31f30ba84a7ab0a2dfe932d7b2080'
+  };
+  for (const [id, hash] of Object.entries(expected)) {
+    const prompt = loadCoursePrompts().find(item => item.id === id);
+    const normalized = prompt.body.replace(/\r\n/g, '\n');
+    assert.equal(crypto.createHash('sha256').update(normalized).digest('hex'), hash, `Prompt ${id}`);
+  }
+});
+
+test('2-2 只取得並檢查 LINE TXT，再明確交給 3-1 做第一次跨來源整理', () => {
   const text = read('chapters/02-02.html');
   for (const phrase of [
     '不是完整聊天室備份', '圖片', '貼圖', '影片', '附件', '回覆關係',
     '記事本', '不是空檔', '繁體中文沒有亂碼', '開始日期', '結束日期',
-    '群組名稱', '敏感資料'
+    '群組名稱', '敏感資料', '想整理日期附近的訊息已載入',
+    '第一筆是否涵蓋想整理的開始範圍', '最後一筆是否到達想整理的結束範圍',
+    '先保留這份 LINE TXT。下一節 3-1 會把它和會議逐字稿一起加入「工作訊息整理」Project 的主對話，進行第一次跨來源整理。'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(text, /data-prompt-id=|貼下方 Prompt|送出 Prompt/);
+});
+
+test('3-1 才開始第一次正式跨來源整理，且提供完成確認', () => {
+  const text = read('chapters/03-01.html');
+  assert.match(text, /2-1 已建立 Project，本節直接進入「工作訊息整理」/);
+  assert.match(text, /會議紀錄與 LINE TXT 都已提供/);
+  assert.match(text, /摘要／決策／待辦／變更／未決事項/);
 });
 
 test('3-2 驗收結果並在同一個專案主對話持續更新', () => {
@@ -168,20 +239,24 @@ test('3-2 驗收結果並在同一個專案主對話持續更新', () => {
   for (const phrase of [
     '人工確認', '抽查', '已確認決策', '待辦', '決策變更', '候選',
     '來源', '同一個專案主對話', '新的日期範圍', '後續更新',
-    '不得因為時間較晚就自動覆蓋', '你現在應該看到'
+    '不得因為時間較晚就自動覆蓋', 'ChatGPT 網頁版',
+    'Save to project／Add to project sources', '只有人工確認過的結果',
+    '不代表內容已自動成為正式專案狀態', '你現在應該看到'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
-  assert.doesNotMatch(text, /儲存到專案|加入專案來源|決策辨識 Prompt/);
+  assert.ok(text.indexOf('人工驗收第一版') < text.indexOf('Save to project／Add to project sources'));
+  assert.doesNotMatch(text, /課程宣傳專案｜工作記憶|決策辨識 Prompt/);
 });
 
-test('4-1 與正式 LINE 事件範圍及 Demo 安全限制一致', () => {
+test('4-1 與正式 LINE 事件範圍及練習環境安全限制一致', () => {
   const text = read('chapters/04-01.html');
   for (const phrase of [
     'source.type = group', 'join', 'memberJoined', '歡迎訊息',
     '不會寫入 messages', '私訊', 'multi-person room', '非文字訊息',
-    '課程 Demo 安全限制', '測試群組', '管理員權限驗證',
+    '練習環境安全限制', '測試群組', '管理員權限驗證',
     '任何可使用控制指令的成員', '#設定信箱', '#寄出紀錄',
     '公司資料政策', '告知／授權'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(text, /課程 Demo|不偷偷擴充/);
 });
 
 test('4-2 使用現行 OA Manager 主流程並逐階段自我檢查', () => {
@@ -219,14 +294,19 @@ function assertBase64SimpleTransfer(relative) {
   ]) assert.doesNotMatch(text, new RegExp(escapeRegExp(obsolete)), `${relative}: ${obsolete}`);
 }
 
-test('4-3 與 5-1 各自提供簡化且安全的 Base64 剪貼簿流程', () => {
-  assertBase64SimpleTransfer('chapters/04-03.html');
+test('4-3 只準備並安全保存 JSON，5-1 才執行唯一正式 Base64 流程', () => {
+  const google = read('chapters/04-03.html');
+  for (const phrase of [
+    '下載並安全保存 Service Account JSON',
+    '5-1 再轉成 Base64',
+    '若目前使用學校／公司管理的 Google 帳號，而且組織政策禁止建立 JSON key，建議改用自己可管理的個人 Google Cloud Project，或洽組織管理員確認權限。'
+  ]) assert.match(google, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(google, /ToBase64String|直接進入下一節 5-1|回到 PowerShell/);
   assertBase64SimpleTransfer('chapters/05-01.html');
-  const gmail = read('chapters/04-03.html');
   for (const phrase of [
     'Security Key', '組織管理帳號', 'Advanced Protection',
     '修改一般登入密碼', 'GMAIL_ADDRESS', '建立這組 App Password 的寄件 Google 帳號'
-  ]) assert.match(gmail, new RegExp(escapeRegExp(phrase)), phrase);
+  ]) assert.match(google, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
 test('相關學生文件不再提供 Base64 解碼驗證，starter 使用同一簡化流程', () => {
@@ -240,7 +320,7 @@ test('相關學生文件不再提供 Base64 解碼驗證，starter 使用同一�
   ]) assert.doesNotMatch(related, new RegExp(escapeRegExp(obsolete)), obsolete);
   const starter = read('downloads/line-bot-starter/README.md');
   const command = '[Convert]::ToBase64String([IO.File]::ReadAllBytes("完整JSON路徑")) | Set-Clipboard';
-  assert.equal(starter.split(command).length - 1, 2);
+  assert.equal(starter.split(command).length - 1, 1);
   assert.match(starter, /最終是否設定正確，以部署與實際 Google Sheets 寫入測試為準/);
 });
 
@@ -311,13 +391,33 @@ test('排錯中心涵蓋 A～J 與 SMTP 成功但 Sheets 標記失敗的重寄�
   ]) assert.match(text, new RegExp(escapeRegExp(heading)), heading);
   for (const phrase of [
     'SMTP 成功送出', 'sent = TRUE 更新失敗', '維持 sent = FALSE',
-    '可能造成重複 Email', '先檢查收件匣與 Sheets 狀態'
+    '可能造成重複 Email', '先檢查收件匣與 Sheets 狀態',
+    'LINE TXT 缺少想整理的舊訊息', '找不到 Project instructions',
+    'Service Account JSON key 無法建立', 'receiver email',
+    'Scheduled Task', 'connected app'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
-test('首頁提供單一查驗日期、三層 Prompt 流程與跨平台維護提醒', () => {
+test('跨來源工作記憶概念名稱仍保留，完成確認補在需要的實作章節', () => {
+  const publicText = [
+    read('index.html'), ...filesBelow('chapters', file => file.endsWith('.html')).map(read),
+    read('appendices/prompts.html'), JSON.stringify(loadCoursePrompts())
+  ].join('\n');
+  for (const phrase of ['跨來源工作記憶', '建立跨來源工作記憶', '更新專案工作記憶']) {
+    assert.match(publicText, new RegExp(escapeRegExp(phrase)), phrase);
+  }
+  for (const relative of ['chapters/03-01.html', 'chapters/06-02.html']) {
+    const text = read(relative);
+    const match = text.match(/<h2>完成確認<\/h2><ul class="checklist">([\s\S]*?)<\/ul>/);
+    assert.ok(match, `${relative}: 完成確認`);
+    const count = (match[1].match(/<li>/g) || []).length;
+    assert.ok(count >= 2 && count <= 5, `${relative}: ${count} completion items`);
+  }
+});
+
+test('首頁提供三層 Prompt 流程與不帶內部查驗日期的介面提醒', () => {
   const text = read('index.html');
-  assert.equal((text.match(/介面／政策最後查驗：2026-09-15/g) || []).length, 1);
+  assert.doesNotMatch(text, /介面／政策最後查驗：\d{4}-\d{2}-\d{2}/);
   for (const phrase of [
     'ChatGPT', 'LINE', 'Google', 'Vercel', 'Tactiq', '官方當下介面為準',
     'Project 固定指示', '專案主對話', '跨來源週期排程'
@@ -331,10 +431,40 @@ test('排程只在手動跨來源驗證成功後建立，且不依賴 Project �
   for (const phrase of [
     '先手動驗證成功，再自動化', 'Google Drive', 'Gmail', '[LINE紀錄]',
     '完整逐字稿', '上一次成功執行', '查無符合資料', '無法存取',
-    '本次週期沒有新的工作記憶需要更新', 'Project 中上傳或保存的檔案',
-    'plan', 'workspace', 'App／Plugin', '專案主對話手動執行 Prompt 2'
+    '本次週期沒有新的工作記憶需要更新', '每次執行都要依 Prompt 重新搜尋',
+    '不能只因排程建立在 Project 裡', 'ChatGPT 網頁版',
+    'plan', 'workspace', 'Plugins／Apps', 'Settings／設定 → Notifications／通知 → Manage tasks／管理任務',
+    '專案主對話手動執行 Prompt 2'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
   assert.doesNotMatch(text, /每天整理一次我的 LINE 工作記憶|只處理今天的紀錄/);
+  assert.doesNotMatch(text, /任務不能存取該 Project 中上傳或保存的檔案/);
+});
+
+test('版本變更使用明確標示的虛構工作案例，不像課程製作紀錄', () => {
+  const text = [
+    read('chapters/01-02.html'), read('chapters/03-02.html'),
+    read('chapters/05-02.html'), read('chapters/06-02.html')
+  ].join('\n');
+  for (const phrase of ['練習案例', '活動籌備專案', '4/18', '4/21', '4/25']) {
+    assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  }
+  for (const phrase of ['小美', '10/20', '10/23', '10/30', '候選上架日']) {
+    assert.doesNotMatch(text, new RegExp(escapeRegExp(phrase)), phrase);
+  }
+});
+
+test('所有學員可見內容與 Prompt 不含講師製作流程痕跡', () => {
+  const text = [
+    read('index.html'), read('404.html'),
+    ...filesBelow('chapters', file => file.endsWith('.html')).map(read),
+    ...filesBelow('appendices', file => file.endsWith('.html')).map(read),
+    JSON.stringify(loadCoursePrompts()), JSON.stringify(loadCoursePromptTools()),
+    read('downloads/line-bot-starter/README.md')
+  ].join('\n');
+  for (const phrase of [
+    '課程宣傳專案', '老師 Demo', '老師提供', '老師與學生', '講師驗收',
+    '由講師將專案', '講師本機除錯', 'Demo 文案', '課程 Demo', '錄課驗收'
+  ]) assert.doesNotMatch(text, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
 test('實作頁提供起點、連續操作路徑與成功確認點', () => {
@@ -440,9 +570,9 @@ test('實際操作步驟內提供對應快捷按鈕', () => {
     ['chapters/01-02.html', '建立測試 Meet', 'https://meet.google.com/'],
     ['chapters/01-02.html', '結束並確認 Transcript', 'https://app.tactiq.io/'],
     ['chapters/01-02.html', '先建立資料夾', 'https://drive.google.com/drive/my-drive'],
-    ['chapters/02-01.html', '新增 Project', 'https://chatgpt.com/'],
-    ['chapters/02-01.html', '設定資料來源', 'https://drive.google.com/drive/my-drive'],
-    ['chapters/02-01.html', '設定資料來源', 'https://mail.google.com/'],
+    ['chapters/02-01.html', '開啟 ChatGPT 網頁版', 'https://chatgpt.com/'],
+    ['chapters/02-01.html', '連接 Google Drive 與 Gmail', 'https://drive.google.com/drive/my-drive'],
+    ['chapters/02-01.html', '連接 Google Drive 與 Gmail', 'https://mail.google.com/'],
     ['chapters/04-02.html', '登入 LINE Developers', 'https://developers.line.biz/console/'],
     ['chapters/04-02.html', '調整回覆模式', 'https://manager.line.biz/'],
     ['chapters/04-03.html', '命名檔案', 'https://sheets.new/'],

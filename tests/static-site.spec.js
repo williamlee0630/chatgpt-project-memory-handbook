@@ -24,12 +24,12 @@ const formalStudentHashes = {
   'line_utils.py': 'eaec38d7a5eee7a026278e8779428cd20b446ab5f3150649c800b45b89286792',
   'main.py': 'dd410ae68333493a62c5d37ccea9288f873af5ad8e5ed25a4e7ecbf255234951',
   'message_service.py': '94659087b765cf7ab30b1e9aade1e9a573ed2b7712f1a3c94d19b8d70c2ccc27',
-  'README.md': '37b821d4aa2a676efeba8c960fcc9f03add05acc321e99a9fd0d641686f1161c',
+  'README.md': 'ed8dd7e7ffcebe0762a1373baa0f3c87ec32166a3c471790f4742550dc036fee',
   'requirements.txt': '0df175d04ffbc50eae9ff09f9514cb81c2620f1c00801b1052d544633399cabf',
   'sheets_store.py': '8827b41ee958db3c109fcad903833ed3e632726c8dd5cf7073e2590c2caee8ab',
   'vercel.json': '99cc91956fd2ac8a511a32dee2dfff44705defc5e441793562ccdd68b359d4f6'
 };
-const formalZipHash = 'ecc8a44243d2d060b18be1bc5c2515fd4e303587c252cc81b3c817faa3e36ef9';
+const formalZipHash = '9b0f59814127394e4c7f472b3b8ed1e3625304834ab5ae0c097fd1b3943547e9';
 
 function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
@@ -116,6 +116,20 @@ test('正式學生 ZIP 是 14 個正式原檔的平鋪、安全且逐位元相�
 
   const forbidden = /(^|\/)(\.env|\.git|\.venv|__pycache__|tests)(\/|$)|service[^/]*account[^/]*\.json$|\.(tmp|temp|pyc)$/i;
   assert.equal([...entries.keys()].filter(name => forbidden.test(name)).length, 0, 'ZIP contains excluded files');
+});
+
+test('學生下載包 README 與網站版本一致且不含講師製作語氣', () => {
+  const starter = fs.readFileSync(path.join(root, 'downloads', 'line-bot-starter', 'README.md'), 'utf8');
+  const entries = readZipEntries(path.join(root, 'downloads', 'LINE訊息整理Bot_課程正式版.zip'));
+  const archived = entries.get('README.md').toString('utf8');
+  assert.equal(archived, starter);
+  for (const phrase of [
+    '老師 Demo', '老師提供', '老師與學生', '講師驗收',
+    '由講師將專案', '講師本機除錯', '課程 Demo'
+  ]) {
+    assert.doesNotMatch(starter, new RegExp(phrase), phrase);
+    assert.doesNotMatch(archived, new RegExp(phrase), phrase);
+  }
 });
 
 test('每個複製按鈕都有同頁唯一目標', () => {

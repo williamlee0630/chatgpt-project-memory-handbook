@@ -7,9 +7,9 @@
       name: 'Project 固定指示',
       tag: '只設定一次',
       indexLabel: '01｜只設定一次',
-      placement: 'ChatGPT Project → Project instructions',
+      placement: 'ChatGPT 網頁版 → Project → Project instructions',
       purpose: '設定同一專案共用的來源定義、版本判斷與人工確認規則。',
-      when: '第一次建立「專案工作記憶」Project 時設定一次。',
+      when: '第一次建立本課示範的「工作訊息整理」Project 時設定一次。',
       body: `你是我的「專案工作記憶助理」。
 
 你的任務不是單純摘要單一來源，而是協助我持續整理同一專案在不同時間、不同來源產生的工作紀錄。
@@ -53,7 +53,7 @@
       name: '專案主對話｜建立／更新跨來源工作記憶',
       tag: '日常主要使用',
       indexLabel: '02｜日常主要使用',
-      placement: 'ChatGPT Project → 專案主對話',
+      placement: 'ChatGPT 網頁版 → Project → 專案主對話',
       purpose: '第一次建立完整跨來源工作記憶，之後沿用同一對話持續更新。',
       when: '第一次整合會議與 LINE 資料，或需要完整重跑指定日期範圍時。',
       notice: '第一次貼完整版；後續留在同一個專案主對話，使用卡片下方的簡短版即可。',
@@ -206,17 +206,19 @@ LINE 時間較晚不代表一定推翻會議決策。
       name: '跨來源週期排程',
       tag: '進階篇完成後',
       indexLabel: '03｜進階篇完成後',
-      placement: 'ChatGPT Scheduled Task／排程',
+      placement: 'ChatGPT 網頁版 → Scheduled Task／排程',
       purpose: '定期檢查 Google Drive 會議逐字稿與 Gmail [LINE紀錄]，更新跨來源工作記憶。',
       when: '完整資料流與手動跨來源驗證都成功後，最後再建立。',
-      notice: '先手動驗證成功，再自動化。此排程以已連接的 Google Drive + Gmail 為來源，不依賴 Project 中上傳或保存的檔案。',
+      notice: '先手動驗證成功，再自動化。每次執行都要依 Prompt 重新搜尋已連接的 Google Drive + Gmail；不能只因排程建立在 Project 裡，就假設一定能讀取 Project 檔案或 sources。',
       body: `檢查本次排程週期內新增的工作紀錄，並整理成可持續追蹤的跨來源工作記憶。
+
+每次執行都要重新搜尋下列 Google Drive 與 Gmail 來源，實際開啟內容後再整理。不可沿用上次的搜尋結果，也不可只因這個排程建立在 Project 裡，就假設已取得 Project 上傳檔案或 Project sources。
 
 【來源 1：Google Drive】
 
 搜尋本次週期新增或屬於本次週期的 Tactiq／Google Meet 會議紀錄。
 
-優先尋找課程指定的「會議原始紀錄」資料夾，以及明確屬於會議逐字稿的 Google Docs。
+優先尋找你用來保存逐字稿的「會議原始紀錄」資料夾，以及明確屬於會議逐字稿的 Google Docs。
 
 必須實際讀取完整逐字稿，不可只依文件名稱或搜尋摘要判斷。
 
