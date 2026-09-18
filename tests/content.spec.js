@@ -82,6 +82,95 @@ test('專案主對話固定揭露實際來源並保留人工確認', () => {
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)));
 });
 
+test('三張主流程 Prompt 都以專案相關性閘門隔離其他專案', () => {
+  for (const prompt of loadCoursePrompts()) {
+    const text = prompt.body;
+    assert.match(text, /專案相關性/, `Prompt ${prompt.id}: relevance gate`);
+    assert.match(text, /相同人物不代表同一專案/, `Prompt ${prompt.id}: people are not a project boundary`);
+    assert.match(text, /人物姓名拿掉/, `Prompt ${prompt.id}: final relevance check`);
+    assert.match(text, /明確相關/, `Prompt ${prompt.id}: include state`);
+    assert.match(text, /無法確認/, `Prompt ${prompt.id}: review state`);
+    assert.match(text, /明確無關/, `Prompt ${prompt.id}: exclude state`);
+    assert.match(text, /無法確認[\s\S]{0,180}需要人工確認/, `Prompt ${prompt.id}: uncertain items need review`);
+  }
+});
+
+test('三張主流程 Prompt 限制新事實的來源並禁止既有記憶跨專案補入', () => {
+  for (const prompt of loadCoursePrompts()) {
+    const text = prompt.body;
+    assert.match(text, /本次指定來源/, `Prompt ${prompt.id}: requested sources`);
+    assert.match(text, /本次指定日期範圍/, `Prompt ${prompt.id}: requested date range`);
+    assert.match(text, /通過專案相關性/, `Prompt ${prompt.id}: passed relevance gate`);
+    assert.match(text, /過去對話|模型記憶|其他聊天/, `Prompt ${prompt.id}: no remembered facts`);
+    assert.match(text, /其他專案/, `Prompt ${prompt.id}: no cross-project facts`);
+  }
+});
+
+test('三張主流程 Prompt 以執行日切開已發生與未來期間', () => {
+  for (const prompt of loadCoursePrompts()) {
+    const text = prompt.body;
+    assert.match(text, /執行當下的實際系統日期/, `Prompt ${prompt.id}: actual system date`);
+    assert.match(text, /尚未發生/, `Prompt ${prompt.id}: future period`);
+    assert.match(text, /未來期間[\s\S]{0,100}不得[\s\S]{0,60}查無資料/, `Prompt ${prompt.id}: future is not no-data`);
+    assert.doesNotMatch(text, /2026-09-18/, `Prompt ${prompt.id}: no hard-coded acceptance date`);
+  }
+});
+
+test('Prompt 2 與 Prompt 3 區分四種來源與日期狀態', () => {
+  for (const id of ['2', '3']) {
+    const text = loadCoursePrompts().find(prompt => prompt.id === id).body;
+    for (const phrase of [
+      '已讀取且找到相關資料',
+      '指定已發生期間內未找到相關資料',
+      '目前無法存取此來源',
+      '該期間尚未發生'
+    ]) assert.match(text, new RegExp(escapeRegExp(phrase)), `Prompt ${id}: ${phrase}`);
+  }
+});
+
+test('Prompt 2 短版與 Prompt 3 都固定更新單一指定專案', () => {
+  const prompts = loadCoursePrompts();
+  const prompt2 = prompts.find(prompt => prompt.id === '2');
+  const prompt3 = prompts.find(prompt => prompt.id === '3');
+  for (const [label, text] of [['Prompt 2 短版', prompt2.followup.body], ['Prompt 3', prompt3.body]]) {
+    assert.match(text, /「＿＿＿＿專案」/, `${label}: project placeholder`);
+    assert.match(text, /專案相關性/, `${label}: relevance gate`);
+    assert.match(text, /尚未發生/, `${label}: future boundary`);
+  }
+  assert.match(
+    prompt2.followup.body,
+    /指定結束日[\s\S]{0,40}實際系統日期[\s\S]{0,40}較早日期/,
+    'Prompt 2 短版: effective end is the earlier of requested end and system date'
+  );
+  for (const phrase of [
+    '廣搜候選',
+    '關鍵字不能作為唯一篩選條件',
+    '如果把人物姓名拿掉',
+    '已讀取且找到相關資料',
+    '指定已發生期間內未找到相關資料',
+    '目前無法存取此來源',
+    '該期間尚未發生',
+    '無法判斷原因與缺少的脈絡',
+    '既有工作記憶只能用於同一專案內的前後比較，不能提供新增事實'
+  ]) assert.match(prompt2.followup.body, new RegExp(escapeRegExp(phrase)), `Prompt 2 短版: ${phrase}`);
+  assert.doesNotMatch(prompt3.body, /【每個專案輸出】/, 'Prompt 3 must not aggregate every project');
+});
+
+test('相關教材說明搜尋結果須先通過專案閘門並正確處理未來日期', () => {
+  const projectSetup = read('chapters/02-01.html');
+  const mainConversation = read('chapters/03-01.html');
+  const review = read('chapters/03-02.html');
+  const schedule = read('chapters/06-02.html');
+  const catalog = read('appendices/prompts.html');
+  assert.match(projectSetup, /Project-only memory[\s\S]{0,240}專案相關性/);
+  assert.match(mainConversation, /搜尋到資料[^<]{0,80}不代表[^<]{0,80}目前專案/);
+  assert.match(mainConversation, /人物與日期相同[^<]{0,120}研討會[^<]{0,120}課程影片[^<]{0,120}黑客松/);
+  assert.match(review, /人物姓名拿掉/);
+  assert.match(schedule, /把 <code>＿＿＿＿專案<\/code> 換成[^<]{0,80}實際專案名稱/);
+  assert.match(schedule, /尚未發生[^<]{0,160}查無資料/);
+  assert.match(catalog, /只有通過專案相關性判斷/);
+});
+
 test('prompts.js 只提供三張主流程 Prompt，部署救援另列實作工具', () => {
   const prompts = loadCoursePrompts();
   const expected = [
@@ -204,9 +293,9 @@ test('Project 範例名稱與設定入口在後續教材保持一致', () => {
 
 test('Prompt 1、2、3 本文維持核准版本', () => {
   const expected = {
-    '1': '3e33912914f0beedf2fd5c4af0441ec7fbd6a78c97835e1c212d303fead65093',
-    '2': 'b798a7dc1bdfafc90447939c2e952898c745b2b056ca37923d1ea969f497443f',
-    '3': '742a8f7105e5d574804089c5f760dfcb47b31f30ba84a7ab0a2dfe932d7b2080'
+    '1': '4749d92cf14c49574085ee54c00b845ba9f585064ec74010efc73677deeeeab1',
+    '2': 'a74e80fde427e9a52ea818ae7ee56a5d329b949bf44d493422e4aba141522042',
+    '3': 'ce80a205c1bc51c0e53340ea0e5acda049d17ea5ef069365a6dab418a87222c9'
   };
   for (const [id, hash] of Object.entries(expected)) {
     const prompt = loadCoursePrompts().find(item => item.id === id);
@@ -430,7 +519,7 @@ test('排程只在手動跨來源驗證成功後建立，且不依賴 Project �
   const text = read('chapters/06-02.html') + loadCoursePrompts().find(prompt => prompt.id === '3').body;
   for (const phrase of [
     '先手動驗證成功，再自動化', 'Google Drive', 'Gmail', '[LINE紀錄]',
-    '完整逐字稿', '上一次成功執行', '查無符合資料', '無法存取',
+    '完整逐字稿', '上一次成功執行', '指定已發生期間內未找到相關資料', '無法存取',
     '本次週期沒有新的工作記憶需要更新', '每次執行都要依 Prompt 重新搜尋',
     '不能只因排程建立在 Project 裡', 'ChatGPT 網頁版',
     'plan', 'workspace', 'Plugins／Apps', 'Settings／設定 → Notifications／通知 → Manage tasks／管理任務',
