@@ -179,6 +179,19 @@ test('Prompt 複製按鈕只複製本文並在 1.8 秒後復原', async t => {
   await page.close();
 });
 
+test('Prompt 3 複製按鈕保留每日重複排程開頭與換行', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由 content.spec.js 驗證 Prompt 合約');
+  const page = await browser.newPage({ permissions: ['clipboard-read', 'clipboard-write'] });
+  await page.goto(baseURL + '/chapters/06-02.html');
+  const card = page.locator('[data-prompt-card="3"]');
+  const expected = await card.locator(':scope > .prompt-copy-card pre').textContent();
+  await card.locator(':scope > .prompt-copy-card [data-copy-target]').click();
+  const clipboard = (await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n');
+  assert.equal(clipboard, expected.replace(/\r\n/g, '\n'));
+  assert.match(clipboard, /^請建立一個重複排程，更新「＿＿＿＿專案」的跨來源工作記憶。\n\n排程頻率：每天執行一次。\n每次執行完成後，將本次整理結果通知給我。\n\n/);
+  await page.close();
+});
+
 test('Prompt 2 後續更新短版可獨立複製且沒有新編號', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由 content.spec.js 驗證資料合約');
   const page = await browser.newPage({ permissions: ['clipboard-read', 'clipboard-write'] });

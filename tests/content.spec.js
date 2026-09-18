@@ -156,6 +156,53 @@ test('Prompt 2 短版與 Prompt 3 都固定更新單一指定專案', () => {
   assert.doesNotMatch(prompt3.body, /【每個專案輸出】/, 'Prompt 3 must not aggregate every project');
 });
 
+test('Prompt 3 明確建立每日重複排程且不寫死執行時間', () => {
+  const text = loadCoursePrompts().find(prompt => prompt.id === '3').body;
+  assert.ok(text.startsWith(
+    '請建立一個重複排程，更新「＿＿＿＿專案」的跨來源工作記憶。\n\n' +
+    '排程頻率：每天執行一次。\n' +
+    '每次執行完成後，將本次整理結果通知給我。\n\n'
+  ));
+  assert.doesNotMatch(text, /每天(?:上午|下午|晚上|早上|中午|凌晨)?\s*\d{1,2}(?::\d{2}|：\d{2}|點)/);
+  for (const section of [
+    '【來源 1：Google Drive】', '【來源 2：Gmail】', '【時間範圍】', '【來源狀態】',
+    '【專案相關性閘門】', '【既有工作記憶】', '【版本判斷】', '【固定輸出】'
+  ]) assert.match(text, new RegExp(escapeRegExp(section)), section);
+});
+
+test('6-2 提醒學生確認每日重複排程介面並自行選擇時間', () => {
+  const text = read('chapters/06-02.html');
+  for (const phrase of [
+    'Prompt 必須明確描述排程意圖與執行頻率',
+    '一般的一次性任務',
+    '重複／每天／時間',
+    '依自己的需求選擇執行時間並儲存'
+  ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+});
+
+test('6-2 教學生開啟 ChatGPT 排程 Email／Push 通知且不把 Gmail 當寄件管道', () => {
+  const schedule = read('chapters/06-02.html');
+  const prompt = loadCoursePrompts().find(item => item.id === '3').body;
+  assert.match(prompt, /每次執行完成後，將本次整理結果通知給我。/);
+  assert.match(
+    schedule,
+    /貼上下方 Prompt 3[\s\S]*確認排程設定顯示重複、每天與時間[\s\S]*依自己的需求選擇執行時間[\s\S]*儲存[\s\S]*開啟排程 Email 通知[\s\S]*Settings／設定 → Notifications／通知[\s\S]*Email 已開啟[\s\S]*Push[\s\S]*排程執行完成後/
+  );
+  for (const phrase of [
+    '實際是否收到 Email，由 ChatGPT 的通知設定決定',
+    '如果同時開啟 Push 與 Email',
+    'ChatGPT 排程任務通知',
+    '不是透過本課程連接的 Gmail 寄出另一封工作郵件'
+  ]) assert.match(schedule, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.match(prompt, /【來源 2：Gmail】[\s\S]*\[LINE紀錄\][\s\S]*必須實際讀取 Email 正文。/);
+  for (const forbidden of [
+    /使用 Gmail 寄 Email 給我/,
+    /寄到\s*\S+@gmail\.com/,
+    /透過 Gmail Connector 寄信/,
+    /Gmail API 再寄一封信/
+  ]) assert.doesNotMatch(prompt, forbidden);
+});
+
 test('相關教材說明搜尋結果須先通過專案閘門並正確處理未來日期', () => {
   const projectSetup = read('chapters/02-01.html');
   const mainConversation = read('chapters/03-01.html');
@@ -295,7 +342,7 @@ test('Prompt 1、2、3 本文維持核准版本', () => {
   const expected = {
     '1': '4749d92cf14c49574085ee54c00b845ba9f585064ec74010efc73677deeeeab1',
     '2': 'a74e80fde427e9a52ea818ae7ee56a5d329b949bf44d493422e4aba141522042',
-    '3': 'ce80a205c1bc51c0e53340ea0e5acda049d17ea5ef069365a6dab418a87222c9'
+    '3': '5d04fc29c03a9de9c0997d60f338934734775de018f93615226a341f7fe54403'
   };
   for (const [id, hash] of Object.entries(expected)) {
     const prompt = loadCoursePrompts().find(item => item.id === id);
