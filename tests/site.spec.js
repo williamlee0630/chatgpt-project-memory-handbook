@@ -192,6 +192,8 @@ test('Prompt 3 複製按鈕保留每日重複排程開頭與換行', async t => 
   const clipboard = (await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n');
   assert.equal(clipboard, expected.replace(/\r\n/g, '\n'));
   assert.match(clipboard, /^請建立一個重複排程，更新「＿＿＿＿專案」的跨來源工作記憶。\n\n排程頻率：每天執行一次。\n\n每次執行完成後，請在本次排程任務的執行結果中輸出完整整理結果。\n\n若 ChatGPT 帳號已在「設定 → 通知 → 任務」開啟推播或電子郵件通知，\n則由 ChatGPT 系統依目前通知設定發送提醒。\n\n不可因為提示詞中寫有「通知」就假設推播或電子郵件一定會送達。\n任務是否成功，應以排程任務本身的實際執行結果與執行紀錄為準。\n\n/);
+  assert.match(clipboard, /【時間範圍】\n\n本排程固定每天 15:00 執行，時區為 Asia\/Taipei。\n\n每次執行的資料範圍固定為：\n\n「前一日 15:00（含）→ 本日 15:00（不含）」/);
+  assert.doesNotMatch(clipboard, /使用「上一次成功執行後 → 本次執行時間」/);
   await page.close();
 });
 

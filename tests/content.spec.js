@@ -156,7 +156,7 @@ test('Prompt 2 短版與 Prompt 3 都固定更新單一指定專案', () => {
   assert.doesNotMatch(prompt3.body, /【每個專案輸出】/, 'Prompt 3 must not aggregate every project');
 });
 
-test('Prompt 3 明確建立每日重複排程且不寫死執行時間', () => {
+test('Prompt 3 固定每日 15:00 與前一日 15:00 到本日 15:00 的資料範圍', () => {
   const text = loadCoursePrompts().find(prompt => prompt.id === '3').body;
   assert.ok(text.startsWith(
     '請建立一個重複排程，更新「＿＿＿＿專案」的跨來源工作記憶。\n\n' +
@@ -168,21 +168,38 @@ test('Prompt 3 明確建立每日重複排程且不寫死執行時間', () => {
     '任務是否成功，應以排程任務本身的實際執行結果與執行紀錄為準。\n\n'
   ));
   assert.doesNotMatch(text, /每次執行完成後，將本次整理結果通知給(?:我|使用者)。/);
-  assert.doesNotMatch(text, /每天(?:上午|下午|晚上|早上|中午|凌晨)?\s*\d{1,2}(?::\d{2}|：\d{2}|點)/);
+  for (const phrase of [
+    '本排程固定每天 15:00 執行，時區為 Asia/Taipei。',
+    '「前一日 15:00（含）→ 本日 15:00（不含）」',
+    '不要依賴系統是否能取得「上一次成功執行時間」',
+    '2026/09/20 15:00 執行時，只檢查 2026/09/19 15:00 ～ 2026/09/20 15:00。',
+    '2026/09/21 15:00 執行時，只檢查 2026/09/20 15:00 ～ 2026/09/21 15:00。',
+    'Google Drive 先以本次時間範圍內新增或修改的會議紀錄作為候選',
+    'Gmail 只搜尋本次時間範圍內收到或寄出的、主旨包含「[LINE紀錄]」的郵件',
+    '不得因為本次週期沒有新資料，就重新引用、摘要或輸出前一週期已處理過的舊資料。',
+    '「本次週期沒有新的工作記憶需要更新。」',
+    '不要把上一週期的資料當成本次結果。'
+  ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(
+    text,
+    /如果系統可以辨識上一次成功執行時間|使用「上一次成功執行後 → 本次執行時間」|如果無法可靠取得上一次成功執行時間/
+  );
   for (const section of [
     '【來源 1：Google Drive】', '【來源 2：Gmail】', '【時間範圍】', '【來源狀態】',
     '【專案相關性閘門】', '【既有工作記憶】', '【版本判斷】', '【固定輸出】'
   ]) assert.match(text, new RegExp(escapeRegExp(section)), section);
 });
 
-test('6-2 提醒學生確認每日重複排程介面並自行選擇時間', () => {
+test('6-2 提醒學生設定每日 15:00 與 Asia/Taipei', () => {
   const text = read('chapters/06-02.html');
   for (const phrase of [
     'Prompt 必須明確描述排程意圖與執行頻率',
     '一般的一次性任務',
     '重複／每天／時間',
-    '依自己的需求選擇執行時間並儲存'
+    '每天 <strong>15:00</strong>',
+    '<code>Asia/Taipei</code>'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(text, /依自己的需求選擇執行時間/);
 });
 
 test('6-2 區分 Prompt、帳號通知與 Gmail Connector', () => {
@@ -383,7 +400,7 @@ test('Prompt 1、2、3 本文維持核准版本', () => {
   const expected = {
     '1': '4749d92cf14c49574085ee54c00b845ba9f585064ec74010efc73677deeeeab1',
     '2': 'a74e80fde427e9a52ea818ae7ee56a5d329b949bf44d493422e4aba141522042',
-    '3': '4f3ec3528af926d722aaa856fd7a8b4313468fcd7c7971d42a857d8963d25b3e'
+    '3': '27ac8a5deb1cb0ffc714fae1d1e4f037ec89a7d2c2c9f11835298b8435bbdf1a'
   };
   for (const [id, hash] of Object.entries(expected)) {
     const prompt = loadCoursePrompts().find(item => item.id === id);
