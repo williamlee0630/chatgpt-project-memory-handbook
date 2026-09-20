@@ -110,12 +110,15 @@ test('所有公開頁面載入時沒有 console error 或 pageerror', async t =>
   await page.close();
 });
 
-test('390px 的兩欄對照表改為可掃讀的上下區塊', async t => {
+test('390px 的兩欄對照表與排程故障表改為可掃讀的上下區塊', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由實際手機版驗收補充');
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  for (const relative of ['chapters/05-01.html', 'chapters/06-02.html']) {
+  for (const [relative, selector] of [
+    ['chapters/05-01.html', 'table'],
+    ['chapters/06-02.html', '[data-schedule-troubleshooting]']
+  ]) {
     await page.goto(baseURL + '/' + relative);
-    const firstRowCells = page.locator('table tbody tr').first().locator('td');
+    const firstRowCells = page.locator(`${selector} tbody tr`).first().locator('td');
     assert.equal(await firstRowCells.count(), 2, relative + ': expected a two-column mapping table');
     const widths = await firstRowCells.evaluateAll(cells => cells.map(cell => cell.getBoundingClientRect().width));
     assert.ok(
@@ -188,7 +191,7 @@ test('Prompt 3 複製按鈕保留每日重複排程開頭與換行', async t => 
   await card.locator(':scope > .prompt-copy-card [data-copy-target]').click();
   const clipboard = (await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n');
   assert.equal(clipboard, expected.replace(/\r\n/g, '\n'));
-  assert.match(clipboard, /^請建立一個重複排程，更新「＿＿＿＿專案」的跨來源工作記憶。\n\n排程頻率：每天執行一次。\n每次執行完成後，將本次整理結果通知給我。\n\n/);
+  assert.match(clipboard, /^請建立一個重複排程，更新「＿＿＿＿專案」的跨來源工作記憶。\n\n排程頻率：每天執行一次。\n\n每次執行完成後，請在本次排程任務的執行結果中輸出完整整理結果。\n\n若 ChatGPT 帳號已在「設定 → 通知 → 任務」開啟推播或電子郵件通知，\n則由 ChatGPT 系統依目前通知設定發送提醒。\n\n不可因為提示詞中寫有「通知」就假設推播或電子郵件一定會送達。\n任務是否成功，應以排程任務本身的實際執行結果與執行紀錄為準。\n\n/);
   await page.close();
 });
 

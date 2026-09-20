@@ -160,9 +160,14 @@ test('Prompt 3 明確建立每日重複排程且不寫死執行時間', () => {
   const text = loadCoursePrompts().find(prompt => prompt.id === '3').body;
   assert.ok(text.startsWith(
     '請建立一個重複排程，更新「＿＿＿＿專案」的跨來源工作記憶。\n\n' +
-    '排程頻率：每天執行一次。\n' +
-    '每次執行完成後，將本次整理結果通知給我。\n\n'
+    '排程頻率：每天執行一次。\n\n' +
+    '每次執行完成後，請在本次排程任務的執行結果中輸出完整整理結果。\n\n' +
+    '若 ChatGPT 帳號已在「設定 → 通知 → 任務」開啟推播或電子郵件通知，\n' +
+    '則由 ChatGPT 系統依目前通知設定發送提醒。\n\n' +
+    '不可因為提示詞中寫有「通知」就假設推播或電子郵件一定會送達。\n' +
+    '任務是否成功，應以排程任務本身的實際執行結果與執行紀錄為準。\n\n'
   ));
+  assert.doesNotMatch(text, /每次執行完成後，將本次整理結果通知給(?:我|使用者)。/);
   assert.doesNotMatch(text, /每天(?:上午|下午|晚上|早上|中午|凌晨)?\s*\d{1,2}(?::\d{2}|：\d{2}|點)/);
   for (const section of [
     '【來源 1：Google Drive】', '【來源 2：Gmail】', '【時間範圍】', '【來源狀態】',
@@ -180,20 +185,21 @@ test('6-2 提醒學生確認每日重複排程介面並自行選擇時間', () =
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
-test('6-2 教學生開啟 ChatGPT 排程 Email／Push 通知且不把 Gmail 當寄件管道', () => {
+test('6-2 區分 Prompt、帳號通知與 Gmail Connector', () => {
   const schedule = read('chapters/06-02.html');
   const prompt = loadCoursePrompts().find(item => item.id === '3').body;
-  assert.match(prompt, /每次執行完成後，將本次整理結果通知給我。/);
-  assert.match(
-    schedule,
-    /貼上下方 Prompt 3[\s\S]*確認排程設定顯示重複、每天與時間[\s\S]*依自己的需求選擇執行時間[\s\S]*儲存[\s\S]*開啟排程 Email 通知[\s\S]*Settings／設定 → Notifications／通知[\s\S]*Email 已開啟[\s\S]*Push[\s\S]*排程執行完成後/
-  );
   for (const phrase of [
-    '實際是否收到 Email，由 ChatGPT 的通知設定決定',
-    '如果同時開啟 Push 與 Email',
-    'ChatGPT 排程任務通知',
-    '不是透過本課程連接的 Gmail 寄出另一封工作郵件'
+    'Prompt 負責定義任務要做什麼',
+    'Email／Push 屬於 ChatGPT 帳號層級的通知設定',
+    '兩者不是同一件事',
+    'ChatGPT → 設定 → 通知 → 任務',
+    'Gmail Connector',
+    '讀取 <code>[LINE紀錄]</code> 等工作來源',
+    'ChatGPT Task Email Notification',
+    '通知某次排程任務已有更新／結果',
+    '不是透過課程中的 Gmail Connector 主動寄信'
   ]) assert.match(schedule, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(schedule, /只要 Prompt 寫通知就會寄 Email/);
   assert.match(prompt, /【來源 2：Gmail】[\s\S]*\[LINE紀錄\][\s\S]*必須實際讀取 Email 正文。/);
   for (const forbidden of [
     /使用 Gmail 寄 Email 給我/,
@@ -201,6 +207,41 @@ test('6-2 教學生開啟 ChatGPT 排程 Email／Push 通知且不把 Gmail 當�
     /透過 Gmail Connector 寄信/,
     /Gmail API 再寄一封信/
   ]) assert.doesNotMatch(prompt, forbidden);
+});
+
+test('6-2 提供建立後驗證、三層判斷與下一週期複驗', () => {
+  const text = read('chapters/06-02.html');
+  for (const phrase of [
+    '<h2>建立後驗證</h2>',
+    '下一次執行時間',
+    'Asia/Taipei',
+    '第一次排程執行後，不要只看 Email',
+    '任務是否真的有執行',
+    '是否有新的執行結果',
+    '下一個週期是否真的再次執行',
+    '第一層：排程有沒有實際執行？',
+    '第二層：任務執行內容有沒有成功？',
+    '第三層：Email／Push 有沒有送達？',
+    '第一次收到 Task Update，不代表重複排程之後每次都一定會正常執行。',
+    '排程執行、任務內容與通知配送是三個不同層級'
+  ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+});
+
+test('6-2 故障判斷表不把缺少 Email 直接判定為排程失敗', () => {
+  const text = read('chapters/06-02.html');
+  const table = text.match(/<table[^>]*data-schedule-troubleshooting[^>]*>([\s\S]*?)<\/table>/);
+  assert.ok(table, 'missing schedule troubleshooting table');
+  for (const [situation, priority] of [
+    ['任務有執行、Email 有、Push 有', '正常'],
+    ['任務有執行、Email 有、Push 沒有', '檢查手機 ChatGPT 通知權限'],
+    ['任務有執行、Email／Push 都沒有', '檢查 ChatGPT「設定 → 通知 → 任務」'],
+    ['任務沒有執行、Email／Push 都沒有', '優先檢查排程時間、時區與任務是否啟用'],
+    ['任務有執行，但無法讀取 Drive／Gmail', '檢查 Connector 權限或來源存取']
+  ]) {
+    const row = new RegExp(`<tr><td>${escapeRegExp(situation)}<\\/td><td>${escapeRegExp(priority)}<\\/td><\\/tr>`);
+    assert.match(table[0], row, situation);
+  }
+  assert.doesNotMatch(text, /沒有 Email[^<]{0,40}排程失敗/);
 });
 
 test('相關教材說明搜尋結果須先通過專案閘門並正確處理未來日期', () => {
@@ -342,7 +383,7 @@ test('Prompt 1、2、3 本文維持核准版本', () => {
   const expected = {
     '1': '4749d92cf14c49574085ee54c00b845ba9f585064ec74010efc73677deeeeab1',
     '2': 'a74e80fde427e9a52ea818ae7ee56a5d329b949bf44d493422e4aba141522042',
-    '3': '5d04fc29c03a9de9c0997d60f338934734775de018f93615226a341f7fe54403'
+    '3': '4f3ec3528af926d722aaa856fd7a8b4313468fcd7c7971d42a857d8963d25b3e'
   };
   for (const [id, hash] of Object.entries(expected)) {
     const prompt = loadCoursePrompts().find(item => item.id === id);
