@@ -16,7 +16,8 @@ const publicPages = [
   'chapters/04-01.html', 'chapters/04-02.html', 'chapters/04-03.html',
   'chapters/05-01.html', 'chapters/05-02.html',
   'chapters/06-01.html', 'chapters/06-02.html',
-  'appendices/prompts.html', 'appendices/troubleshooting.html'
+  'appendices/prompts.html', 'appendices/troubleshooting.html',
+  'appendices/project-memory-skill.html'
 ];
 
 before(async () => {
@@ -76,7 +77,8 @@ test('本輪修訂頁在桌面與 390px 手機均無水平捲動', async t => {
       'chapters/04-01.html', 'chapters/04-02.html', 'chapters/04-03.html',
       'chapters/05-01.html', 'chapters/05-02.html',
       'chapters/06-01.html', 'chapters/06-02.html',
-      'appendices/prompts.html', 'appendices/troubleshooting.html'
+      'appendices/prompts.html', 'appendices/troubleshooting.html',
+      'appendices/project-memory-skill.html'
     ]) {
       await page.goto(baseURL + '/' + relative);
       const widths = await page.evaluate(() => ({
@@ -277,5 +279,24 @@ test('搜尋可篩選到 Tactiq 相關小節', async t => {
   await assert.equal(await page.locator('[data-search-item]:visible').count() > 0, true);
   const visibleText = await page.locator('[data-search-item]:visible').allTextContents();
   assert.ok(visibleText.some(text => text.includes('Tactiq')));
+  await page.close();
+});
+
+test('Skill 附錄頁與下載連結在 390px 手機版可用', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證結構');
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const response = await page.goto(baseURL + '/appendices/project-memory-skill.html');
+  assert.equal(response.status(), 200);
+  assert.equal(await page.locator('h1').textContent(), '進階工具｜專案工作記憶更新 Skill');
+  const widths = await page.evaluate(() => ({
+    scroll: document.documentElement.scrollWidth,
+    client: document.documentElement.clientWidth
+  }));
+  assert.ok(widths.scroll <= widths.client + 1, `Skill page horizontal overflow: ${JSON.stringify(widths)}`);
+  const download = page.locator('a[href="../downloads/project-memory-updater-skill.zip"]').first();
+  assert.equal(await download.count(), 1);
+  const downloadResponse = await page.request.get(baseURL + '/downloads/project-memory-updater-skill.zip');
+  assert.equal(downloadResponse.status(), 200);
+  assert.ok((await downloadResponse.body()).length > 0);
   await page.close();
 });

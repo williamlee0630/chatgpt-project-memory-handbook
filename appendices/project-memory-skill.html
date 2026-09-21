@@ -1,0 +1,43 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>進階工具｜專案工作記憶更新 Skill</title><link rel="stylesheet" href="../assets/styles.css"></head><body data-root="../" data-page="project-memory-skill"><a class="skip-link" href="#main">跳到主要內容</a><header class="topbar"><button id="menu-toggle" class="menu-button" aria-label="開啟課程目錄">☰</button><a class="brand" href="../index.html">專案工作記憶助理<small>Windows 實作電子講義</small></a><div class="top-progress"><div class="top-progress-row"><span>學習進度</span><span data-progress-text></span></div><div class="progress-track"><i data-progress-bar></i></div></div></header><aside class="sidebar"><input id="course-search" class="sidebar-search" type="search" placeholder="搜尋課程"><nav id="desktop-nav"></nav></aside><div id="mobile-nav" class="mobile-drawer" aria-hidden="true"><div class="mobile-panel"><button class="drawer-close" data-close-menu>關閉</button><nav id="mobile-nav-links"></nav></div></div>
+<main id="main" class="content"><article class="content-inner"><p class="eyebrow">附錄｜選用進階工具</p><h1>進階工具｜專案工作記憶更新 Skill</h1><p class="lede">本課程仍以 Prompt 為主要教學方式。Skill 是將前面已學過、已測試過的跨來源工作記憶整理規則進一步封裝，方便在支援 Skills 的環境中重複使用。</p><div class="meta-row"><span class="badge advanced">選用</span><span class="badge">instruction-first Skill</span><span class="badge">沿用 Prompt 2 整理邏輯</span></div><div class="callout warning"><span class="callout-title">相容性說明</span>適用於支援 Skills 的 ChatGPT／Codex 使用環境，實際可用能力依帳號與環境而異。資料來源能否直接讀取，仍取決於當下環境的連線與權限。</div><p><a class="button-link" href="../downloads/project-memory-updater-skill.zip" download>下載 Skill</a><a class="button-link secondary" href="../chapters/03-01.html">回到跨來源工作記憶 Prompt</a></p>
+
+<h2>1. Skill 是什麼？</h2><p>前面的課程使用「跨來源工作記憶 Prompt」，把 Google Meet／Tactiq 紀錄存入 Google Drive，把 LINE 工作紀錄送到 Gmail，再由 ChatGPT 整理 30 秒摘要、最新決策、待辦、負責人、期限、決策變更、未決事項、衝突提醒與需要人工確認的內容。</p><p>Skill 使用相同的整理邏輯，只是把固定規則預先封裝。它不取代 Prompt，也不改變 Google Drive、Gmail、LINE Bot 或排程的主流程。</p><div class="course-grid"><section class="chapter-card"><span class="badge">Prompt 版本</span><h3>每次提供整理規則</h3><p>↓</p><p><strong>ChatGPT 執行跨來源整理</strong></p></section><section class="chapter-card"><span class="badge advanced">Skill 版本</span><h3>整理規則預先封裝</h3><p>↓</p><p>指定專案與本次任務</p><p>↓</p><p><strong>ChatGPT 執行相同整理流程</strong></p></section></div>
+
+<h2>2. Skill 解決什麼問題？</h2><p>它不是單純摘要兩份資料，而是要根據明確的後續修改，判斷目前最新版本。</p><div class="course-grid"><section class="chapter-card"><span class="badge">Google Meet｜會議當下版本</span><h3>影片第一版 10/20 完成</h3><p>剪輯由小王負責。</p></section><section class="chapter-card"><span class="badge advanced">後續 LINE｜明確更新</span><h3>第一版改成 10/23</h3><p>剪輯改由羅力辰負責。</p></section></div><div class="callout success"><span class="callout-title">整理後的目前版本</span><strong>最新完成日：10/23</strong><br><strong>最新剪輯負責人：羅力辰</strong><br><br>決策變更：10/20 → 10/23<br>負責人變更：小王 → 羅力辰</div>
+
+<h2>3. Skill 固定執行規則</h2><div class="chapter-card"><ul class="checklist"><li>只處理目前指定的專案與本次允許來源</li><li>先確認本次指定日期範圍</li><li>不把其他專案資料混入</li><li>必須實際讀取來源內容，不只看檔名或搜尋摘要</li><li>Google Meet／Tactiq 紀錄視為「會議當下版本」</li><li>後續 LINE 紀錄若出現明確新決定，可以更新較早資訊</li><li>既有工作記憶只用於同一專案的前後比較，不作為本次新增事實來源</li><li>保留重要的決策變更</li><li>無法判斷時不可自行猜測</li><li>缺少負責人、期限或結論時不可自行補資料</li><li>來源互相衝突而無法判斷時，列為「需要人工確認」</li></ul></div>
+
+<h2>4. Skill 需要哪些輸入？</h2><table class="responsive-map"><thead><tr><th>輸入</th><th>範例</th></tr></thead><tbody><tr><td>專案名稱</td><td>研討會討論紀錄</td></tr><tr><td>日期範圍</td><td>2026/09/14～2026/09/20</td></tr></tbody></table><h3>可使用的資料來源</h3><ul><li>Google Drive 中的 Tactiq／Google Meet 紀錄</li><li>Gmail 中主旨包含 <code>[LINE紀錄]</code> 的工作紀錄</li><li>使用者直接上傳的會議紀錄</li><li>使用者直接貼上的 LINE 紀錄</li></ul><div class="callout danger"><span class="callout-title">不可假裝已讀取</span>Skill 不應在沒有 Google Drive／Gmail 權限的情況下假裝已經讀取資料。如果無法存取來源，應清楚說明限制，並要求使用者提供、上傳或貼上資料後再整理。</div>
+
+<h2>5. 固定輸出格式</h2><div class="copy-card"><div class="copy-label">專案工作記憶更新｜固定格式</div><pre><code># 30 秒摘要
+
+# 最新已確認決策
+
+# 待辦事項
+
+| 待辦 | 負責人 | 期限 | 狀態 |
+| --- | --- | --- | --- |
+
+# 決策變更
+
+# 未決事項
+
+# 衝突提醒
+
+# 需要人工確認
+
+# 本次資料範圍與來源狀態
+
+# 本次實際讀取的資料
+
+# 本次排除的資料</code></pre></div><p>後三區用來揭露實際日期範圍、每個允許來源是否成功讀取、真正讀過的文件／郵件，以及排除資料與原因；它們不會改變上方待辦表的四個欄位。</p>
+
+<h2>6. 使用範例</h2><div class="copy-card"><div class="copy-label">呼叫 Skill 的簡短範例</div><pre><code>請使用「專案工作記憶更新」，
+更新「研討會討論紀錄」本週的工作記憶。
+
+日期範圍：
+2026/09/14～2026/09/20</code></pre></div><p>若目前使用環境支援 Skill 且資料來源可存取，就依 Skill 規則執行。若資料來源無法直接存取，則請使用者上傳或貼上資料後再整理。</p>
+
+<h2>7. Prompt、Skill、排程差異</h2><table class="responsive-map"><thead><tr><th>工具</th><th>用途</th><th>在本課的定位</th></tr></thead><tbody><tr><td>Prompt</td><td>學習、修改與理解工作規則</td><td>本課程主要教學方式</td></tr><tr><td>Skill</td><td>封裝成熟且會重複使用的工作流程</td><td>選用進階工具</td></tr><tr><td>Task／排程</td><td>決定什麼時間自動執行</td><td>不是 Skill 的替代品</td></tr></tbody></table><div class="flow prompt-flow"><div>Prompt<br><small>定義與學習工作方式</small></div><div>Skill<br><small>封裝成熟工作方式</small></div><div>Task／排程<br><small>定期執行</small></div></div>
+
+<h2>8. 重要提醒</h2><div class="callout success"><span class="callout-title">不支援 Skill 也能完成課程</span>即使你的使用環境目前不支援 Skill，也不影響本課程主要流程。直接使用前面提供的「跨來源工作記憶 Prompt」即可完成相同的核心整理工作。</div><p><a class="button-link" href="../downloads/project-memory-updater-skill.zip" download>下載 project-memory-updater-skill.zip</a><a class="button-link secondary" href="prompts.html#prompt-2">查看課程 Prompt 2</a></p><nav class="pager"><a href="prompts.html">← 課程提示詞總整理</a><a href="troubleshooting.html">前往排錯中心 →</a></nav></article></main><script src="../assets/app.js"></script></body></html>

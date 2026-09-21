@@ -35,6 +35,10 @@ function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^()|[\]\\{}$]/g, '\\$&');
+}
+
 function readZipEntries(zipPath) {
   const zip = fs.readFileSync(zipPath);
   let eocd = -1;
@@ -175,4 +179,99 @@ test('CSS 包含桌面側欄與手機抽屜斷點且括號平衡', () => {
   assert.match(css, /@media\(max-width:980px\)/);
   assert.match(css, /\.mobile-drawer/);
   assert.equal((css.match(/{/g) || []).length, (css.match(/}/g) || []).length);
+});
+
+test('Prompt 2 之後提供選用 Skill 導流且未改變課程主線', () => {
+  const chapter = fs.readFileSync(path.join(root, 'chapters', '03-01.html'), 'utf8');
+  const promptPosition = chapter.indexOf('<div data-prompt-id="2"></div>');
+  const skillCardPosition = chapter.indexOf('data-skill-cta');
+  assert.ok(promptPosition >= 0, 'Prompt 2 placement missing');
+  assert.ok(skillCardPosition > promptPosition, 'Skill CTA must appear after Prompt 2');
+  const card = chapter.match(/<div[^>]*data-skill-cta[^>]*>([\s\S]*?)<\/div>/);
+  assert.ok(card, 'Skill CTA card missing');
+  assert.match(card[0], /進階：把這套流程封裝成 Skill/);
+  assert.match(card[0], /選用|支援 Skills/);
+  assert.match(card[0], /href="\.\.\/appendices\/project-memory-skill\.html"/);
+  assert.match(card[0], /href="\.\.\/downloads\/project-memory-updater-skill\.zip"/);
+  assert.doesNotMatch(chapter, /data-progress-id="project-memory-skill"/);
+});
+
+test('Skill 附錄頁保守說明能力並提供指定教材內容', () => {
+  const relative = path.join('appendices', 'project-memory-skill.html');
+  assert.ok(fs.existsSync(path.join(root, relative)), `${relative} missing`);
+  const text = fs.readFileSync(path.join(root, relative), 'utf8');
+  for (const phrase of [
+    '進階工具｜專案工作記憶更新 Skill',
+    '本課程仍以 Prompt 為主要教學方式',
+    '適用於支援 Skills 的 ChatGPT／Codex 使用環境，實際可用能力依帳號與環境而異。',
+    'Skill 是什麼？', 'Skill 解決什麼問題？', 'Skill 固定執行規則',
+    'Skill 需要哪些輸入？', '固定輸出格式', '使用範例',
+    'Prompt、Skill、排程差異', '重要提醒',
+    '最新完成日：10/23', '最新剪輯負責人：羅力辰',
+    '小王 → 羅力辰', '10/20 → 10/23',
+    '需要人工確認', '本次資料範圍與來源狀態',
+    '本次實際讀取的資料', '本次排除的資料',
+    'project-memory-updater-skill.zip'
+  ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  for (const forbidden of [
+    '所有 ChatGPT 帳號都可以直接安裝',
+    'Skill 取代 Prompt',
+    '安裝 Skill 後就一定能直接讀取 Google Drive / Gmail',
+    'Skill 本身等於排程功能'
+  ]) assert.doesNotMatch(text, new RegExp(escapeRegExp(forbidden)), forbidden);
+});
+
+test('專案工作記憶更新 Skill ZIP 可解壓且包含完整 instruction-first Skill', () => {
+  const zipPath = path.join(root, 'downloads', 'project-memory-updater-skill.zip');
+  assert.ok(fs.existsSync(zipPath), 'project-memory-updater-skill.zip missing');
+  const entries = readZipEntries(zipPath);
+  const files = [...entries.keys()].filter(name => !name.endsWith('/')).sort();
+  assert.deepEqual(files, [
+    'project-memory-updater/SKILL.md',
+    'project-memory-updater/examples/demo-project.md',
+    'project-memory-updater/references/output-format.md',
+    'project-memory-updater/references/source-rules.md'
+  ]);
+
+  const skill = entries.get('project-memory-updater/SKILL.md').toString('utf8');
+  assert.match(skill, /^---\s+name: project-memory-updater\s+description: Use when /);
+  for (const phrase of [
+    '專案名稱', '日期範圍', '允許來源', '只處理目前指定的專案',
+    '實際讀取', 'Google Drive', 'Tactiq', 'Google Meet', 'Gmail', '[LINE紀錄]',
+    '不得假裝', '較晚且明確', '需要人工確認', '不自行猜測',
+    '30 秒摘要', '最新已確認決策', '待辦事項', '決策變更',
+    '未決事項', '衝突提醒', '完成前檢查',
+    '只處理本次允許來源', '過去對話', '模型記憶', '其他聊天', '常識推測',
+    '既有工作記憶只能用於同一專案內的前後比較',
+    '本次資料範圍與來源狀態', '本次實際讀取的資料', '本次排除的資料',
+    'references/source-rules.md', 'references/output-format.md'
+  ]) assert.match(skill, new RegExp(escapeRegExp(phrase)), `SKILL.md: ${phrase}`);
+
+  const sourceRules = entries.get('project-memory-updater/references/source-rules.md').toString('utf8');
+  for (const phrase of [
+    'Google Drive', 'Google Meet', 'Tactiq', 'Gmail', 'LINE 紀錄',
+    '日期範圍', '專案範圍', '來源優先順序', '版本更新規則', '來源衝突規則',
+    '「較晚」不代表一定正確', '只處理本次允許來源',
+    '既有工作記憶只能用於同一專案內的前後比較',
+    '跨更新期間', '舊版本 → 新版本',
+    '修改', '改成', '延後', '取消', '改由', '改為'
+  ]) assert.match(sourceRules, new RegExp(escapeRegExp(phrase)), `source-rules.md: ${phrase}`);
+
+  const output = entries.get('project-memory-updater/references/output-format.md').toString('utf8');
+  for (const heading of [
+    '# 30 秒摘要', '# 最新已確認決策', '# 待辦事項', '# 決策變更',
+    '# 未決事項', '# 衝突提醒', '# 需要人工確認',
+    '# 本次資料範圍與來源狀態', '# 本次實際讀取的資料', '# 本次排除的資料'
+  ]) assert.match(output, new RegExp(escapeRegExp(heading)), `output-format.md: ${heading}`);
+  assert.match(output, /\| 事項 \| 負責人 \| 期限 \| 狀態 \|/);
+
+  const demo = entries.get('project-memory-updater/examples/demo-project.md').toString('utf8');
+  for (const phrase of ['10/20', '小王', '10/23', '羅力辰', '10/20 → 10/23', '小王 → 羅力辰']) {
+    assert.match(demo, new RegExp(escapeRegExp(phrase)), `demo-project.md: ${phrase}`);
+  }
+
+  const allSkillText = [...entries.values()].map(value => value.toString('utf8')).join('\n');
+  assert.doesNotMatch(allSkillText, /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/);
+  assert.doesNotMatch(allSkillText, /\b(?:sk|ghp|glpat)-[A-Za-z0-9_-]{20,}\b/);
+  assert.doesNotMatch(allSkillText, /AIza[0-9A-Za-z_-]{35}/);
 });

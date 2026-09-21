@@ -39,6 +39,7 @@
     }
     html += `<p class="nav-group">工具箱</p>
       <a class="nav-link" href="${root}appendices/prompts.html" data-search-item data-search-text="Prompt 提示詞 總整理 Project 固定指示 專案主對話 跨來源週期排程 Codex Vercel">📋 課程提示詞總整理</a>
+      <a class="nav-link" href="${root}appendices/project-memory-skill.html" data-search-item data-search-text="Skill 專案工作記憶更新 跨來源 進階工具">專案工作記憶更新 Skill</a>
       <a class="nav-link" href="${root}appendices/troubleshooting.html" data-search-item data-search-text="Tactiq LINE Vercel troubleshooting 排錯">排錯中心</a>`;
     const target = document.getElementById(id);
     if (target) target.innerHTML = html;
