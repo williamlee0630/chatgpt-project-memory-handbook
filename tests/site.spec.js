@@ -271,14 +271,20 @@ test('完成勾選會跨頁重新載入保存', async t => {
   await page.close();
 });
 
-test('搜尋可篩選到 Tactiq 相關小節', async t => {
+test('搜尋 Tactiq、Microsoft Teams、Teams 或 Edge 都可篩選到 1-2', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證搜尋合約');
   const page = await browser.newPage();
-  await page.goto(baseURL);
-  await page.locator('#course-search').fill('Tactiq');
-  await assert.equal(await page.locator('[data-search-item]:visible').count() > 0, true);
-  const visibleText = await page.locator('[data-search-item]:visible').allTextContents();
-  assert.ok(visibleText.some(text => text.includes('Tactiq')));
+  for (const relative of ['', '/chapters/01-01.html']) {
+    await page.goto(baseURL + relative);
+    for (const query of ['Tactiq', 'Microsoft Teams', 'Teams', 'Edge']) {
+      await page.locator('#course-search').fill(query);
+      await assert.equal(
+        await page.locator('[data-search-item][href$="chapters/01-02.html"]:visible').count() > 0,
+        true,
+        `${relative || 'index'}: ${query} should find 1-2`
+      );
+    }
+  }
   await page.close();
 });
 

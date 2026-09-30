@@ -3,7 +3,7 @@
 
   const lessons = [
     ['01-01', '1-1 成果展示與資料流', 'chapters/01-01.html', '基礎篇', 'Google Meet Tactiq Drive LINE Gmail ChatGPT 資料流'],
-    ['01-02', '1-2 Tactiq 轉錄與儲存至 Google Drive', 'chapters/01-02.html', '基礎篇', 'Tactiq Transcript Automatic Workflow Liquid'],
+    ['01-02', '1-2 Tactiq 轉錄與儲存至 Google Drive', 'chapters/01-02.html', '基礎篇', 'Tactiq Transcript Automatic Workflow Liquid Microsoft Teams Teams Microsoft Edge Edge 瀏覽器版'],
     ['02-01', '2-1 ChatGPT 專案與來源設定', 'chapters/02-01.html', '基礎篇', 'ChatGPT 專案 Plugins Apps Google Drive Gmail 日期範圍'],
     ['02-02', '2-2 LINE 手動匯出', 'chapters/02-02.html', '基礎篇', 'LINE TXT 匯出 個資'],
     ['03-01', '3-1 第一次執行專案主對話', 'chapters/03-01.html', '基礎篇', '跨來源 專案主對話 第一次 會議當下版本 會後補充'],
@@ -30,12 +30,12 @@
   function navMarkup(id) {
     let html = '';
     let lastPart = '';
-    for (const [lessonId, title, href, group] of lessons) {
+    for (const [lessonId, title, href, group, keywords] of lessons) {
       if (group !== lastPart) {
         html += `<p class="nav-group">${group === '基礎篇' ? '基礎篇｜40 分鐘' : '進階篇｜60 分鐘'}</p>`;
         lastPart = group;
       }
-      html += `<a class="nav-link${lessonId === current ? ' active' : ''}" href="${root}${href}" data-search-item data-search-text="${title} ${group}">${title}</a>`;
+      html += `<a class="nav-link${lessonId === current ? ' active' : ''}" href="${root}${href}" data-search-item data-search-text="${title} ${group} ${keywords}">${title}</a>`;
     }
     html += `<p class="nav-group">工具箱</p>
       <a class="nav-link" href="${root}appendices/prompts.html" data-search-item data-search-text="Prompt 提示詞 總整理 Project 固定指示 專案主對話 跨來源週期排程 Codex Vercel">📋 課程提示詞總整理</a>
