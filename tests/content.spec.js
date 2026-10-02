@@ -73,6 +73,70 @@ test('Tactiq 主線包含已驗證 Automatic Workflow、Liquid 與四項排錯',
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)));
 });
 
+test('Tactiq 主線先完成 Drive Workflow，再用唯一一場 Google Meet 驗證完整資料流', () => {
+  const html = read('chapters/01-02.html');
+  const relatedGuidance = html + read('appendices/troubleshooting.html');
+  const mainStart = html.indexOf('<h2>實作 A：完成 Tactiq 與 Google Drive 自動化設定</h2>');
+  const meetTestStart = html.indexOf('<h2>實作 B：用一場 Google Meet 完整測試</h2>');
+  const extensionStart = html.indexOf('<h2>延伸：使用 Microsoft Edge + Microsoft Teams</h2>');
+  assert.ok(mainStart >= 0, 'missing setup-first practice A');
+  assert.ok(meetTestStart > mainStart, 'missing final Meet test');
+  assert.ok(extensionStart > mainStart, 'missing main-flow boundary');
+  const mainFlow = html.slice(mainStart, extensionStart);
+  const expectedOrder = [
+    '安裝並登入',
+    '確認 Google Meet 支援',
+    '先建立資料夾',
+    '新增 Workflow',
+    '設定觸發',
+    '連接 Google Drive',
+    '貼上固定參數',
+    '儲存 Workflow',
+    '實作 B：用一場 Google Meet 完整測試',
+    '開啟唯一一場測試 Meet',
+    '確認 Tactiq widget 與繁中',
+    '念出測試句',
+    '結束並等待 Meeting Processed',
+    '確認 Tactiq Transcript',
+    '確認 Workflow Activity',
+    '確認 Google Drive',
+    '確認 Google Docs 內容'
+  ];
+  let previous = -1;
+  for (const phrase of expectedOrder) {
+    const current = mainFlow.indexOf(phrase);
+    assert.ok(current > previous, `${phrase}: incorrect or missing teaching order`);
+    previous = current;
+  }
+  assert.match(mainFlow, /Chinese \(Traditional\)/);
+  assert.match(mainFlow, /My Workflows／Workflows/);
+  assert.doesNotMatch(relatedGuidance, /Chinese \/ Mandarin Traditional/);
+  assert.match(mainFlow, /只需要開一場 Google Meet/);
+  assert.doesNotMatch(mainFlow, /再開一場|第一場|第二場/);
+  assert.doesNotMatch(html.slice(0, meetTestStart), />開啟 Google Meet<\/a>/);
+});
+
+test('Tactiq Workflow 固定參數維持正式版本', () => {
+  const html = read('chapters/01-02.html');
+  const fileName = html.match(/File name／檔名欄可填 <code>([^<]+)<\/code>/);
+  const liquidTemplate = html.match(/<pre id="liquid-template"><code>([\s\S]*?)<\/code><\/pre>/);
+  assert.ok(fileName, 'missing File name parameter');
+  assert.ok(liquidTemplate, 'missing Liquid Template');
+  assert.equal(fileName[1], '{{ meeting.title }} - {{ meeting.date | date: "%Y-%m-%d" }}');
+  assert.equal(
+    crypto.createHash('sha256').update(fileName[1]).digest('hex'),
+    '8eeef1d73d4743f826f8c865dac3a97031d90cc9786fdfe479d2017423bf450d'
+  );
+  assert.equal(
+    crypto.createHash('sha256').update(liquidTemplate[1].replaceAll('\r\n', '\n')).digest('hex'),
+    '6bb4f9edd46677b07ea32b4aa270b9fe39c48e078b3ba93aa57545daedbfe2c8'
+  );
+  for (const phrase of [
+    '會議逐字稿自動存 Drive', 'Automatic', 'Meeting Processed',
+    'Share to an Integration', 'Google Drive', '會議原始紀錄'
+  ]) assert.match(html, new RegExp(escapeRegExp(phrase)), phrase);
+});
+
 test('專案主對話固定揭露實際來源並保留人工確認', () => {
   const text = loadCoursePrompts().find(prompt => prompt.id === '2').body;
   for (const phrase of [
@@ -761,8 +825,8 @@ test('正式 Python schema、控制指令、Webhook 與 Vercel Drop 完整出現
 test('實際操作步驟內提供對應快捷按鈕', () => {
   for (const [relative, heading, href] of [
     ['chapters/01-02.html', '安裝並登入', 'https://chromewebstore.google.com/detail/tactiq-ai-meeting-transcr/fggkaccpbmombhnjkjokndojfgagejfb'],
-    ['chapters/01-02.html', '建立測試 Meet', 'https://meet.google.com/'],
-    ['chapters/01-02.html', '結束並確認 Transcript', 'https://app.tactiq.io/'],
+    ['chapters/01-02.html', '開啟唯一一場測試 Meet', 'https://meet.google.com/'],
+    ['chapters/01-02.html', '確認 Tactiq Transcript', 'https://app.tactiq.io/'],
     ['chapters/01-02.html', '先建立資料夾', 'https://drive.google.com/drive/my-drive'],
     ['chapters/02-01.html', '開啟 ChatGPT 網頁版', 'https://chatgpt.com/'],
     ['chapters/02-01.html', '連接 Google Drive 與 Gmail', 'https://drive.google.com/drive/my-drive'],

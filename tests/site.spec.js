@@ -73,6 +73,7 @@ test('本輪修訂頁在桌面與 390px 手機均無水平捲動', async t => {
     const page = await browser.newPage({ viewport });
     for (const relative of [
       'index.html',
+      'chapters/01-02.html',
       'chapters/02-01.html', 'chapters/02-02.html', 'chapters/03-01.html', 'chapters/03-02.html',
       'chapters/04-01.html', 'chapters/04-02.html', 'chapters/04-03.html',
       'chapters/05-01.html', 'chapters/05-02.html',
@@ -256,7 +257,20 @@ test('複製按鈕複製完整內容並顯示成功回饋', async t => {
   );
   assert.equal(await button.textContent(), '已複製');
   const copied = await page.evaluate(() => navigator.clipboard.readText());
-  assert.match(copied, /meeting\.transcript/);
+  assert.equal(copied.replaceAll('\r\n', '\n').trim(), `【會議名稱】
+{{ meeting.title }}
+
+【會議日期】
+{{ meeting.date | date: "%Y-%m-%d" }}
+
+【會議參與者】
+{{ meeting.participantNames }}
+
+【完整逐字稿】
+{{ meeting.transcript }}
+
+【Tactiq 原始紀錄】
+{{ meeting.url }}`);
   await page.close();
 });
 
