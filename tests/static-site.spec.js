@@ -39,6 +39,17 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^()|[\]\\{}$]/g, '\\$&');
 }
 
+function filesBelow(relative) {
+  return fs.readdirSync(path.join(root, relative), { withFileTypes: true }).flatMap(entry => {
+    const child = path.join(relative, entry.name);
+    return entry.isDirectory() ? filesBelow(child) : [child];
+  });
+}
+
+function normalizeLines(value) {
+  return value.replace(/\r\n/g, '\n');
+}
+
 function readZipEntries(zipPath) {
   const zip = fs.readFileSync(zipPath);
   let eocd = -1;
@@ -196,22 +207,19 @@ test('Prompt 2 之後提供選用 Skill 導流且未改變課程主線', () => {
   assert.doesNotMatch(chapter, /data-progress-id="project-memory-skill"/);
 });
 
-test('Skill 附錄頁保守說明能力並提供指定教材內容', () => {
+test('Skill Kit 附錄保留 URL、相容說明、完整案例與下載入口', () => {
   const relative = path.join('appendices', 'project-memory-skill.html');
   assert.ok(fs.existsSync(path.join(root, relative)), `${relative} missing`);
   const text = fs.readFileSync(path.join(root, relative), 'utf8');
   for (const phrase of [
-    '進階工具｜專案工作記憶更新 Skill',
-    '本課程仍以 Prompt 為主要教學方式',
-    '適用於支援 Skills 的 ChatGPT／Codex 使用環境，實際可用能力依帳號與環境而異。',
-    'Skill 是什麼？', 'Skill 解決什麼問題？', 'Skill 固定執行規則',
-    'Skill 需要哪些輸入？', '固定輸出格式', '使用範例',
-    'Prompt、Skill、排程差異', '重要提醒',
-    '最新完成日：10/23', '最新剪輯負責人：羅力辰',
-    '小王 → 羅力辰', '10/20 → 10/23',
-    '需要人工確認', '本次資料範圍與來源狀態',
-    '本次實際讀取的資料', '本次排除的資料',
-    'project-memory-updater-skill.zip'
+    '<h1>專案整理 Skill Kit</h1>',
+    'Prompt = 全員可使用的核心版本；Skill = 將同一套流程封裝成更方便重複使用的進階版本。',
+    '會議決議與待辦整理', '跨來源決策更新', '專案工作記憶更新', '專案進度週報',
+    '國際研討會規劃專案', '研究日本＋新加坡', '只研究日本',
+    '指定來源自動收集＋固定週期重新搜尋與整理＋形成最新版工作記憶。',
+    '紙本手寫筆記', '需要人工確認', '只使用 Prompt',
+    'project-work-memory-skill-kit.zip', 'project-memory-updater-skill.zip',
+    'data-copy-target="kit-prompt-text-1"', 'data-copy-target="kit-prompt-text-4"'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
   for (const forbidden of [
     '所有 ChatGPT 帳號都可以直接安裝',
@@ -219,6 +227,46 @@ test('Skill 附錄頁保守說明能力並提供指定教材內容', () => {
     '安裝 Skill 後就一定能直接讀取 Google Drive / Gmail',
     'Skill 本身等於排程功能'
   ]) assert.doesNotMatch(text, new RegExp(escapeRegExp(forbidden)), forbidden);
+});
+
+test('完整 Skill Kit ZIP 可解壓，四個 Skill、四份 Prompt 與來源檔一致', () => {
+  const kit = path.join(root, 'downloads', 'project-skill-kit');
+  const entries = readZipEntries(path.join(root, 'downloads', 'project-work-memory-skill-kit.zip'));
+  const skillNames = ['meeting-action-items', 'cross-source-decision-update', 'project-memory-updater', 'weekly-project-report'];
+  const promptFiles = [
+    '01-會議決議與待辦整理.md', '02-跨來源決策更新.md',
+    '03-專案工作記憶更新.md', '04-專案進度週報.md'
+  ];
+  assert.ok(entries.has('README.md'));
+  const sourceFiles = filesBelow('downloads/project-skill-kit').map(file => file.replace(/^downloads[\\/]project-skill-kit[\\/]/, '').replaceAll('\\', '/')).sort();
+  assert.deepEqual([...entries.keys()].filter(name => !name.endsWith('/')).sort(), sourceFiles);
+  for (const name of skillNames) {
+    for (const file of ['SKILL.md', 'references/example-input.md', 'references/example-output.md']) {
+      const entry = `skills/${name}/${file}`;
+      assert.ok(entries.has(entry), `${entry} missing`);
+      assert.equal(normalizeLines(entries.get(entry).toString('utf8')), normalizeLines(fs.readFileSync(path.join(kit, entry), 'utf8')));
+    }
+    const skill = entries.get(`skills/${name}/SKILL.md`).toString('utf8');
+    assert.match(skill, new RegExp(`^---\\s+name: ${name}\\s+description: Use when `));
+    for (const phrase of ['專案', '來源', '需要人工確認']) assert.match(skill, new RegExp(phrase));
+  }
+  for (const file of promptFiles) {
+    const entry = `prompts/${file}`;
+    assert.ok(entries.has(entry), `${entry} missing`);
+    const prompt = entries.get(entry).toString('utf8');
+    assert.equal(normalizeLines(prompt), normalizeLines(fs.readFileSync(path.join(kit, entry), 'utf8')));
+    for (const phrase of ['專案名稱', '本次', '來源', '需要人工確認']) assert.match(prompt, new RegExp(phrase));
+  }
+  const sourceRules = entries.get('skills/project-memory-updater/references/source-rules.md');
+  const original = readZipEntries(path.join(root, 'downloads', 'project-memory-updater-skill.zip'));
+  assert.deepEqual(sourceRules, original.get('project-memory-updater/references/source-rules.md'));
+  const page = fs.readFileSync(path.join(root, 'appendices', 'project-memory-skill.html'), 'utf8');
+  for (const [index, file] of promptFiles.entries()) {
+    const match = page.match(new RegExp(`<pre id="kit-prompt-text-${index + 1}"><code>([\\s\\S]*?)<\\/code><\\/pre>`));
+    assert.ok(match, `Prompt ${index + 1} copy target missing`);
+    const embedded = match[1].replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&');
+    assert.equal(normalizeLines(embedded), normalizeLines(fs.readFileSync(path.join(kit, 'prompts', file), 'utf8').trim()));
+  }
 });
 
 test('專案工作記憶更新 Skill ZIP 可解壓且包含完整 instruction-first Skill', () => {

@@ -42,6 +42,12 @@ webhook_event_id	message_id	group_id	user_id	display_name	message	created_at	sen
 
 Webhook 使用 /callback；群組控制指令為 #設定信箱、#查看信箱、#寄出紀錄。群組新文字寫入 messages；join／memberJoined 只回覆歡迎訊息；私訊、room 與非文字不在正式流程。新訊息 sent 是 FALSE，Email 成功後才改為 TRUE。
 
+## 專案整理 Skill Kit
+
+- 講義入口：`appendices/project-memory-skill.html`（保留原 URL）。
+- 完整下載：`downloads/project-work-memory-skill-kit.zip`；可閱讀來源：`downloads/project-skill-kit/`。
+- 四個 Skill 都有可複製的 Prompt 相容版。原版 `downloads/project-memory-updater-skill.zip` 仍可單獨下載。
+
 ## 本機開啟講義
 
 最簡單：直接雙擊 index.html。若瀏覽器限制剪貼簿功能，可在此資料夾開啟 PowerShell：

@@ -307,16 +307,33 @@ test('Skill 附錄頁與下載連結在 390px 手機版可用', async t => {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const response = await page.goto(baseURL + '/appendices/project-memory-skill.html');
   assert.equal(response.status(), 200);
-  assert.equal(await page.locator('h1').textContent(), '進階工具｜專案工作記憶更新 Skill');
+  assert.equal(await page.locator('h1').textContent(), '專案整理 Skill Kit');
   const widths = await page.evaluate(() => ({
     scroll: document.documentElement.scrollWidth,
     client: document.documentElement.clientWidth
   }));
   assert.ok(widths.scroll <= widths.client + 1, `Skill page horizontal overflow: ${JSON.stringify(widths)}`);
-  const download = page.locator('a[href="../downloads/project-memory-updater-skill.zip"]').first();
+  const download = page.locator('a[href="../downloads/project-work-memory-skill-kit.zip"]').first();
   assert.equal(await download.count(), 1);
-  const downloadResponse = await page.request.get(baseURL + '/downloads/project-memory-updater-skill.zip');
+  const downloadResponse = await page.request.get(baseURL + '/downloads/project-work-memory-skill-kit.zip');
   assert.equal(downloadResponse.status(), 200);
   assert.ok((await downloadResponse.body()).length > 0);
+  await page.locator('#kit-prompt-1 summary').click();
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.locator('#kit-prompt-1 [data-copy-target]').click();
+  assert.match(await page.evaluate(() => navigator.clipboard.readText()), /# 會議整理/);
+  await page.close();
+});
+
+test('側邊搜尋能從首頁與附錄找到 Skill Kit', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium');
+  const page = await browser.newPage();
+  for (const relative of ['', '/chapters/03-02.html']) {
+    await page.goto(baseURL + relative);
+    for (const query of ['Skill', '技能', '專案整理', '會議整理', '跨來源', '工作記憶', '週報']) {
+      await page.locator('#course-search').fill(query);
+      assert.equal(await page.locator('#desktop-nav a[href$="appendices/project-memory-skill.html"]:visible').count(), 1, query);
+    }
+  }
   await page.close();
 });
