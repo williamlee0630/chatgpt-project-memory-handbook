@@ -4,7 +4,7 @@
   const lessons = [
     ['01-01', '1-1 成果展示與資料流', 'chapters/01-01.html', '基礎篇', 'Google Meet Tactiq Drive LINE Gmail ChatGPT 資料流'],
     ['01-02', '1-2 Tactiq 轉錄與儲存至 Google Drive', 'chapters/01-02.html', '基礎篇', 'Tactiq Transcript Automatic Workflow Liquid Microsoft Teams Teams Microsoft Edge Edge 瀏覽器版'],
-    ['02-01', '2-1 ChatGPT 專案與來源設定', 'chapters/02-01.html', '基礎篇', 'ChatGPT 專案 Plugins Apps Google Drive Gmail 日期範圍'],
+    ['02-01', '2-1 ChatGPT 專案與來源設定', 'chapters/02-01.html', '基礎篇', 'ChatGPT Desktop App ChatGPT Web 網頁版 備用入口 專案 Plugins Apps Google Drive Gmail 日期範圍'],
     ['02-02', '2-2 LINE 手動匯出', 'chapters/02-02.html', '基礎篇', 'LINE TXT 匯出 個資'],
     ['03-01', '3-1 第一次執行專案主對話', 'chapters/03-01.html', '基礎篇', '跨來源 專案主對話 第一次 會議當下版本 會後補充'],
     ['03-02', '3-2 驗收並持續更新工作記憶', 'chapters/03-02.html', '基礎篇', '人工驗收 後續更新 決策 待辦 未決 變更 衝突 進度'],

@@ -359,7 +359,7 @@ test('prompts.js 只提供三張主流程 Prompt，部署救援另列實作工�
   assert.equal(byId['1'].tag, '只設定一次');
   assert.equal(byId['2'].tag, '日常主要使用');
   assert.equal(byId['3'].tag, '進階篇完成後');
-  assert.equal(byId['3'].placement, 'ChatGPT 網頁版 → Scheduled Task／排程');
+  assert.equal(byId['3'].placement, 'ChatGPT Desktop App → Scheduled Task／排程');
   assert.equal(byId['2'].followup.name, '後續更新｜留在同一個主對話使用，不另開新對話');
   assert.match(byId['2'].followup.body, /沿用目前已確認的專案脈絡/);
 
@@ -407,8 +407,9 @@ test('工具箱導覽統一使用課程提示詞總整理名稱', () => {
 test('2-1 完成 Project、固定指示、來源連接與實際讀取驗證', () => {
   const text = read('chapters/02-01.html');
   for (const phrase of [
-    '本課後續 ChatGPT 操作統一以網頁版示範', 'Chrome 或 Edge',
-    '準備用於本課的 ChatGPT 帳號', '左側欄收起', 'chatgpt.com',
+    '本課主要使用 ChatGPT Desktop App', '開啟並登入 ChatGPT Desktop App',
+    '準備用於本課的 ChatGPT 帳號', '左側欄收起', 'Projects／專案入口',
+    'ChatGPT Web 備用入口', 'chatgpt.com',
     '建立「工作訊息整理」專案並加入固定指示',
     '專案總覽頁面', '右上角', '新增', '建立專案', '專案名稱',
     '工作訊息整理', '只是本課程的示範名稱', '不是系統規定名稱',
@@ -432,12 +433,31 @@ test('2-1 完成 Project、固定指示、來源連接與實際讀取驗證', ()
   assert.doesNotMatch(text, /專案名稱旁的選單|Edit project|編輯專案/);
   assert.doesNotMatch(text, /維持[^。<]{0,20}預設記憶|Default memory/);
   assert.doesNotMatch(text, /Project-only memory[^。<]{0,40}(自動整理|永久資料庫|保證)/);
+  assert.doesNotMatch(text, /瀏覽器網址是|本課統一使用 ChatGPT 網頁版/);
 });
 
-test('3-1 從網頁版開啟 2-1 已建立的主對話，不重教建立 Project', () => {
+test('ChatGPT 主流程維持 Desktop App 優先，Web 僅作備用', () => {
+  const pages = [
+    'index.html', 'chapters/02-01.html', 'chapters/03-01.html',
+    'chapters/03-02.html', 'chapters/06-02.html',
+    'appendices/prompts.html', 'appendices/troubleshooting.html',
+    'appendices/project-memory-skill.html'
+  ];
+  for (const relative of pages) {
+    assert.doesNotMatch(read(relative), /ChatGPT 網頁版|網頁版本的 ChatGPT|統一以網頁版|全部以網頁版為準/, relative);
+  }
+  assert.match(read('index.html'), /ChatGPT Desktop App 作為主要示範環境/);
+  assert.match(read('chapters/02-01.html'), /無法安裝 Desktop App.*ChatGPT Web/);
+  assert.match(read('chapters/06-02.html'), /在 Desktop App 開啟 Scheduled/);
+  assert.match(read('appendices/project-memory-skill.html'), /切換到 Codex 工作區/);
+  assert.match(read('assets/app.js'), /Desktop App ChatGPT Web 網頁版 備用入口/);
+  assert.match(read('chapters/01-02.html'), /Chrome／Edge.*Tactiq/);
+});
+
+test('3-1 從 Desktop App 開啟 2-1 已建立的主對話，不重教建立 Project', () => {
   const text = read('chapters/03-01.html');
   for (const phrase of [
-    '開啟 ChatGPT 網頁版', 'Projects／專案', '工作訊息整理',
+    '開啟 ChatGPT Desktop App', 'Projects／專案', '工作訊息整理',
     '網站改版專案｜工作記憶', '目前實際專案的主對話', '輸入框旁的', '+／工具選單', 'Prompt 2'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
   assert.doesNotMatch(text, /課程宣傳專案｜工作記憶/);
@@ -497,7 +517,7 @@ test('3-2 驗收結果並在同一個專案主對話持續更新', () => {
   for (const phrase of [
     '人工確認', '抽查', '已確認決策', '待辦', '決策變更', '候選',
     '來源', '同一個專案主對話', '新的日期範圍', '後續更新',
-    '不得因為時間較晚就自動覆蓋', 'ChatGPT 網頁版',
+    '不得因為時間較晚就自動覆蓋', 'ChatGPT Desktop App',
     'Save to project／Add to project sources', '只有人工確認過的結果',
     '不代表內容已自動成為正式專案狀態', '你現在應該看到'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
@@ -690,7 +710,7 @@ test('排程只在手動跨來源驗證成功後建立，且不依賴 Project �
     '先手動驗證成功，再自動化', 'Google Drive', 'Gmail', '[LINE紀錄]',
     '完整逐字稿', '上一次成功執行', '指定已發生期間內未找到相關資料', '無法存取',
     '本次週期沒有新的工作記憶需要更新', '每次執行都要依 Prompt 重新搜尋',
-    '不能只因排程建立在 Project 裡', 'ChatGPT 網頁版',
+    '不能只因排程建立在 Project 裡', 'ChatGPT Desktop App',
     'plan', 'workspace', 'Plugins／Apps', 'Settings／設定 → Notifications／通知 → Manage tasks／管理任務',
     '專案主對話手動執行 Prompt 2'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
@@ -828,7 +848,7 @@ test('實際操作步驟內提供對應快捷按鈕', () => {
     ['chapters/01-02.html', '開啟唯一一場測試 Meet', 'https://meet.google.com/'],
     ['chapters/01-02.html', '確認 Tactiq Transcript', 'https://app.tactiq.io/'],
     ['chapters/01-02.html', '先建立資料夾', 'https://drive.google.com/drive/my-drive'],
-    ['chapters/02-01.html', '開啟 ChatGPT 網頁版', 'https://chatgpt.com/'],
+    ['chapters/02-01.html', '開啟並登入 ChatGPT Desktop App', 'https://chatgpt.com/'],
     ['chapters/02-01.html', '連接 Google Drive 與 Gmail', 'https://drive.google.com/drive/my-drive'],
     ['chapters/02-01.html', '連接 Google Drive 與 Gmail', 'https://mail.google.com/'],
     ['chapters/04-02.html', '登入 LINE Developers', 'https://developers.line.biz/console/'],

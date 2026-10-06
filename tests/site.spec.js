@@ -302,6 +302,22 @@ test('搜尋 Tactiq、Microsoft Teams、Teams 或 Edge 都可篩選到 1-2', asy
   await page.close();
 });
 
+test('搜尋 Desktop App、ChatGPT Web 或網頁版可找到 2-1', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由內容測試驗證搜尋詞');
+  const page = await browser.newPage();
+  for (const relative of ['', '/chapters/03-01.html']) {
+    await page.goto(baseURL + relative);
+    for (const query of ['Desktop App', 'ChatGPT Web', '網頁版']) {
+      await page.locator('#course-search').fill(query);
+      assert.ok(
+        await page.locator('[data-search-item][href$="chapters/02-01.html"]:visible').count() > 0,
+        `${relative || 'index'}: ${query} should find 2-1`
+      );
+    }
+  }
+  await page.close();
+});
+
 test('Skill 附錄頁與下載連結在 390px 手機版可用', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由 static-site.spec.js 驗證結構');
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
