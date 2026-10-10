@@ -302,6 +302,35 @@ test('搜尋 Tactiq、Microsoft Teams、Teams 或 Edge 都可篩選到 1-2', asy
   await page.close();
 });
 
+test('3-1 與 3-2 的 Prompt 複製、章節導覽和手機版寬度正常', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由 content.spec.js 驗證文字與放置位置');
+  const page = await browser.newPage({
+    viewport: { width: 390, height: 844 },
+    permissions: ['clipboard-read', 'clipboard-write']
+  });
+  for (const [relative, cardSelector, nextHref] of [
+    ['chapters/03-01.html', '[data-prompt-card="2"] > .prompt-copy-card', '03-02.html'],
+    ['chapters/03-02.html', '[data-prompt-followup-card="2"]', '04-01.html']
+  ]) {
+    await page.goto(baseURL + '/' + relative);
+    const card = page.locator(cardSelector);
+    const expected = await card.locator('pre').textContent();
+    await card.locator('[data-copy-target]').click();
+    assert.equal(
+      (await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n'),
+      expected.replace(/\r\n/g, '\n'),
+      relative
+    );
+    assert.equal(await page.locator(`nav.pager a[href="${nextHref}"]`).count(), 1, relative);
+    const widths = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      client: document.documentElement.clientWidth
+    }));
+    assert.ok(widths.scroll <= widths.client + 1, `${relative}: ${JSON.stringify(widths)}`);
+  }
+  await page.close();
+});
+
 test('搜尋 Desktop App、ChatGPT Web 或網頁版可找到 2-1', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由內容測試驗證搜尋詞');
   const page = await browser.newPage();

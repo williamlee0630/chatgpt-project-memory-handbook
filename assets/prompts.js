@@ -8,8 +8,8 @@
       tag: '只設定一次',
       indexLabel: '01｜只設定一次',
       placement: 'ChatGPT Desktop App → Project → Project instructions',
-      purpose: '設定共用的來源定義、專案邊界、版本判斷與人工確認規則。',
-      when: '第一次建立本課示範的「工作訊息整理」Project 時設定一次。',
+      purpose: '設定目前 Project 的來源定義、專案邊界、版本判斷與人工確認規則。',
+      when: '第三集建立「活動籌備」Project 時，在該 Project 設定一次。不同工作各自建立 Project。',
       body: `你是我的「專案工作記憶助理」。
 
 你的任務不是單純摘要單一來源，而是協助我持續整理使用者目前指定專案在不同時間、不同來源產生的工作紀錄。
@@ -73,15 +73,15 @@
     },
     {
       id: '2',
-      name: '專案主對話｜建立／更新跨來源工作記憶',
+      name: '專用工作記憶對話｜建立／更新跨來源工作記憶',
       tag: '日常主要使用',
       indexLabel: '02｜日常主要使用',
-      placement: 'ChatGPT Desktop App → Project → 專案主對話',
+      placement: 'ChatGPT Desktop App → 「活動籌備」Project → 專用工作記憶對話',
       purpose: '第一次建立完整跨來源工作記憶，之後沿用同一對話持續更新。',
       when: '第一次整合會議與 LINE 資料，或需要完整重跑指定日期範圍時。',
-      notice: '第一次貼完整版；後續留在同一個專案主對話，使用卡片下方的簡短版即可。',
+      notice: '第一次在「活動籌備」Project 的新對話貼完整版，整理後命名為「活動籌備｜工作記憶」；後續留在同一對話使用下方簡短版。',
       followup: Object.freeze({
-        name: '後續更新｜留在同一個主對話使用，不另開新對話',
+        name: '後續更新｜留在同一個工作記憶對話使用，不另開新對話',
         purpose: '第一次完整整理完成後，用這段短訊息更新下一個日期範圍。它不是新的編號 Prompt。',
         body: `請更新「＿＿＿＿專案」的工作記憶。
 

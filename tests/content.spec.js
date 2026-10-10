@@ -344,7 +344,7 @@ test('prompts.js 只提供三張主流程 Prompt，部署救援另列實作工�
   const prompts = loadCoursePrompts();
   const expected = [
     ['1', 'Project 固定指示'],
-    ['2', '專案主對話｜建立／更新跨來源工作記憶'],
+    ['2', '專用工作記憶對話｜建立／更新跨來源工作記憶'],
     ['3', '跨來源週期排程']
   ];
   assert.deepEqual(prompts.map(prompt => [prompt.id, prompt.name]), expected);
@@ -360,7 +360,7 @@ test('prompts.js 只提供三張主流程 Prompt，部署救援另列實作工�
   assert.equal(byId['2'].tag, '日常主要使用');
   assert.equal(byId['3'].tag, '進階篇完成後');
   assert.equal(byId['3'].placement, 'ChatGPT Desktop App → Scheduled Task／排程');
-  assert.equal(byId['2'].followup.name, '後續更新｜留在同一個主對話使用，不另開新對話');
+  assert.equal(byId['2'].followup.name, '後續更新｜留在同一個工作記憶對話使用，不另開新對話');
   assert.match(byId['2'].followup.body, /沿用目前已確認的專案脈絡/);
 
   const tools = loadCoursePromptTools();
@@ -410,14 +410,13 @@ test('2-1 完成 Project、固定指示、來源連接與實際讀取驗證', ()
     '本課主要使用 ChatGPT Desktop App', '開啟並登入 ChatGPT Desktop App',
     '準備用於本課的 ChatGPT 帳號', '左側欄收起', 'Projects／專案入口',
     'ChatGPT Web 備用入口', 'chatgpt.com',
-    '建立「工作訊息整理」專案並加入固定指示',
+    '建立「活動籌備」Project 並加入固定指示',
     '專案總覽頁面', '右上角', '新增', '建立專案', '專案名稱',
-    '工作訊息整理', '只是本課程的示範名稱', '不是系統規定名稱',
-    '行銷專案整理', '畢業專題', '產品開發紀錄',
+    '活動籌備', '網站製作', '研討會討論',
     '僅限專案的記憶（Project-only memory）',
     '讓這個 Project 的工作脈絡集中在專案內',
     '避免其他聊天的內容影響整理結果',
-    'ChatGPT Project 容器',
+    '不同工作',
     '你現在是在 Project 裡，而不是一般 ChatGPT 對話',
     '進入專案後，點右上角', '⋯',
     '專案設定（Project settings）', '專案指示（Project instructions）',
@@ -426,8 +425,8 @@ test('2-1 完成 Project、固定指示、來源連接與實際讀取驗證', ()
     'Google Drive', 'Gmail', 'Install', 'Connect', 'Allow',
     'plan', 'region', 'workspace', '管理員政策', '實際打開', '讀取內容',
     'Tactiq 逐字稿', '[LINE紀錄]', 'LINE TXT', '手動提供', '不得假裝已成功',
-    '在這個 Project 裡建立新的 Chat', '不要從一般 ChatGPT 首頁建立普通聊天',
-    '網站改版專案｜工作記憶', 'Rename／重新命名', '範例名稱',
+    '在「活動籌備」Project 裡查找來源', '不要從一般 ChatGPT 首頁建立普通聊天',
+    '查找會議原始紀錄', 'Rename／重新命名',
     '你現在應該看到'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
   assert.doesNotMatch(text, /專案名稱旁的選單|Edit project|編輯專案/);
@@ -454,23 +453,25 @@ test('ChatGPT 主流程維持 Desktop App 優先，Web 僅作備用', () => {
   assert.match(read('chapters/01-02.html'), /Chrome／Edge.*Tactiq/);
 });
 
-test('3-1 從 Desktop App 開啟 2-1 已建立的主對話，不重教建立 Project', () => {
+test('3-1 從 Desktop App 開啟既有 Project 並建立專用工作記憶對話', () => {
   const text = read('chapters/03-01.html');
   for (const phrase of [
-    '開啟 ChatGPT Desktop App', 'Projects／專案', '工作訊息整理',
-    '網站改版專案｜工作記憶', '目前實際專案的主對話', '輸入框旁的', '+／工具選單', 'Prompt 2'
+    '開啟 ChatGPT Desktop App', 'Projects／專案', '活動籌備',
+    '查找會議原始紀錄', 'New chat／新增聊天', '活動籌備｜工作記憶',
+    '輸入框旁的', '+／工具選單', 'Prompt 2'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
   assert.doesNotMatch(text, /課程宣傳專案｜工作記憶/);
-  assert.doesNotMatch(text, /New project／新增專案/);
+  assert.doesNotMatch(text, /New project／新增專案|「工作訊息整理」/);
 });
 
-test('Project 範例名稱與設定入口在後續教材保持一致', () => {
+test('各頁使用活動籌備 Project 與設定入口', () => {
   const projectText = [
     read('chapters/02-01.html'), read('chapters/03-01.html'),
     read('chapters/03-02.html'), read('chapters/06-02.html'),
     read('appendices/troubleshooting.html'), JSON.stringify(loadCoursePrompts())
   ].join('\n');
-  assert.match(projectText, /工作訊息整理/);
+  assert.match(projectText, /活動籌備/);
+  assert.doesNotMatch(projectText, /工作訊息整理/);
   for (const obsolete of [
     '專案名稱旁的選單', 'Edit project', '編輯專案',
     '第一次建立「專案工作記憶」Project',
@@ -500,23 +501,23 @@ test('2-2 只取得並檢查 LINE TXT，再明確交給 3-1 做第一次跨來�
     '記事本', '不是空檔', '繁體中文沒有亂碼', '開始日期', '結束日期',
     '群組名稱', '敏感資料', '想整理日期附近的訊息已載入',
     '第一筆是否涵蓋想整理的開始範圍', '最後一筆是否到達想整理的結束範圍',
-    '先保留這份 LINE TXT。下一節 3-1 會把它和會議逐字稿一起加入「工作訊息整理」Project 的主對話，進行第一次跨來源整理。'
+    '先保留這份 LINE TXT。下一節 3-1 會回到第三集建立的「活動籌備」Project，新增工作記憶對話，再把它和會議逐字稿一起加入新對話，進行第一次跨來源整理。'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
   assert.doesNotMatch(text, /data-prompt-id=|貼下方 Prompt|送出 Prompt/);
 });
 
 test('3-1 才開始第一次正式跨來源整理，且提供完成確認', () => {
   const text = read('chapters/03-01.html');
-  assert.match(text, /2-1 已建立 Project，本節直接進入「工作訊息整理」/);
+  assert.match(text, /第三集建立的是「活動籌備」Project/);
   assert.match(text, /會議紀錄與 LINE TXT 都已提供/);
   assert.match(text, /摘要／決策／待辦／變更／未決事項/);
 });
 
-test('3-2 驗收結果並在同一個專案主對話持續更新', () => {
+test('3-2 驗收結果並在同一個工作記憶對話持續更新', () => {
   const text = read('chapters/03-02.html');
   for (const phrase of [
     '人工確認', '抽查', '已確認決策', '待辦', '決策變更', '候選',
-    '來源', '同一個專案主對話', '新的日期範圍', '後續更新',
+    '來源', '同一個對話', '新的日期範圍', '後續更新',
     '不得因為時間較晚就自動覆蓋', 'ChatGPT Desktop App',
     'Save to project／Add to project sources', '只有人工確認過的結果',
     '不代表內容已自動成為正式專案狀態', '你現在應該看到'
@@ -698,7 +699,7 @@ test('首頁提供三層 Prompt 流程與不帶內部查驗日期的介面提醒
   assert.doesNotMatch(text, /介面／政策最後查驗：\d{4}-\d{2}-\d{2}/);
   for (const phrase of [
     'ChatGPT', 'LINE', 'Google', 'Vercel', 'Tactiq', '官方當下介面為準',
-    'Project 固定指示', '專案主對話', '跨來源週期排程'
+    'Project 固定指示', '專用工作記憶對話', '跨來源週期排程'
   ]) {
     assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
   }
@@ -750,7 +751,7 @@ test('實作頁提供起點、連續操作路徑與成功確認點', () => {
     'chapters/01-02.html': ['https://meet.google.com/', 'Automatic', 'Save', '你現在應該看到'],
     'chapters/02-01.html': ['https://chatgpt.com/', '新增專案', 'Project instructions', '你現在應該看到'],
     'chapters/02-02.html': ['匯出聊天記錄', 'LINE TXT', '你現在應該看到'],
-    'chapters/03-01.html': ['專案主對話', '日期範圍', '實際讀取', '你現在應該看到'],
+    'chapters/03-01.html': ['專用工作記憶對話', '日期範圍', '實際讀取', '你現在應該看到'],
     'chapters/03-02.html': ['抽查', '後續更新', '你現在應該看到'],
     'chapters/04-02.html': ['https://manager.line.biz/', 'Use Messaging API', '你現在應該看到'],
     'chapters/04-03.html': ['console.cloud.google.com', 'Create', 'JSON', 'client_email', '你現在應該看到'],

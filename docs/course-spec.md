@@ -22,7 +22,7 @@
 ## Prompt 與對話合約
 
 - Prompt 1「Project 固定指示」只在 Project instructions 設定一次。
-- Prompt 2「專案主對話｜建立／更新跨來源工作記憶」第一次完整執行；後續更新留在同一對話，使用其下方不另編號的簡短版。
+- Prompt 2「專用工作記憶對話｜建立／更新跨來源工作記憶」在「活動籌備」Project 的新對話第一次完整執行；後續更新留在同一對話，使用其下方不另編號的簡短版。
 - Prompt 3「跨來源週期排程」只在進階篇手動驗證 Google Drive + Gmail 成功後建立。
 - 舊的 LINE、Tactiq、合併、決策、待辦與 LINE-only 排程不保留獨立 Prompt 或隱藏別名。
 - Codex／Vercel 部署協助屬於獨立實作輔助工具，不列入 Prompt 1、2、3。
