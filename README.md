@@ -17,7 +17,7 @@ Windows 操作為主的純靜態教學網站：6 章、13 節、約 100 分鐘�
 - ZIP 根目錄直接包含 14 個正式檔案，不多包一層資料夾。
 - ZIP 與 starter 不含真實 .env、Service Account JSON、Token、密碼或 Gmail 憑證。
 
-你可以從 https://vercel.com/drop 直接上傳 ZIP 或 folder，不需要先解壓縮。第一次 Drop 建立 Project 後，在原 Project 設定六個變數並 Redeploy；不要重新 Drop ZIP。你不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機啟動 Flask。
+從 https://vercel.com/ 登入後，在 Dashboard 點 Add New… → Project，於建立專案頁面直接上傳 ZIP，不需要先解壓縮；也可先解壓縮後上傳專案資料夾。建立 Project 後，在原 Project 設定六個變數並 Redeploy；不要重新上傳 ZIP。你不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機啟動 Flask。
 
 正式環境變數只有六個：
 
@@ -60,7 +60,7 @@ python -m http.server 8000
 
 ## 發布到 GitHub Pages
 
-這一節只描述電子講義網站的發布，與你在課程中部署 LINE Bot 的 Vercel Drop 流程不同。
+這一節只描述電子講義網站的發布，與你在課程中部署 LINE Bot 從 Vercel 官網建立 Project 的流程不同。
 
 1. 在 GitHub 建立新的 Repository。
 2. 上傳本資料夾內全部網站檔案，index.html 必須位於 Repository 根目錄。

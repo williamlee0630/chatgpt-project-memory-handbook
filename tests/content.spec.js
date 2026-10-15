@@ -603,15 +603,16 @@ test('相關學生文件不再提供 Base64 解碼驗證，starter 使用同一�
   assert.match(starter, /最終是否設定正確，以部署與實際 Google Sheets 寫入測試為準/);
 });
 
-test('5-1 使用官方 Drop、原 Project Redeploy 與恰好六個 Value', () => {
+test('5-1 從 Vercel 官網建立 Project、原 Project Redeploy 與恰好六個 Value', () => {
   const text = read('chapters/05-01.html');
-  assert.match(text, /href="https:\/\/vercel\.com\/drop"/);
-  assert.doesNotMatch(text, /href="https:\/\/vercel\.com\/(?:new)?"/);
+  assert.match(text, /<a class="button-link secondary" target="_blank" rel="noopener" href="https:\/\/vercel\.com\/">前往 Vercel 官方網站<\/a>/);
+  assert.doesNotMatch(text, /vercel\.com\/drop|Vercel Drop|重新 Drop/);
   for (const phrase of [
-    'ZIP 或 folder', '不用先解壓縮', '登入', 'Team', '個人帳號', 'Project name',
-    'Deploy', 'Project', 'Settings', 'Environment Variables', 'Add New',
-    'Production', 'Save', '你現在應該看到', '不要重新 Drop ZIP',
-    '每次重新 Drop 都會建立新的 Project', 'Redeploy 原本 Project',
+    '不用先解壓縮', 'Log In', 'Dashboard', 'Add New…', 'Project',
+    'file', 'folder', 'LINE訊息整理Bot_課程正式版.zip', 'Team', '個人帳號', 'Project name',
+    'Deploy', 'Settings', 'Environment Variables', 'Add New',
+    'Production', 'Save', '你現在應該看到', '不要重新上傳課程 ZIP',
+    'Redeploy 原本 Project',
     'Value 欄只貼真正的值', 'LINE_CHANNEL_SECRET=abc123',
     '不要加雙引號', '不要加單引號', '不要帶變數名稱', '不要多貼換行'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
@@ -755,7 +756,7 @@ test('實作頁提供起點、連續操作路徑與成功確認點', () => {
     'chapters/03-02.html': ['抽查', '後續更新', '你現在應該看到'],
     'chapters/04-02.html': ['https://manager.line.biz/', 'Use Messaging API', '你現在應該看到'],
     'chapters/04-03.html': ['console.cloud.google.com', 'Create', 'JSON', 'client_email', '你現在應該看到'],
-    'chapters/05-01.html': ['https://vercel.com/drop', 'Environment Variables', 'Redeploy', '你現在應該看到'],
+    'chapters/05-01.html': ['https://vercel.com/', 'Environment Variables', 'Redeploy', '你現在應該看到'],
     'chapters/05-02.html': ['Production Domain', 'Verify', 'Success', '你現在應該看到'],
     'chapters/06-01.html': ['#設定信箱', '#寄出紀錄', '你現在應該看到'],
     'chapters/06-02.html': ['Google Drive', 'Gmail', 'Scheduled Task', '你現在應該看到']
@@ -824,7 +825,7 @@ test('第 4～6 章與學生範例不再教授 Node.js 舊流程', () => {
   assert.doesNotMatch(advanced, /學生.{0,20}(必須|需要).{0,20}(建立|使用).{0,20}GitHub Repository/s);
 });
 
-test('正式 Python schema、控制指令、Webhook 與 Vercel Drop 完整出現', () => {
+test('正式 Python schema、控制指令、Webhook 與 Vercel 官網部署完整出現', () => {
   const advanced = ['04-01','04-02','04-03','05-01','05-02','06-01','06-02']
     .map(id => read('chapters/' + id + '.html')).join('\n');
   const groupsHeader = 'group_id\tgroup_name\treceiver_email';
@@ -832,7 +833,7 @@ test('正式 Python schema、控制指令、Webhook 與 Vercel Drop 完整出現
   for (const required of [
     'Python', 'Flask', 'gspread', 'Gmail SMTP', 'LINE Messaging API',
     'groups', 'messages', groupsHeader, messagesHeader, '/callback',
-    '#設定信箱', '#查看信箱', '#寄出紀錄', 'Vercel Drop', 'FALSE', 'TRUE'
+    '#設定信箱', '#查看信箱', '#寄出紀錄', 'Vercel 官方網站', 'FALSE', 'TRUE'
   ]) assert.match(advanced, new RegExp(escapeRegExp(required)), required);
   const envPage = read('chapters/05-01.html');
   for (const name of [
@@ -858,7 +859,7 @@ test('實際操作步驟內提供對應快捷按鈕', () => {
     ['chapters/04-03.html', '建立／選擇 Cloud Project', 'https://console.cloud.google.com/'],
     ['chapters/04-03.html', '新增 App Password', 'https://myaccount.google.com/apppasswords'],
     ['chapters/05-01.html', '下載課程 ZIP', '../downloads/LINE訊息整理Bot_課程正式版.zip'],
-    ['chapters/05-01.html', '開啟 Vercel Drop', 'https://vercel.com/drop'],
+    ['chapters/05-01.html', '進入 Vercel 官網並登入', 'https://vercel.com/'],
     ['chapters/05-02.html', 'Redeploy', 'https://vercel.com/']
   ]) assertStepContains(relative, heading, href);
 });
