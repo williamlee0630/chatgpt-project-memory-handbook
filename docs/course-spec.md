@@ -82,7 +82,7 @@ GMAIL_APP_PASSWORD 不是一般登入密碼，貼入前必須移除顯示用空�
 
 ## 課程部署合約
 
-讀者以 https://vercel.com/drop 上傳 downloads/LINE訊息整理Bot_課程正式版.zip 或專案資料夾。ZIP 可以直接上傳，不必先解壓縮。第一次因缺少環境變數而失敗是預期狀況；Project 建立後填六個變數，再到 Deployments 對原 Project 執行 Redeploy，不重新 Drop ZIP。
+讀者從 https://vercel.com/ 登入後，在 Dashboard 點 Add New… → Project，於建立專案頁面上傳 downloads/LINE訊息整理Bot_課程正式版.zip 或專案資料夾。ZIP 可以直接上傳，不必先解壓縮；若選資料夾，先解壓縮並選擇包含 app.py、index.py、requirements.txt、vercel.json 的專案資料夾。第一次因缺少環境變數而失敗是預期狀況；Project 建立後填六個變數，再到 Deployments 對原 Project 執行 Redeploy，不重新上傳 ZIP。
 
 一般課程操作不需要 Git、GitHub、Vercel CLI、Python、venv、pip、ngrok或本機 Flask。GitHub 只可出現在長期維護或電子講義 GitHub Pages 發布說明。
 

@@ -446,12 +446,12 @@ LINE 時間較晚，不代表一定修改會議決策。
       name: 'Codex／Vercel 部署協助 Prompt',
       tag: '選用',
       placement: 'Codex',
-      purpose: '正常 Vercel Drop 部署流程卡住時，協助檢查 README 與非敏感操作。',
+      purpose: '從 Vercel 官網建立 Project 的流程卡住時，協助檢查講義、README 與非敏感操作。',
       when: '只在第 5 章部署遇到問題時使用。',
       notice: '這是獨立的實作輔助工具，不是工作記憶主流程，也不是完成課程的必要步驟。',
       body: `我要部署課程提供的「LINE 訊息整理 Bot」專案。
 
-請協助我依照課程 README 完成部署。
+請協助我依照講義第 5-1 節的 Vercel 官網操作步驟，並參考課程 README 的程式設定完成部署。
 
 我的目標流程是：
 
@@ -459,7 +459,7 @@ Google Sheets
 → Google Service Account
 → Gmail App Password
 → LINE Messaging API
-→ Vercel Drop
+→ Vercel 官網 → Dashboard → Add New… → Project → 上傳課程 ZIP
 → Environment Variables
 → Redeploy
 → LINE Webhook /callback
@@ -467,11 +467,11 @@ Google Sheets
 → Bot 加入群組
 → 實際測試
 
-請先閱讀專案中的 README.md，再開始操作。
+請先閱讀講義第 5-1 節與專案中的 README.md，再開始操作。
 
 重要規則：
 
-1. 以 README.md 的課程流程為最高優先，不要自行改寫程式架構。
+1. 以講義第 5-1 節的部署入口與 README.md 的程式設定為準；若兩者的入口不同，以講義第 5-1 節為準。不要自行改寫程式架構。
 
 2. 一般課程部署不需要：
    - Git
@@ -480,7 +480,7 @@ Google Sheets
    - Python 本機環境
    - ngrok
 
-3. 使用 Vercel Drop 部署課程提供的專案。
+3. 從 https://vercel.com/ 登入，在 Dashboard 點 Add New… → Project，於建立專案頁面上傳課程 ZIP。
 
 4. Vercel 需要設定的 Environment Variables 只有：
    LINE_CHANNEL_SECRET
@@ -498,11 +498,11 @@ Google Sheets
 
 8. 每完成一個階段先檢查結果，再進入下一個階段。
 
-9. 如果畫面與 README 不一致，先告訴我差異，不要自行猜測或進行破壞性操作。
+9. 如果畫面與講義第 5-1 節不一致，先告訴我差異，不要自行猜測或進行破壞性操作。
 
 如果目前環境支援 Computer Use，可以協助我操作瀏覽器完成非敏感步驟。
 
-現在先檢查 README.md，告訴我第一個要完成的步驟，再開始。`
+現在先檢查講義第 5-1 節與 README.md，告訴我第一個要完成的步驟，再開始。`
     }
   ].map(tool => Object.freeze(tool));
 

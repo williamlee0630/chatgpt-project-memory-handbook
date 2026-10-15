@@ -1,6 +1,6 @@
 # LINE 訊息整理 Bot
 
-這是本課提供的 LINE 訊息整理 Bot 部署範本。請直接使用下載包中的程式、Google Sheets schema 與 Vercel Drop 流程，只需填入你自己的帳號與憑證。
+這是本課提供的 LINE 訊息整理 Bot 部署範本。請直接使用下載包中的程式、Google Sheets schema 與講義第 5-1 節的 Vercel 官網部署流程，只需填入你自己的帳號與憑證。
 
 Bot 的工作很單純：保存加入 LINE 群組後收到的新文字訊息，並在群組輸入指令後，將尚未寄送的紀錄放在 Email 正文寄出。群組的 `join`／`memberJoined` 事件只觸發歡迎訊息，不寫入 `messages`；私訊、room 與非文字訊息不在正式處理範圍。
 
@@ -37,7 +37,7 @@ Service Account JSON 安全保存
 ↓
 建立 LINE Messaging API Bot
 ↓
-使用 Vercel Drop 上傳本課下載的 ZIP
+從 Vercel 官網建立 Project 並上傳本課下載的 ZIP
 ↓
 Service Account JSON → Base64
 ↓
@@ -142,7 +142,7 @@ LINE_CHANNEL_ACCESS_TOKEN
 
 本課練習流程使用 long-lived token 簡化操作；正式工作環境應評估 short-lived、v2.1 或 stateless token。重新發行 long-lived token 會讓舊 token 失效，必須同步更新 Vercel 並 Redeploy。同一個 LINE 群組／多人聊天室同一時間只能有一個 LINE Official Account；無法加入時先檢查群組內是否已有另一個官方帳號。
 
-## 五、使用 Vercel Drop 部署
+## 五、從 Vercel 官網建立 Project
 
 請使用本課提供的下載包：
 
@@ -152,16 +152,16 @@ LINE訊息整理Bot_課程正式版.zip
 
 部署方式：
 
-1. 登入 Vercel。
-2. 進入官方 [Vercel Drop](https://vercel.com/drop)。
-3. 將下載的 ZIP 或專案 folder 拖入上傳區；ZIP 可以直接上傳，不用先解壓縮。
-4. 等待 Vercel 建立 Project。
+1. 點擊 [前往 Vercel 官方網站](https://vercel.com/)，按右上角 **Log In**，選擇登入方式並完成登入。
+2. 進入 **Dashboard**，點 **Add New…** → **Project**。
+3. 在建立專案頁面的「You can also drag and drop your project, or choose a file or a folder.」區域點 **file**，選擇本課下載的 ZIP；也可將 ZIP 拖入此區域。ZIP 可以直接上傳，不用先解壓縮。若使用 **folder**，先解壓縮，再選擇直接包含 `app.py`、`index.py`、`requirements.txt`、`vercel.json` 的專案資料夾。
+4. 等待讀取完成，確認 Team／個人帳號與 Project name，檢查其他設定後點 **Deploy**，進入 Project 管理頁面。
 
-Vercel Drop 不需要 Git、GitHub 或 Vercel CLI，可直接上傳 ZIP 或 folder。
+此流程不需要 Git、GitHub 或 Vercel CLI。
 
-第一次 Drop 尚未設定環境變數，第一次 Deployment 可能失敗；Project 建立後繼續完成下一節，最後 Redeploy 原 Project 即可。
+第一次尚未設定環境變數，第一次 Deployment 可能失敗；Project 建立後繼續完成下一節，最後 Redeploy 原 Project 即可。
 
-> **不要重新 Drop ZIP。** Vercel Drop 每次重新 Drop 都會建立新的 Project。環境變數錯誤時回原 Project 修正並 Redeploy。未來若需要長期修改與自動部署，再使用 GitHub；本課一般操作不需要。
+> **不要重新上傳課程 ZIP。** 環境變數錯誤時回原 Project 修正並 Redeploy，不要回到建立專案頁面重新上傳，以免建立另一個 Project。未來若需要長期修改與自動部署，再使用 GitHub；本課一般操作不需要。
 
 ## 六、填入六個 Environment Variables
 
