@@ -14,7 +14,7 @@
     ['05-01', '5-1 設定環境變數', 'chapters/05-01.html', '進階篇', 'Python ZIP Vercel 官網 Base64 六個 Environment Variables'],
     ['05-02', '5-2 部署、Webhook 與驗證', 'chapters/05-02.html', '進階篇', 'Vercel Production Domain Ready callback Verify 設定信箱 查看信箱'],
     ['06-01', '6-1 多群組與收件信箱分流', 'chapters/06-01.html', '進階篇', '多聊天室 group_id receiver_email 寄出紀錄 sent'],
-    ['06-02', '6-2 完整測試與跨來源週期排程', 'chapters/06-02.html', '進階篇', '完整測試 跨來源週期排程 Scheduled Task group_id message sent ChatGPT Drive Gmail']
+    ['06-02', '6-2 Skill 實作與最終驗收', 'chapters/06-02.html', '進階篇', '完整測試 Skill 安裝 週報 跨來源週期排程 Scheduled Task group_id message sent ChatGPT Drive Gmail']
   ];
 
   const root = document.body.dataset.root || './';

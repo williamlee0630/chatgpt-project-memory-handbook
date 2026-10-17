@@ -370,6 +370,36 @@ test('Skill 附錄頁與下載連結在 390px 手機版可用', async t => {
   await page.close();
 });
 
+test('6-2 Skill 入口、示範提示詞與附錄完整安裝提示詞可在手機複製', async t => {
+  if (!browser) return t.skip('執行環境未提供 Chromium；由靜態測試驗證內容');
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto(baseURL + '/chapters/06-02.html');
+  const lessonWidths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
+  assert.ok(lessonWidths.scroll <= lessonWidths.client + 1, `Lesson page horizontal overflow: ${JSON.stringify(lessonWidths)}`);
+  for (const target of ['skill-cross-source-demo', 'skill-weekly-demo']) {
+    await page.locator(`[data-copy-target="${target}"]`).click();
+    const expected = await page.locator(`#${target}`).innerText();
+    assert.equal((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n'), expected.replace(/\r\n/g, '\n'));
+  }
+  await page.locator('a[href="../appendices/project-memory-skill.html#skill-one-click-install"]').click();
+  await page.waitForURL(/project-memory-skill\.html#skill-one-click-install$/);
+  assert.equal(await page.locator('#skill-one-click-install').count(), 1);
+  for (const target of ['skill-install-prompt', 'skill-verify-prompt', 'codex-file-practice-prompt']) {
+    await page.locator(`[data-copy-target="${target}"]`).click();
+    const expected = await page.locator(`#${target}`).innerText();
+    assert.equal((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n'), expected.replace(/\r\n/g, '\n'));
+  }
+  const installText = await page.locator('#skill-install-prompt').innerText();
+  assert.match(installText, /^請協助我安裝「專案整理 Skill Kit」。/);
+  assert.match(installText, /不要修改任何與 Skill 安裝無關的專案檔案。$/);
+  const verifyText = await page.locator('#skill-verify-prompt').innerText();
+  assert.match(verifyText, /最後以表格呈現四個 Skill 的檢查結果。$/);
+  const widths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
+  assert.ok(widths.scroll <= widths.client + 1, `Skill page horizontal overflow: ${JSON.stringify(widths)}`);
+  await page.close();
+});
+
 test('側邊搜尋能從首頁與附錄找到 Skill Kit', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium');
   const page = await browser.newPage();

@@ -290,7 +290,7 @@ test('6-2 區分 Prompt、帳號通知與 Gmail Connector', () => {
   ]) assert.doesNotMatch(prompt, forbidden);
 });
 
-test('6-2 提供建立後驗證、三層判斷與下一週期複驗', () => {
+test('6-2 提供建立後驗證、四層判斷與下一週期複驗', () => {
   const text = read('chapters/06-02.html');
   for (const phrase of [
     '<h2>建立後驗證</h2>',
@@ -301,10 +301,11 @@ test('6-2 提供建立後驗證、三層判斷與下一週期複驗', () => {
     '是否有新的執行結果',
     '下一個週期是否真的再次執行',
     '第一層：排程有沒有實際執行？',
-    '第二層：任務執行內容有沒有成功？',
-    '第三層：Email／Push 有沒有送達？',
+    '第二層：指定 Drive／Gmail 來源有沒有實際讀取？',
+    '第三層：結果的專案、日期、決策與待辦是否正確？',
+    '第四層：Email／Push 有沒有送達？',
     '第一次收到 Task Update，不代表重複排程之後每次都一定會正常執行。',
-    '排程執行、任務內容與通知配送是三個不同層級'
+    '排程執行、資料讀取、結果正確與通知配送是四個不同層級'
   ]) assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
 });
 
@@ -471,7 +472,7 @@ test('各頁使用活動籌備 Project 與設定入口', () => {
     read('appendices/troubleshooting.html'), JSON.stringify(loadCoursePrompts())
   ].join('\n');
   assert.match(projectText, /活動籌備/);
-  assert.doesNotMatch(projectText, /工作訊息整理/);
+  assert.doesNotMatch(projectText, /「工作訊息整理」(?:Project|專案)/);
   for (const obsolete of [
     '專案名稱旁的選單', 'Edit project', '編輯專案',
     '第一次建立「專案工作記憶」Project',

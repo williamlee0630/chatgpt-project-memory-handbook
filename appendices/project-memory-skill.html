@@ -27,6 +27,115 @@
 <section class="chapter-card"><span class="badge">Step 4</span><h3>專案進度週報</h3><p><strong>輸入：</strong>指定日期範圍內的專案資料。</p><p><strong>輸出：</strong>本週完成、進行中、待辦、決策變更、風險與下週重點。</p><p>期間外資料只當背景；沒有來源數字就不寫完成百分比。</p></section>
 </div>
 
+<h2 id="skill-one-click-install">3. 安裝與驗收四個 Skill</h2>
+<p>以下是 Codex 本機 Skill 的教學。Skill 是封裝好的工作流程與判斷規則，不是資料來源；安裝不會開通原本 ChatGPT Project、Google Drive 或 Gmail 的讀取權限。<a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">OpenAI 官方 Skill 文件</a>列出個人 Skill 目錄 <code>$HOME/.agents/skills</code>；在 Windows 中，<code>$HOME</code> 是目前使用者資料夾。Codex 可自動偵測 Skill 變更；若新 Skill 未出現，重新啟動 Codex 再檢查。</p>
+<h3>方法一：複製提示詞，讓 Codex 協助安裝（推薦）</h3>
+<p>本課程已經準備好四個 Skill。只要開啟 Codex，複製下面的提示詞並貼上，就可以讓 Codex 協助取得、安裝與檢查 Skill。安裝前先讓 Codex 確認來源和同名資料夾；遇到權限不足時依畫面處理，不把下載成功當成安裝成功。</p>
+<div class="copy-card lesson-copy-card"><div class="copy-label">Codex｜完整 Skill Kit 一鍵安裝提示詞</div><button class="copy-button" data-copy-target="skill-install-prompt">複製 Skill 一鍵安裝提示詞</button><pre id="skill-install-prompt"><code>請協助我安裝「專案整理 Skill Kit」。
+
+GitHub 專案來源：
+https://github.com/williamlee0630/chatgpt-project-memory-handbook
+
+Skill 原始目錄：
+`downloads/project-skill-kit/skills/`
+
+我要安裝以下四個 Skill：
+
+1. `meeting-action-items`
+2. `cross-source-decision-update`
+3. `project-memory-updater`
+4. `weekly-project-report`
+
+請依照以下步驟協助：
+
+第一步：檢查來源
+
+確認 GitHub 專案可以正常存取。
+
+確認上述四個 Skill 資料夾都存在。
+
+確認每個 Skill 都包含有效的 `SKILL.md`，並檢查是否有 references、examples 或其他必要資源。
+
+第二步：確認安裝環境
+
+確認目前使用的是 Codex，並根據目前 OpenAI 官方文件確認正確的 Skill 安裝方式。
+
+如果 `$skill-installer` 適用，優先使用官方支援的安裝工具。
+
+如果無法使用，請改用目前 Codex 支援的本機 Skill 安裝方式。
+
+第三步：安裝 Skill
+
+請將四個 Skill 安裝到目前使用者的個人 Skill 目錄。
+
+依照目前官方文件確認正確路徑，常見位置為：
+
+`$HOME/.agents/skills`
+
+Windows 環境請使用對應的使用者目錄。
+
+保留每個 Skill 完整的資料夾結構，不要只複製 `SKILL.md` 而遺漏必要資源。
+
+若已經存在同名 Skill，先檢查差異，不要直接覆蓋原本內容。
+
+第四步：檢查安裝結果
+
+確認四個 Skill 都已放在正確位置。
+
+逐一檢查：
+
+- Skill 名稱
+- 實際安裝路徑
+- `SKILL.md` 是否存在
+- 必要資源是否完整
+
+第五步：說明使用方式
+
+請告訴我如何在目前 Codex 版本中找到並使用這四個 Skill。
+
+如果需要重新啟動 Codex，請明確提醒。
+
+最後提供簡短的安裝報告：
+
+- 已成功安裝的 Skill
+- 未成功安裝的 Skill
+- 安裝位置
+- 是否需要重新啟動
+- 下一步如何測試
+
+如果遇到下載失敗、網路問題或權限不足，不要假裝安裝完成，請說明原因與替代方案。
+
+不要修改任何與 Skill 安裝無關的專案檔案。</code></pre></div>
+<h3>確認四個 Skill 是否安裝成功</h3>
+<p>完成安裝後，在 Codex 貼上這段驗收提示詞。檔案存在與 Codex 已載入是兩個要分開檢查的狀態。</p>
+<div class="copy-card lesson-copy-card"><div class="copy-label">Codex｜四個 Skill 安裝驗收提示詞</div><button class="copy-button" data-copy-target="skill-verify-prompt">複製 Skill 驗收提示詞</button><pre id="skill-verify-prompt"><code>請檢查目前 Codex 是否成功安裝以下四個 Skill：
+
+1. `meeting-action-items`
+2. `cross-source-decision-update`
+3. `project-memory-updater`
+4. `weekly-project-report`
+
+請逐一檢查：
+
+- 是否能找到對應 Skill。
+- 實際安裝位置。
+- `SKILL.md` 是否存在。
+- 必要的 references 或 examples 是否完整。
+- 是否能被目前的 Codex 正常辨識。
+- 是否可以使用正確方式啟動。
+
+若檔案存在但尚未確認可被 Codex 載入，請區分這兩種狀態，不要直接宣稱成功。
+
+如果發現錯誤，請提供修正方式。
+
+最後以表格呈現四個 Skill 的檢查結果。</code></pre></div>
+<h3>方法二：下載 ZIP 手動安裝</h3>
+<ol class="steps"><li><h4>下載並解壓縮</h4><p>在本頁上方按「下載完整 Skill Kit」，取得 <code>project-work-memory-skill-kit.zip</code>。在 Windows 檔案總管對 ZIP 按右鍵 →「全部解壓縮」，選一個容易找到的資料夾。</p></li><li><h4>找到四個獨立資料夾</h4><p>打開解壓後的 <code>skills</code> 資料夾，確認裡面有 <code>meeting-action-items</code>、<code>cross-source-decision-update</code>、<code>project-memory-updater</code> 和 <code>weekly-project-report</code>。每個資料夾都應包含 <code>SKILL.md</code> 及所附參考資料。</p></li><li><h4>放進個人 Skill 目錄</h4><p>依<a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">目前官方文件</a>確認 Codex 的使用者 Skill 目錄。Windows 常見位置是 <code>C:\Users\你的使用者名稱\.agents\skills</code>，也就是 <code>$HOME/.agents/skills</code>。在檔案總管開啟該位置；若 <code>.agents</code> 或 <code>skills</code> 尚未存在，可建立資料夾。複製上述四個<strong>獨立 Skill 資料夾</strong>進去，不要只複製 <code>SKILL.md</code>。若同名資料夾已存在，先比對內容，勿直接覆蓋。</p></li><li><h4>重新載入與驗收</h4><p>回到 Codex 檢查 Skill 清單；若未出現，關閉後重新開啟 Codex。貼上上方「Skill 驗收提示詞」，檢查檔案、資源、辨識與實際啟動方式。完整 Kit ZIP 內含多個 Skill，不可直接把整包 ZIP 當成單一 Skill 匯入。</p></li></ol>
+<div class="callout warning"><span class="callout-title">使用環境不同，資料要分開準備</span><strong>路線 A｜ChatGPT Project + Prompt 相容版：</strong>留在原本專案對話，用課程既有 Google Drive、Gmail 連線，複製<a href="#kit-prompts">下方四份 Prompt</a>。<br><strong>路線 B｜Codex + 本機 Skill：</strong>用上面提示詞安裝後，在 Codex 指定可讀取來源；Codex 不一定取得原本 ChatGPT Project 的連線或對話內容。若無連接方式，下載會議紀錄和 LINE 郵件正文為文字檔，放入 Codex 可讀的練習資料夾，再指定檔案。不要混用 ChatGPT 與 Codex 的安裝步驟。</div>
+<p>本課提供兩份虛構練習檔：<a href="../downloads/lesson-06-02/01_meeting.txt" download>下載 01_meeting.txt</a>、<a href="../downloads/lesson-06-02/02_line_email.txt" download>下載 02_line_email.txt</a>。在 Codex 開啟這兩份檔案所在的練習資料夾後，可直接複製下方指令。</p>
+<div class="copy-card lesson-copy-card"><div class="copy-label">Codex｜本機檔案替代練習</div><button class="copy-button" data-copy-target="codex-file-practice-prompt">複製本機檔案練習提示詞</button><pre id="codex-file-practice-prompt"><code>請使用 cross-source-decision-update，處理「活動籌備專案」2026-04-16 ～ 2026-04-17 的資料。只讀取目前練習資料夾內的 01_meeting.txt 和 02_line_email.txt，逐筆確認專案與紀錄日期，比較會議決策及後續 LINE 更新。列出最新有效決策、原決策與更新、負責人與期限、未決事項、資訊衝突及本次實際讀取的來源。4/25 只是候選公開報名日，不得當成已定案。若檔案無法讀取，請明說，不要使用過去對話或其他資料補充。</code></pre></div>
+<p>本頁的 Prompt 相容版可直接在 ChatGPT Project 使用；本機 Skill 的使用方式以目前 Codex 介面為準。桌面版可從側邊欄 Skills 找到 Skill；Codex CLI／IDE 可用 <code>/skills</code> 或輸入 <code>$</code> 指定名稱。<a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">官方說明</a>也提醒若變更未顯示，可重新啟動。</p>
+
 <h2>3. 建議操作順序</h2>
 <ol class="steps"><li><h3>先完成本課 Project 與來源設定</h3><p>依第 1～3 章取得逐字稿、LINE 紀錄，建立 Project 與專案主對話。</p></li><li><h3>先用 Prompt 跑過一次</h3><p>從本頁選一份 Prompt，填入目前專案、日期與允許來源，實際讀取正文。</p></li><li><h3>人工確認結果</h3><p>核對決議是否真的定案、待辦有沒有負責人與期限、來源是否屬於本專案。</p></li><li><h3>若帳號支援，再安裝 Skill</h3><p>解壓完整 Kit，依目前環境提供的 Skill 匯入方式選取對應 Skill 資料夾。功能與安裝介面依帳號、工作區和使用環境而異。</p></li><li><h3>用同一案例比較</h3><p>再次指定相同專案與來源，看看 Prompt 與 Skill 是否遵守同一套判斷規則。</p></li></ol>
 <div class="copy-card"><div class="copy-label">使用範例｜先選取對應 Skill，再提供任務</div><button class="copy-button" data-copy-target="kit-run-example">複製範例</button><pre id="kit-run-example"><code>請使用「跨來源決策更新」，比較「國際研討會規劃專案」2026-09-15～2026-09-16 的 Google Meet 逐字稿與 LINE 紀錄。請實際讀取我提供的兩份來源，保留原決議、後續變更、日期與來源；無法確認的資訊列為需要人工確認。</code></pre></div>
