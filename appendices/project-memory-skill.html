@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="專案整理 Skill Kit：四個 Skill、四份 Prompt、完整案例與使用方式"><title>專案整理 Skill Kit｜進階工具</title><link rel="stylesheet" href="../assets/styles.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="專案整理 Skill Kit：一個互動式 Skill、四種服務與四份 Prompt"><title>專案整理 Skill Kit｜進階工具</title><link rel="stylesheet" href="../assets/styles.css"></head>
 <body data-root="../" data-page="project-memory-skill">
 <a class="skip-link" href="#main">跳到主要內容</a>
 <header class="topbar"><button id="menu-toggle" class="menu-button" aria-label="開啟課程目錄">☰</button><a class="brand" href="../index.html">專案工作記憶助理<small>Windows 實作電子講義</small></a><div class="top-progress"><div class="top-progress-row"><span>學習進度</span><span data-progress-text></span></div><div class="progress-track"><i data-progress-bar></i></div></div></header>
@@ -8,184 +8,51 @@
 <main id="main" class="content"><article class="content-inner">
 <p class="eyebrow">工具箱｜選用進階工具</p>
 <h1>專案整理 Skill Kit</h1>
-<p class="lede">把這堂課的跨來源專案整理流程，變成四個可重複使用的 Skill。你也可以直接用四份 Prompt 完成相同的核心整理工作；先學會課程主流程，再選擇適合自己的使用方式。</p>
-<div class="meta-row"><span class="badge advanced">選用</span><span class="badge">4 個 Skill</span><span class="badge">4 份 Prompt 相容版</span><span class="badge">一組完整練習案例</span></div>
-<div class="callout success"><span class="callout-title">Skill 與 Prompt 怎麼選</span><strong>Prompt = 全員可使用的核心版本；Skill = 將同一套流程封裝成更方便重複使用的進階版本。</strong>如果你的帳號目前沒有 Skill 功能，直接使用本頁的 Prompt 版本即可。整理邏輯與本課核心流程不會因此失效。</div>
-<div class="callout"><span class="callout-title">從主流程接到 Skill／Codex</span>前面的工作記憶整理主要在 ChatGPT Desktop App 的 Project 與專案主對話中完成。進入選用的 Skill 進階內容後，可在同一個 Desktop App 中切換到 Codex 工作區，處理本機 Skill、專案資料夾與需要檔案操作的流程；本課核心仍是 ChatGPT Project 工作記憶整理。</div>
-<div class="callout warning"><span class="callout-title">帳號相容性提醒</span>ChatGPT 內建的 Skill 安裝功能目前依方案、工作區設定與產品介面而異。若你的 ChatGPT 帳號目前沒有 Skill 功能，直接使用本課程提供的 Prompt 相容版本即可，不影響本課程的核心整理流程。Codex 可作為進階使用環境，實際支援方式請以目前帳號與產品介面為準。</div>
-<p><a class="button-link" href="../downloads/project-work-memory-skill-kit.zip" download>下載完整 Skill Kit</a><a class="button-link secondary" href="#kit-prompts">只使用 Prompt</a><a class="button-link secondary" href="../downloads/project-memory-updater-skill.zip" download>下載原版工作記憶更新 Skill</a></p>
+<p class="lede">只需安裝一個互動式 <code>project-work-assistant</code> Skill，啟動後選擇會議、決策、工作記憶或週報服務，回答必要問題即可。沒有 Skill 功能時，仍可使用下方四份完整 Prompt 相容版。</p>
+<div class="meta-row"><span class="badge advanced">選用</span><span class="badge">1 個 Skill・4 種服務</span><span class="badge">4 份 Prompt 相容版</span><span class="badge">一組完整練習案例</span></div>
+<div class="callout success"><span class="callout-title">一次安裝，日常用簡短指令</span>Skill 已封裝專案範圍、來源驗證、決策版本、衝突處理與輸出格式。第一次確認專案、日期與允許來源後，同一對話可用「更新一下專案」或「幫我產生本週週報」繼續；只有資訊仍可確認時才省略重問。</div>
+<div class="callout warning"><span class="callout-title">Codex 與 ChatGPT Project 的來源分開</span>使用 Skill 時請切換到 Codex 工作區。Codex Skill 不會自動取得 ChatGPT Project、Google Drive 或 Gmail 的權限。請在 Codex 指定可讀取的檔案／資料夾；若要留在 ChatGPT Project 使用既有已授權來源，改用下方 Prompt 相容版。Skill 也不等於排程。</div>
+<p><a class="button-link" href="../downloads/project-work-assistant-skill.zip" download>下載專案工作助理 Skill ZIP</a><a class="button-link secondary" href="#skill-one-click-install">一鍵安裝</a><a class="button-link secondary" href="#kit-prompts">只使用 Prompt</a></p>
 
-<h2>1. 這套 Skill Kit 是什麼？</h2>
-<p>課程先教你把 Google Meet／Tactiq 逐字稿與 LINE 紀錄放進 ChatGPT Project，再進行跨來源整理與人工驗收。Skill Kit 把已學會的規則封裝，供上課後反覆使用：一場會議後整理待辦、會後討論更新決策、維護最新工作記憶、每週整理進度。它延續課程主線，不增加新的資料工具。</p>
-<div class="flow prompt-flow kit-flow"><div>Google Meet → Tactiq → Drive<br><small>會議當下版本</small></div><div>LINE → 手動匯出／LINE Bot<br><small>會後補充</small></div><div>ChatGPT Project<br><small>跨來源整理</small></div><div>排程更新<br><small>依帳號能力選用</small></div></div>
+<h2>1. 一個 Skill 可以完成哪些工作？</h2>
+<table class="responsive-map"><thead><tr><th>服務</th><th>你可以說</th><th>讀取的規則</th></tr></thead><tbody><tr><td>1. 整理會議決議與待辦</td><td>幫我整理會議</td><td><code>references/meeting.md</code></td></tr><tr><td>2. 確認專案決策變更</td><td>幫我確認決策有沒有改變</td><td><code>references/decision-update.md</code></td></tr><tr><td>3. 更新最新專案工作記憶</td><td>幫我更新專案</td><td><code>references/memory-update.md</code></td></tr><tr><td>4. 產生專案進度週報</td><td>幫我產生本週週報</td><td><code>references/weekly-report.md</code></td></tr></tbody></table>
+<p>四種服務共用 <code>references/source-rules.md</code>，只載入所選服務的詳細規則。新增事實來自本次允許且實際讀到的來源；較晚意見不自動覆蓋決策，候選不算定案，沒有完成證據不標完成。資料衝突交由人工確認。</p>
 
-<h2>2. 四個 Skill 怎麼分工？</h2>
-<div class="course-grid">
-<section class="chapter-card"><span class="badge">Step 1</span><h3>會議決議與待辦整理</h3><p><strong>輸入：</strong>單次會議逐字稿。</p><p><strong>輸出：</strong>30 秒摘要、已確認決議、待辦、負責人、期限、未決事項。</p><p>討論想法不直接變成決議；缺少的負責人與期限寫「未指定」。</p></section>
-<section class="chapter-card"><span class="badge">Step 2</span><h3>跨來源決策更新</h3><p><strong>輸入：</strong>會議與 LINE／Email／文件等後續紀錄。</p><p><strong>輸出：</strong>最新有效決策、變更紀錄、衝突提醒。</p><p>保留時間與來源；後來的不同意見不自動推翻舊決議。</p></section>
-<section class="chapter-card"><span class="badge">Step 3</span><h3>專案工作記憶更新</h3><p><strong>輸入：</strong>指定專案的多來源資料。</p><p><strong>輸出：</strong>目前最新決策、待辦、進度、風險與未決事項。</p><p>沿用原有的專案工作記憶更新 Skill，持續比較同一專案的前後版本。</p></section>
-<section class="chapter-card"><span class="badge">Step 4</span><h3>專案進度週報</h3><p><strong>輸入：</strong>指定日期範圍內的專案資料。</p><p><strong>輸出：</strong>本週完成、進行中、待辦、決策變更、風險與下週重點。</p><p>期間外資料只當背景；沒有來源數字就不寫完成百分比。</p></section>
-</div>
+<h2 id="skill-one-click-install">2. 一鍵安裝與下載</h2>
+<p>ZIP 解壓縮後只有一個頂層 <code>project-work-assistant/</code> 資料夾，內有唯一的 <code>SKILL.md</code>、<code>agents/openai.yaml</code>、四份服務規則、共用來源規則、設定規則及示例。可依<a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">OpenAI 官方 Skill 文件</a>確認目前 Codex 的安裝入口與個人 Skill 目錄；若介面變動，以官方當下說明為準。</p>
+<div class="copy-card lesson-copy-card"><div class="copy-label">Codex｜專案工作助理一鍵安裝</div><button class="copy-button" data-copy-target="skill-install-prompt">複製 Skill 一鍵安裝提示詞</button><pre id="skill-install-prompt"><code>請協助我從 GitHub 專案 williamlee0630/chatgpt-project-memory-handbook 安裝 project-work-assistant Skill。
 
-<h2 id="skill-one-click-install">3. 安裝與驗收四個 Skill</h2>
-<p>以下是 Codex 本機 Skill 的教學。Skill 是封裝好的工作流程與判斷規則，不是資料來源；安裝不會開通原本 ChatGPT Project、Google Drive 或 Gmail 的讀取權限。<a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">OpenAI 官方 Skill 文件</a>列出個人 Skill 目錄 <code>$HOME/.agents/skills</code>；在 Windows 中，<code>$HOME</code> 是目前使用者資料夾。Codex 可自動偵測 Skill 變更；若新 Skill 未出現，重新啟動 Codex 再檢查。</p>
-<h3>方法一：複製提示詞，讓 Codex 協助安裝（推薦）</h3>
-<p>本課程已經準備好四個 Skill。只要開啟 Codex，複製下面的提示詞並貼上，就可以讓 Codex 協助取得、安裝與檢查 Skill。安裝前先讓 Codex 確認來源和同名資料夾；遇到權限不足時依畫面處理，不把下載成功當成安裝成功。</p>
-<div class="copy-card lesson-copy-card"><div class="copy-label">Codex｜完整 Skill Kit 一鍵安裝提示詞</div><button class="copy-button" data-copy-target="skill-install-prompt">複製 Skill 一鍵安裝提示詞</button><pre id="skill-install-prompt"><code>請協助我安裝「專案整理 Skill Kit」。
+來源目錄：downloads/project-skill-kit/skills/project-work-assistant/
+正式下載檔：downloads/project-work-assistant-skill.zip
 
-GitHub 專案來源：
-https://github.com/williamlee0630/chatgpt-project-memory-handbook
+請先確認來源目錄與 SKILL.md 有效，並依目前 Codex 官方支援方式安裝到正確位置。保留 references、assets、agents 及其他必要資源；若已有同名 Skill，先比較，不要直接覆蓋。
 
-Skill 原始目錄：
-`downloads/project-skill-kit/skills/`
+安裝後請確認 Codex 可以辨識 project-work-assistant，並告訴我如何啟動。如果安裝失敗，請明確告訴我原因與 Windows 手動安裝方式。不要修改與安裝無關的專案檔案。</code></pre></div>
+<h3>手動安裝一個資料夾</h3><ol class="steps"><li><h4>下載並解壓縮</h4><p>點上方「下載專案工作助理 Skill ZIP」，在 Windows 檔案總管全部解壓縮。開啟後只會看到一個 <code>project-work-assistant</code> 資料夾。</p></li><li><h4>找出目前 Codex 的 Skill 目錄</h4><p>依<a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">官方文件</a>核對；個人 Skill 目錄可位於 <code>$HOME/.agents/skills</code>（Windows 的 <code>$HOME</code> 為目前使用者資料夾）。若 Codex 版本提供其他匯入方式，以目前介面為準。</p></li><li><h4>只複製一個完整資料夾</h4><p>把整個 <code>project-work-assistant</code> 資料夾放入目前支援的 Skill 目錄，保留 <code>SKILL.md</code>、<code>agents</code>、<code>references</code> 與 <code>assets</code>；已有同名資料夾先比較差異。</p></li><li><h4>重新載入與驗收</h4><p>回到 Codex 檢查清單；未出現時重新啟動，再複製下方驗收提示詞檢查實際辨識情況。</p></li></ol>
+<div class="copy-card lesson-copy-card"><div class="copy-label">Codex｜安裝驗收</div><button class="copy-button" data-copy-target="skill-verify-prompt">複製 Skill 驗收提示詞</button><pre id="skill-verify-prompt"><code>請檢查目前 Codex 是否能辨識 project-work-assistant Skill。
 
-我要安裝以下四個 Skill：
+請列出實際安裝路徑，確認 SKILL.md、agents/openai.yaml、references 內四種服務規則、source-rules.md、settings.md 及 assets/examples 均可讀。再說明在目前 Codex 版本如何啟動 $project-work-assistant，並驗證只輸入啟動指令時可顯示四種服務選項。
 
-1. `meeting-action-items`
-2. `cross-source-decision-update`
-3. `project-memory-updater`
-4. `weekly-project-report`
+請分開標示「檔案存在」「Codex 已辨識」「實際啟動測試」。若任何一項無法確認，明說原因與下一步，不要把檔案存在當成已載入。</code></pre></div>
+<div class="copy-card lesson-copy-card"><div class="copy-label">Codex｜啟動指令</div><button class="copy-button" data-copy-target="skill-launch-command">複製 Skill 啟動指令</button><pre id="skill-launch-command"><code>$project-work-assistant</code></pre></div>
 
-請依照以下步驟協助：
+<h2 id="skill-daily-use">3. 第一次啟動與互動示範</h2>
+<p>只輸入啟動指令時，助理會用文字詢問：「請問今天想完成什麼工作？」並列出 1 整理會議、2 確認決策變更、3 更新最新工作記憶、4 產生週報。輸入 <code>3</code>，即可開始工作記憶流程；直接說「幫我產生本週週報」則直接進入週報，不重問服務類型。</p>
+<div class="chapter-card"><h3>活動籌備專案：第一次使用</h3><ol class="steps"><li>你說：<strong>3</strong>。助理確認專案；若不知道，問「這次要整理哪個專案？」你回答「活動籌備專案」。</li><li>助理確認日期；若不知道，問「你想整理哪個期間？」可選本週、上週、從上次成功更新後到今天、從指定來源的實際紀錄日期辨識，或自訂日期。你選擇根據已指定來源的紀錄日期，再確認助理提出的範圍。</li><li>助理確認本次允許來源；若不知道，問「這次要使用哪些資料？」請指定 Codex 能讀的會議與 LINE 文字檔或資料夾。若無法讀取 ChatGPT Project 中的 Drive／Gmail，就提供<a href="../downloads/lesson-06-02/01_meeting.txt" download>01_meeting.txt</a> 和 <a href="../downloads/lesson-06-02/02_line_email.txt" download>02_line_email.txt</a>。</li><li>助理讀取兩份正文並輸出工作記憶。下載練習檔的固定答案是期限 2026-04-18 → 2026-04-21，活動窗口仍負責，2026-04-25 只是候選日；最後核對實際來源。</li></ol></div>
+<div class="chapter-card"><h3>國際研討會規劃專案：沿用的示例</h3><p>另一組示例在 Skill 的 <code>assets/examples/seminar.md</code>：會議當下決定<strong>研究日本＋新加坡</strong>，後續 LINE 明確改為<strong>只研究日本</strong>。助理須保留兩個版本與來源，不能因較晚的普通建議就推翻決定；示例資料不能當作你目前專案的真實紀錄。</p></div>
+<div class="callout warning"><span class="callout-title">新紀錄使用新日期</span>這些 2026 年 4 月日期只屬於講義虛構檔。自行建立 Google Meet 與 LINE 紀錄時，依來源正文的實際事件日期設定資料期間；工作期限、週報週期與排程時間分開確認。來源不明先問，不猜測未來紀錄。</div>
 
-第一步：檢查來源
+<h2>4. 同專案快速使用、換專案與設定</h2>
+<p>同一個已確認專案，第二次可直接說「更新一下專案」或「幫我產生本週週報」。助理只在必要資訊缺失時追問；每次仍重新讀本次允許來源正文。前次 AI 回答或既有工作記憶只能幫助比較，不是新事實。新對話或換專案時，重新確認專案、允許來源與日期範圍，不能混入舊專案。</p>
+<p>想在下次對話沿用設定時，可以說「我同意把這個專案的非敏感設定儲存在【此專案可寫入的工作資料夾】」。助理只保存專案名稱、非敏感來源參照、時區及已驗收的成功截止日；更新失敗時不能推進日期，也不保存密碼或 Token。想清除時說「清除目前專案的工作助理設定」，助理先核對專案與檔案位置，只清除該專案設定。若沒有持久化能力，只能沿用目前對話確實可確認的設定。</p>
 
-確認 GitHub 專案可以正常存取。
+<h2>5. 資料正確性與使用限制</h2>
+<ul class="checklist"><li>只處理目前指定專案、期間及本次允許的已讀來源，其他專案排除。</li><li>搜尋結果、檔名及郵件主旨只是候選，必須打開正文。</li><li>會議是當下版本；較晚討論不自動覆蓋。建議與候選保留未決。</li><li>完成、負責人、期限與下週安排需有來源證據；資訊衝突列需要人工確認。</li><li>無法存取來源時明說並要求提供，不假裝已讀。</li></ul>
+<div class="callout"><span class="callout-title">課程中的自動化範圍</span><strong>指定來源自動收集＋固定週期重新搜尋與整理＋形成最新版工作記憶。</strong>紙本、錄音或無權存取的系統須先數位化或匯入。Skill 不會自動開通資料權限，也不保證把結果永久寫入 ChatGPT Project。</div>
 
-確認上述四個 Skill 資料夾都存在。
-
-確認每個 Skill 都包含有效的 `SKILL.md`，並檢查是否有 references、examples 或其他必要資源。
-
-第二步：確認安裝環境
-
-確認目前使用的是 Codex，並根據目前 OpenAI 官方文件確認正確的 Skill 安裝方式。
-
-如果 `$skill-installer` 適用，優先使用官方支援的安裝工具。
-
-如果無法使用，請改用目前 Codex 支援的本機 Skill 安裝方式。
-
-第三步：安裝 Skill
-
-請將四個 Skill 安裝到目前使用者的個人 Skill 目錄。
-
-依照目前官方文件確認正確路徑，常見位置為：
-
-`$HOME/.agents/skills`
-
-Windows 環境請使用對應的使用者目錄。
-
-保留每個 Skill 完整的資料夾結構，不要只複製 `SKILL.md` 而遺漏必要資源。
-
-若已經存在同名 Skill，先檢查差異，不要直接覆蓋原本內容。
-
-第四步：檢查安裝結果
-
-確認四個 Skill 都已放在正確位置。
-
-逐一檢查：
-
-- Skill 名稱
-- 實際安裝路徑
-- `SKILL.md` 是否存在
-- 必要資源是否完整
-
-第五步：說明使用方式
-
-請告訴我如何在目前 Codex 版本中找到並使用這四個 Skill。
-
-如果需要重新啟動 Codex，請明確提醒。
-
-最後提供簡短的安裝報告：
-
-- 已成功安裝的 Skill
-- 未成功安裝的 Skill
-- 安裝位置
-- 是否需要重新啟動
-- 下一步如何測試
-
-如果遇到下載失敗、網路問題或權限不足，不要假裝安裝完成，請說明原因與替代方案。
-
-不要修改任何與 Skill 安裝無關的專案檔案。</code></pre></div>
-<h3>確認四個 Skill 是否安裝成功</h3>
-<p>完成安裝後，在 Codex 貼上這段驗收提示詞。檔案存在與 Codex 已載入是兩個要分開檢查的狀態。</p>
-<div class="copy-card lesson-copy-card"><div class="copy-label">Codex｜四個 Skill 安裝驗收提示詞</div><button class="copy-button" data-copy-target="skill-verify-prompt">複製 Skill 驗收提示詞</button><pre id="skill-verify-prompt"><code>請檢查目前 Codex 是否成功安裝以下四個 Skill：
-
-1. `meeting-action-items`
-2. `cross-source-decision-update`
-3. `project-memory-updater`
-4. `weekly-project-report`
-
-請逐一檢查：
-
-- 是否能找到對應 Skill。
-- 實際安裝位置。
-- `SKILL.md` 是否存在。
-- 必要的 references 或 examples 是否完整。
-- 是否能被目前的 Codex 正常辨識。
-- 是否可以使用正確方式啟動。
-
-若檔案存在但尚未確認可被 Codex 載入，請區分這兩種狀態，不要直接宣稱成功。
-
-如果發現錯誤，請提供修正方式。
-
-最後以表格呈現四個 Skill 的檢查結果。</code></pre></div>
-<h3>方法二：下載 ZIP 手動安裝</h3>
-<ol class="steps"><li><h4>下載並解壓縮</h4><p>在本頁上方按「下載完整 Skill Kit」，取得 <code>project-work-memory-skill-kit.zip</code>。在 Windows 檔案總管對 ZIP 按右鍵 →「全部解壓縮」，選一個容易找到的資料夾。</p></li><li><h4>找到四個獨立資料夾</h4><p>打開解壓後的 <code>skills</code> 資料夾，確認裡面有 <code>meeting-action-items</code>、<code>cross-source-decision-update</code>、<code>project-memory-updater</code> 和 <code>weekly-project-report</code>。每個資料夾都應包含 <code>SKILL.md</code> 及所附參考資料。</p></li><li><h4>放進個人 Skill 目錄</h4><p>依<a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">目前官方文件</a>確認 Codex 的使用者 Skill 目錄。Windows 常見位置是 <code>C:\Users\你的使用者名稱\.agents\skills</code>，也就是 <code>$HOME/.agents/skills</code>。在檔案總管開啟該位置；若 <code>.agents</code> 或 <code>skills</code> 尚未存在，可建立資料夾。複製上述四個<strong>獨立 Skill 資料夾</strong>進去，不要只複製 <code>SKILL.md</code>。若同名資料夾已存在，先比對內容，勿直接覆蓋。</p></li><li><h4>重新載入與驗收</h4><p>回到 Codex 檢查 Skill 清單；若未出現，關閉後重新開啟 Codex。貼上上方「Skill 驗收提示詞」，檢查檔案、資源、辨識與實際啟動方式。完整 Kit ZIP 內含多個 Skill，不可直接把整包 ZIP 當成單一 Skill 匯入。</p></li></ol>
-<div class="callout warning"><span class="callout-title">使用環境不同，資料要分開準備</span><strong>路線 A｜ChatGPT Project + Prompt 相容版：</strong>留在原本專案對話，用課程既有 Google Drive、Gmail 連線，複製<a href="#kit-prompts">下方四份 Prompt</a>。<br><strong>路線 B｜Codex + 本機 Skill：</strong>用上面提示詞安裝後，在 Codex 指定可讀取來源；Codex 不一定取得原本 ChatGPT Project 的連線或對話內容。若無連接方式，下載會議紀錄和 LINE 郵件正文為文字檔，放入 Codex 可讀的練習資料夾，再指定檔案。不要混用 ChatGPT 與 Codex 的安裝步驟。</div>
-<p>本課提供兩份虛構練習檔：<a href="../downloads/lesson-06-02/01_meeting.txt" download>下載 01_meeting.txt</a>、<a href="../downloads/lesson-06-02/02_line_email.txt" download>下載 02_line_email.txt</a>。在 Codex 開啟這兩份檔案所在的練習資料夾後，可直接複製下方指令。<strong>下方固定日期只適用於下載的虛構練習檔</strong>；自行操作時請改用來源中的實際日期。</p>
-<div class="copy-card lesson-copy-card"><div class="copy-label">Codex｜本機檔案替代練習</div><button class="copy-button" data-copy-target="codex-file-practice-prompt">複製本機檔案練習提示詞</button><pre id="codex-file-practice-prompt"><code>請使用 cross-source-decision-update，處理「活動籌備專案」2026-04-16 ～ 2026-04-17 的資料。只讀取目前練習資料夾內的 01_meeting.txt 和 02_line_email.txt，逐筆確認專案與紀錄日期，比較會議決策及後續 LINE 更新。列出最新有效決策、原決策與更新、負責人與期限、未決事項、資訊衝突及本次實際讀取的來源。4/25 只是候選公開報名日，不得當成已定案。若檔案無法讀取，請明說，不要使用過去對話或其他資料補充。</code></pre></div>
-<p>本頁的 Prompt 相容版可直接在 ChatGPT Project 使用；本機 Skill 的使用方式以目前 Codex 介面為準。桌面版可從側邊欄 Skills 找到 Skill；Codex CLI／IDE 可用 <code>/skills</code> 或輸入 <code>$</code> 指定名稱。<a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">官方說明</a>也提醒若變更未顯示，可重新啟動。</p>
-
-<h2 id="skill-daily-use">日常快速使用 Skill</h2>
-<p><strong>第一次設定完整，後面操作就能簡短。</strong>Skill 已封裝判斷規則，日常只需說明專案、期間、來源與任務；只有同一對話或工作環境能確認既有設定時，才省略已確認欄位。換新專案或新對話，要重新指定專案、允許來源與日期範圍。安裝提示詞只在安裝時使用一次；以下三段是安裝後的操作提示詞。</p>
-<p>使用講義下載檔時，固定案例的紀錄日期是 2026-04-16～2026-04-17、週報期間為 2026-04-13～2026-04-19；自行操作 Google Meet 與 LINE 時，使用來源正文中的實際紀錄日期。工作截止期限不是紀錄日期，排程執行時間也不是資料期間。若期間不明，先請 AI 辨識並由你確認，不能猜測或把未來紀錄當成已發生。</p>
-<div class="copy-card lesson-copy-card"><div class="copy-label">首次使用｜跨來源決策更新</div><button class="copy-button" data-copy-target="kit-quick-cross-source">複製首次 Skill 提示詞</button><pre id="kit-quick-cross-source"><code>$cross-source-decision-update
-
-請整理「活動籌備專案」這次練習的會議與 LINE 紀錄。
-本次允許來源：【填入 Codex 可讀取的兩份檔案路徑或資料夾】
-
-只讀取我指定的來源，先確認實際紀錄日期與專案歸屬，再依 Skill 規則整理最新決策與變更，附上來源。
-
-如果日期範圍無法確認，請先詢問我。</code></pre></div>
-<div class="copy-card lesson-copy-card"><div class="copy-label">同對話｜後續工作記憶更新</div><button class="copy-button" data-copy-target="kit-quick-memory">複製後續更新提示詞</button><pre id="kit-quick-memory"><code>$project-memory-updater
-
-請延續本對話已確認的專案與來源設定，從上次成功更新的截止日之後整理到今天，重新讀取來源正文並更新工作記憶，保留決策變更及來源。
-
-若無法確認上次截止日、專案或來源，請先詢問我。</code></pre></div>
-<div class="copy-card lesson-copy-card"><div class="copy-label">同對話｜本週週報</div><button class="copy-button" data-copy-target="kit-quick-weekly">複製本週週報提示詞</button><pre id="kit-quick-weekly"><code>$weekly-project-report
-
-請為本對話已確認的專案，整理本週一至今天的工作紀錄，重新讀取已確認的指定來源，依 Skill 規則產出週報並附上證據。
-
-如果專案、週報期間或允許來源不明確，請先詢問我。</code></pre></div>
-<p>Codex 必須先能讀取你指定的檔案或資料夾；ChatGPT Project 請使用下方 Prompt 相容版及已授權的資料來源。不能把前次 AI 回答當成新的原始來源；既有工作記憶只用於比較，每次更新仍要重新讀取本次允許的來源正文。週報以執行環境可確認的當地日期判斷本週一和今天，期間外資料只作背景，未來尚未發生的資料不寫成完成。</p>
-
-<h2>3. 建議操作順序</h2>
-<ol class="steps"><li><h3>先完成本課 Project 與來源設定</h3><p>依第 1～3 章取得逐字稿、LINE 紀錄，建立 Project 與專案主對話。</p></li><li><h3>先用 Prompt 跑過一次</h3><p>從本頁選一份 Prompt，填入目前專案、日期與允許來源，實際讀取正文。</p></li><li><h3>人工確認結果</h3><p>核對決議是否真的定案、待辦有沒有負責人與期限、來源是否屬於本專案。</p></li><li><h3>若帳號支援，再安裝 Skill</h3><p>解壓完整 Kit，依目前環境提供的 Skill 匯入方式選取對應 Skill 資料夾。功能與安裝介面依帳號、工作區和使用環境而異。</p></li><li><h3>用同一案例比較</h3><p>再次指定相同專案與來源，看看 Prompt 與 Skill 是否遵守同一套判斷規則。</p></li></ol>
-<div class="copy-card"><div class="copy-label">使用範例｜先選取對應 Skill，再提供任務</div><button class="copy-button" data-copy-target="kit-run-example">複製範例</button><pre id="kit-run-example"><code>請使用「跨來源決策更新」，比較「國際研討會規劃專案」2026-09-15～2026-09-16 的 Google Meet 逐字稿與 LINE 紀錄。請實際讀取我提供的兩份來源，保留原決議、後續變更、日期與來源；無法確認的資訊列為需要人工確認。</code></pre></div>
-<div class="callout warning"><span class="callout-title">使用 Skill 前要知道</span>Skill 不會自動取得沒有權限的資料，也不等於排程。如果 Google Drive／Gmail 等來源無法存取，請貼上或上傳內容；不要把「無法存取」寫成「沒有資料」。</div>
-
-<h2>4. 一組完整案例：國際研討會規劃專案</h2>
-<p>以下是虛構練習資料，延續本課使用的角色與跨來源情境。每一步都要保留可回查的來源。</p>
-<ol class="steps">
-<li><h3>會議當下｜Google Meet</h3><p>9 月 15 日，羅力辰確認「優先研究日本與新加坡兩個選項」；黃詩陽說由她整理住宿資料。先用<strong>會議決議與待辦整理</strong>記錄當時決議。李唯礽提出的會場建議若未定案，留在未決事項。</p></li>
-<li><h3>會後更新｜LINE</h3><p>9 月 16 日，羅力辰明確說：「剛剛查過預算，新加坡住宿太高，上次研究兩地的決定改成只研究日本。」這是有修改語意的後續來源。</p></li>
-<li><h3>跨來源比較</h3><p>用<strong>跨來源決策更新</strong>記下：原決議「研究日本＋新加坡」→ 後續更新「取消新加坡，改成只研究日本」→ 最新有效決議「優先研究日本」。同時標出 Google Meet 與 LINE 的日期、來源。</p></li>
-<li><h3>更新工作記憶</h3><p>用<strong>專案工作記憶更新</strong>產出目前版本，保留原決議與變更；沒有明確期限或完成證據時，不自行補上。</p></li>
-<li><h3>整理一週進度</h3><p>9 月 18 日 Email 說黃詩陽已寄出日本住宿初稿、仍待會場報價。指定 9 月 14～20 日，讀取同週來源後用<strong>專案進度週報</strong>整理本週完成、待辦與風險。較早資料只能作背景；沒有明確數字時不輸出完成百分比。</p></li>
-</ol>
-<div class="flow prompt-flow"><div>原始資料</div><div>會議決議與待辦</div><div>跨來源決策更新</div><div>最新工作記憶</div><div>專案進度週報</div></div>
-
-<h2>5. 共同判斷規則</h2>
-<ul class="checklist"><li>只處理本次明確指定的專案與實際讀取來源；同一人物不代表同一專案。</li><li>討論、建議、候選與未定方案，不寫成已確認決策。</li><li>負責人、期限、完成、取消與進度都要有來源依據；缺少時寫「未指定」或「需要人工確認」。</li><li>先看時間順序，但較晚不代表自動覆蓋。只有明確修改語意才更新舊版本。</li><li>兩個來源衝突而無法確認最終版本時，寫「存在資訊衝突，需要人工確認。」</li></ul>
-<div class="callout success"><span class="callout-title">結果怎麼看</span>先看「本次實際讀取的來源」是否包含你指定的資料，再回查已確認決策與待辦的原句。接著核對原決議 → 新決議、負責人與期限；未決或衝突應留在「需要人工確認」，不要直接當成定案。</div>
-
-<h2>6. 本課說的「自動化」到哪裡？</h2>
-<div class="callout"><span class="callout-title">可達到的流程</span><strong>指定來源自動收集＋固定週期重新搜尋與整理＋形成最新版工作記憶。</strong>這不表示 ChatGPT 能取得所有資料，或把每次結果永久自動寫入 Project。</div>
-<table class="responsive-map"><thead><tr><th>可較自動化處理</th><th>仍需前處理</th></tr></thead><tbody><tr><td>Tactiq → Google Drive；LINE Bot → Google Sheets／Gmail；ChatGPT 在取得權限後定期搜尋指定 Drive／Gmail 來源並整理。</td><td>紙本手寫筆記、單獨錄音檔、尚未轉成文字的內容，以及 ChatGPT 無權存取的系統，須先數位化、轉錄或匯入可讀來源。</td></tr></tbody></table>
-
-<h2 id="kit-prompts">7. 只使用 Prompt：查看、複製或下載</h2>
-<p>沒有 Skill 功能也可以照課程操作。<strong>首次使用完整版</strong>：從下方四份 Prompt 相容版挑一份，填入專案、日期範圍與允許來源，建立清楚的工作規則；既有的<a href="prompts.html">三張課程主流程 Prompt</a>仍保留原本用途。完整來源驗證、衝突處理與輸出規則都留在下方，日常不必重貼。</p>
-<h3>同一對話後續更新簡短版</h3><p>只適用於目前對話已明確建立工作規則、專案、允許來源和上次成功更新截止日的情況；缺少任何設定就先補充。沿用工作規則不等於沿用前次回答當最新證據，必須重新讀取本次指定來源。換對話或換專案，回到首次使用完整版。</p>
+<h2 id="kit-prompts">6. 沒有 Skill：四份 Prompt 相容版</h2>
+<p><strong>Prompt = 全員可使用的核心版本；Skill = 將同一套流程封裝成更方便重複使用的進階版本。</strong>沒有 Skill 功能也可以在 ChatGPT Project 用已授權的 Google Drive／Gmail 或上傳檔案操作。首次使用先從下方四份完整版選一份，填入專案、日期與允許來源；完整的來源判斷、衝突處理及輸出格式都保留。原本<a href="prompts.html">三張課程主流程 Prompt</a>也維持原用途。</p>
+<h3>同一對話後續更新簡短版</h3><p>只在專案、允許來源、規則與上次成功截止日已確認時使用。沿用規則不等於把前次回答當最新證據；本次新事實仍須重新讀取指定來源。若開新對話、換專案或缺少設定，先使用完整版或補充資訊。</p>
 <div class="copy-card lesson-copy-card"><div class="copy-label">Prompt 相容路線｜同對話後續更新</div><button class="copy-button" data-copy-target="kit-prompt-followup">複製 Prompt 後續簡短版</button><pre id="kit-prompt-followup"><code>請延續本對話已明確確認的專案、允許來源與工作規則，從上次成功更新的截止日之後整理到今天。
 
 請重新讀取本次指定來源正文，更新工作記憶，列出決策變更與證據。既有工作記憶只用來比較；前次 AI 回答不能當成新事實來源。
@@ -296,6 +163,6 @@ Windows 環境請使用對應的使用者目錄。
 ## 下週重點
 ## 需要人工確認
 ## 本次實際讀取的來源</code></pre></div><p><a class="button-link secondary" href="../downloads/project-skill-kit/prompts/04-專案進度週報.md" download>下載這份 Prompt</a></p></details>
-<p><a class="button-link secondary" href="../downloads/project-skill-kit/README.md">查看 Kit 使用說明</a><a class="button-link secondary" href="../chapters/03-01.html">回到跨來源主流程</a></p>
+<p><a class="button-link secondary" href="../downloads/project-skill-kit/README.md">查看 Kit 使用說明</a><a class="button-link secondary" href="../chapters/06-02.html">回到 6-2</a></p>
 <nav class="pager"><a href="prompts.html">← 課程提示詞總整理</a><a href="troubleshooting.html">前往排錯中心 →</a></nav>
 </article></main><script src="../assets/app.js"></script></body></html>

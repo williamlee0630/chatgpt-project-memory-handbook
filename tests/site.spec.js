@@ -358,9 +358,9 @@ test('Skill 附錄頁與下載連結在 390px 手機版可用', async t => {
     client: document.documentElement.clientWidth
   }));
   assert.ok(widths.scroll <= widths.client + 1, `Skill page horizontal overflow: ${JSON.stringify(widths)}`);
-  const download = page.locator('a[href="../downloads/project-work-memory-skill-kit.zip"]').first();
+  const download = page.locator('a[href="../downloads/project-work-assistant-skill.zip"]').first();
   assert.equal(await download.count(), 1);
-  const downloadResponse = await page.request.get(baseURL + '/downloads/project-work-memory-skill-kit.zip');
+  const downloadResponse = await page.request.get(baseURL + '/downloads/project-work-assistant-skill.zip');
   assert.equal(downloadResponse.status(), 200);
   assert.ok((await downloadResponse.body()).length > 0);
   await page.locator('#kit-prompt-1 summary').click();
@@ -370,14 +370,14 @@ test('Skill 附錄頁與下載連結在 390px 手機版可用', async t => {
   await page.close();
 });
 
-test('6-2 三種日常 Skill 提示詞與附錄安裝、相容提示詞可在手機複製', async t => {
+test('6-2 單一 Skill 啟動指令與附錄安裝、相容提示詞可在手機複製', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由靜態測試驗證內容');
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto(baseURL + '/chapters/06-02.html');
   const lessonWidths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
   assert.ok(lessonWidths.scroll <= lessonWidths.client + 1, `Lesson page horizontal overflow: ${JSON.stringify(lessonWidths)}`);
-  for (const target of ['skill-cross-source-demo', 'skill-memory-update-demo', 'skill-weekly-demo']) {
+  for (const target of ['skill-launch-command']) {
     await page.locator(`[data-copy-target="${target}"]`).click();
     const expected = await page.locator(`#${target}`).innerText();
     assert.equal((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n'), expected.replace(/\r\n/g, '\n'));
@@ -385,16 +385,16 @@ test('6-2 三種日常 Skill 提示詞與附錄安裝、相容提示詞可在手
   await page.locator('a[href="../appendices/project-memory-skill.html#skill-one-click-install"]').click();
   await page.waitForURL(/project-memory-skill\.html#skill-one-click-install$/);
   assert.equal(await page.locator('#skill-one-click-install').count(), 1);
-  for (const target of ['skill-install-prompt', 'skill-verify-prompt', 'codex-file-practice-prompt', 'kit-quick-cross-source', 'kit-quick-memory', 'kit-quick-weekly', 'kit-prompt-followup']) {
+  for (const target of ['skill-install-prompt', 'skill-verify-prompt', 'skill-launch-command', 'kit-prompt-followup']) {
     await page.locator(`[data-copy-target="${target}"]`).click();
     const expected = await page.locator(`#${target}`).innerText();
     assert.equal((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n'), expected.replace(/\r\n/g, '\n'));
   }
   const installText = await page.locator('#skill-install-prompt').innerText();
-  assert.match(installText, /^請協助我安裝「專案整理 Skill Kit」。/);
-  assert.match(installText, /不要修改任何與 Skill 安裝無關的專案檔案。$/);
+  assert.match(installText, /^請協助我從 GitHub 專案 williamlee0630\/chatgpt-project-memory-handbook 安裝 project-work-assistant Skill。/);
+  assert.match(installText, /不要修改與安裝無關的專案檔案。$/);
   const verifyText = await page.locator('#skill-verify-prompt').innerText();
-  assert.match(verifyText, /最後以表格呈現四個 Skill 的檢查結果。$/);
+  assert.match(verifyText, /不要把檔案存在當成已載入。$/);
   const widths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
   assert.ok(widths.scroll <= widths.client + 1, `Skill page horizontal overflow: ${JSON.stringify(widths)}`);
   await page.close();

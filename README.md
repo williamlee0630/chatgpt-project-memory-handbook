@@ -45,8 +45,8 @@ Webhook 使用 /callback；群組控制指令為 #設定信箱、#查看信箱�
 ## 專案整理 Skill Kit
 
 - 講義入口：`appendices/project-memory-skill.html`（保留原 URL）。
-- 完整下載：`downloads/project-work-memory-skill-kit.zip`；可閱讀來源：`downloads/project-skill-kit/`。
-- 四個 Skill 都有可複製的 Prompt 相容版。原版 `downloads/project-memory-updater-skill.zip` 仍可單獨下載。
+- 單一 Skill 下載：`downloads/project-work-assistant-skill.zip`；可閱讀來源：`downloads/project-skill-kit/skills/project-work-assistant/`。
+- `project-work-assistant` 提供四種互動式服務；四份完整 Prompt 相容版仍在 `downloads/project-skill-kit/prompts/`。
 
 ## 本機開啟講義
 

@@ -12,43 +12,14 @@
 <li><h3>回到同一個專案主對話</h3><p>開啟 ChatGPT Desktop App → 左側欄的 <strong>Projects／專案</strong> → <strong>活動籌備</strong> Project → 開啟「活動籌備｜工作記憶」對話。確認 Google Drive 與 Gmail 可由 <strong>Plugins／Apps（依目前介面顯示名稱為準）</strong> 使用 → 貼上 Prompt 2 的「後續更新簡短版」，指定本次實際紀錄日期並要求重新讀取兩邊正文。</p><p><a class="button-link" href="../appendices/prompts.html#prompt-2">開啟 Prompt 2</a></p></li>
 <li><h3>核對判斷與來源</h3><p>下載檔的固定答案是場地期限 <strong>2026-04-18 → 2026-04-21</strong>，負責人仍為活動窗口，2026-04-25 只是候選。自行產生的紀錄則應呈現你實際設定的<strong>原期限 → 新期限</strong>，候選日期不能列為已定案。答案必須列出實際讀取的 Google Drive 文件與 Gmail 郵件，排除其他專案；任一來源無法存取時須明說。</p><div class="callout success"><span class="callout-title">你現在應該看到</span>同一則回答同時引用 Drive 完整逐字稿與 Gmail <code>[LINE紀錄]</code> 正文，專案歸屬與版本判斷正確，且列出需要人工確認的事項。到這裡才算手動跨來源驗證成功。</div></li>
 </ol>
-<h2>第二階段：使用 Skill，把工作紀錄轉換成專案管理成果</h2>
-<p>Skill 已封裝來源驗證、決策判斷、衝突處理與輸出格式。<strong>第一次設定完整，後面操作就能簡短。</strong>日常快速使用只要說明專案、期間、來源與本次任務，不必每次重貼 SKILL.md。Skill 不是資料來源，也不會自動取得 Google Drive、Gmail 或 ChatGPT Project 的權限。</p>
-<div class="callout warning"><span class="callout-title">安裝提示詞只用一次</span>還沒安裝時，前往<a href="../appendices/project-memory-skill.html#skill-one-click-install">Skill 一鍵安裝教學</a>複製完整安裝提示詞；安裝成功後回到本章。沒有 Skill 功能的學生使用<a href="../appendices/project-memory-skill.html#kit-prompts">Prompt 相容版</a>。</div>
-<p>本課 Skill Kit 有四個：<code>meeting-action-items</code> 整理單次會議；<code>cross-source-decision-update</code> 比較會議與後續紀錄；<code>project-memory-updater</code> 維護指定專案的工作記憶；<code>weekly-project-report</code> 產出有證據的週報。本節用後三個示範日常快速使用。</p>
-<h3>先確認本次資料的日期</h3>
-<table class="responsive-map"><thead><tr><th>日期類型</th><th>怎麼使用</th></tr></thead><tbody><tr><td>會議及 LINE 訊息的實際發生日期</td><td>從已打開的來源正文核對，是篩選紀錄的依據。</td></tr><tr><td>工作事項的截止期限</td><td>記錄待辦何時到期，不要當成資料發生日期。</td></tr><tr><td>Skill 需要整理的資料期間</td><td>指定這次要讀的事件日期範圍；來源清楚時可先請 AI 辨識，再由你確認範圍。</td></tr><tr><td>週報涵蓋的週期</td><td>明確指定週一至週日或週一至今天；只寫已發生且有來源的工作。</td></tr><tr><td>自動化排程的執行時間</td><td>由任務排程設定控制，與來源資料期間分開。</td></tr></tbody></table>
-<p>日期應從實際讀取的來源正文確認。若資料範圍不明確，先詢問使用者，不能猜測；資料結束日不得超過實際執行日，未來期間不能假裝已有紀錄。工作截止期限也不能被當成紀錄日期。</p>
-<h3>每個階段要提供什麼？</h3>
-<table class="responsive-map"><thead><tr><th>使用階段</th><th>你需要提供</th></tr></thead><tbody><tr><td>第一次使用</td><td>專案、來源、日期範圍</td></tr><tr><td>同專案後續更新</td><td>新增期間、更新需求</td></tr><tr><td>每週整理</td><td>週報日期範圍</td></tr><tr><td>換新專案</td><td>重新指定專案與來源</td></tr></tbody></table>
-<p>Skill 已經封裝完整的整理規則，所以日常使用不需要反覆貼上長篇提示詞。你只需要清楚說明本次要處理哪個專案、哪個期間，以及資料從哪裡來。只有目前對話或工作環境確實保留且能確認必要設定時，才可省略重複欄位；Skill 不會自動記住所有設定。</p>
-<div class="callout"><span class="callout-title">固定下載檔練習與自行產生的新紀錄</span>以下固定日期只適用於講義下載的虛構練習檔。如果你是跟著課程實際建立 Google Meet 與 LINE 紀錄，請使用自己練習當天的實際紀錄日期。下載 <a href="../downloads/lesson-06-02/01_meeting.txt" download>01_meeting.txt</a>、<a href="../downloads/lesson-06-02/02_line_email.txt" download>02_line_email.txt</a>；紀錄日期分別是 2026-04-16、2026-04-17，固定週報為 <strong>2026-04-13 ～ 2026-04-19</strong>。固定答案：場地期限 2026-04-18 → 2026-04-21、負責人仍是活動窗口，2026-04-25 只列候選，不可當已完成或定案。</div>
-<h3>情境一：第一次進行跨來源決策更新</h3>
-<p>Codex 請先指定可讀取的練習檔案或資料夾，並把路徑填入下方提示詞；只看到檔名還不夠。ChatGPT Project 請使用<a href="../appendices/project-memory-skill.html#kit-prompts">對應的 Prompt 相容版</a>及已授權的 Google Drive／Gmail 來源。</p>
-<div class="copy-card lesson-copy-card"><div class="copy-label">首次使用｜跨來源決策更新</div><button class="copy-button" data-copy-target="skill-cross-source-demo">複製首次 Skill 提示詞</button><pre id="skill-cross-source-demo"><code>$cross-source-decision-update
-
-請整理「活動籌備專案」這次練習的會議與 LINE 紀錄。
-本次允許來源：【填入 Codex 可讀取的兩份檔案路徑或資料夾】
-
-只讀取我指定的來源，先確認實際紀錄日期與專案歸屬，再依 Skill 規則整理最新決策與變更，附上來源。
-
-如果日期範圍無法確認，請先詢問我。</code></pre></div>
-<p>初次使用時，請核對輸出有原期限 → 新期限、負責人延續與候選日期；候選公開報名日仍是尚未確認事項。如果來源正文未明確寫出某項結論，就不要自行補上。</p>
-<h3>情境二：後續更新同一個專案</h3>
-<p>這個簡短版只適合同一個對話中，專案、來源及上次成功更新的截止日已確認。每次仍要重新讀取本次允許的來源正文；前次 AI 回答不是新資料來源，既有工作記憶只能比較前後版本。若另開新對話或切換專案，須重新指定專案、來源與日期範圍。不能只因說「更新一下」就搜尋所有資料或混入其他專案。</p>
-<div class="copy-card lesson-copy-card"><div class="copy-label">同專案｜工作記憶日常更新</div><button class="copy-button" data-copy-target="skill-memory-update-demo">複製同專案更新提示詞</button><pre id="skill-memory-update-demo"><code>$project-memory-updater
-
-請延續本對話已確認的專案與來源設定，從上次成功更新的截止日之後整理到今天，重新讀取來源正文並更新工作記憶，保留決策變更及來源。
-
-若無法確認上次截止日、專案或來源，請先詢問我。</code></pre></div>
-<h3>情境三：快速產出本週週報</h3>
-<p>週報必須有明確期間。以執行環境可確認的當地日期判斷今天星期幾及本週開始、結束日期；整理只到今天，未來尚未發生的工作不能列已完成。較早的資料可作背景，不得直接算本週完成。</p>
-<div class="copy-card lesson-copy-card"><div class="copy-label">每週整理｜本週週報</div><button class="copy-button" data-copy-target="skill-weekly-demo">複製本週週報提示詞</button><pre id="skill-weekly-demo"><code>$weekly-project-report
-
-請為本對話已確認的專案，整理本週一至今天的工作紀錄，重新讀取已確認的指定來源，依 Skill 規則產出週報並附上證據。
-
-如果專案、週報期間或允許來源不明確，請先詢問我。</code></pre></div>
-<p>完整 Skill 說明、長版 Prompt、安裝與驗收內容保留在<a href="../appendices/project-memory-skill.html#skill-daily-use">Skill Kit 附錄</a>；<code>meeting-action-items</code> 可先整理單次逐字稿。</p>
+<h2>第二階段：使用互動式專案工作助理，完成最新工作記憶與週報</h2>
+<p><strong>只安裝一個 <code>project-work-assistant</code> Skill。</strong>它包含整理會議、確認決策變更、更新工作記憶及產生週報四種服務。啟動後選服務、回答缺少的問題即可；已明確說出任務時直接進入該服務，不必撰寫四份提示詞。</p>
+<ol class="steps"><li><h3>下載並安裝一個 Skill</h3><p>開啟<a href="../appendices/project-memory-skill.html#skill-one-click-install">一鍵安裝教學</a>，下載<a href="../downloads/project-work-assistant-skill.zip" download>專案工作助理 ZIP</a>。讓 Codex 安裝並驗收唯一的 <code>project-work-assistant</code> 資料夾；完整的 references 與範例也必須保留。</p></li><li><h3>在 Codex 啟動</h3><p>複製下方指令並貼到 Codex。若只輸入指令，助理會列四種服務；你也可以直接說「幫我產生本週週報」，它會直接進入週報流程。</p></li></ol>
+<div class="copy-card lesson-copy-card"><div class="copy-label">啟動專案工作助理</div><button class="copy-button" data-copy-target="skill-launch-command">複製 Skill 啟動指令</button><pre id="skill-launch-command"><code>$project-work-assistant</code></pre></div>
+<div class="callout"><span class="callout-title">啟動畫面會詢問</span>1. 整理會議決議與待辦<br>2. 確認專案決策變更<br>3. 更新最新專案工作記憶<br>4. 產生專案進度週報<br>直接輸入數字，也可以用自己的話說想做什麼。</div>
+<ol class="steps"><li><h3>第一次選「3. 更新最新專案工作記憶」</h3><p>助理會先檢查目前對話已確認的專案、允許來源與日期範圍；缺少才依序問「這次要整理哪個專案？」「你想整理哪個期間？」「這次要使用哪些資料？」。本課可選「活動籌備專案」，指定這次實際可讀取的會議與 LINE 紀錄。選擇「根據指定來源的實際紀錄日期」時，先讓助理從正文找出範圍，再由你確認。</p></li><li><h3>提供 Codex 可讀取的來源</h3><p>若 Codex 無法讀取 ChatGPT Project 中已連接的 Google Drive／Gmail，請下載或提供兩份來源正文：<a href="../downloads/lesson-06-02/01_meeting.txt" download>01_meeting.txt</a> 與 <a href="../downloads/lesson-06-02/02_line_email.txt" download>02_line_email.txt</a>，放進 Codex 可讀的資料夾並明確指定。不要假設 Codex 與 ChatGPT Project 的權限互通；無法存取來源時要先提供檔案，不能把未讀資料當成已讀。</p></li><li><h3>核對本次工作記憶</h3><p>下載的虛構練習檔分別記於 <strong>2026-04-16</strong> 與 <strong>2026-04-17</strong>；固定答案是場地確認期限 <strong>2026-04-18 → 2026-04-21</strong>、負責人仍為活動窗口、<strong>2026-04-25</strong> 只作候選公開報名日。核對輸出是否附上實際讀取的兩份來源，沒有完成證據就不能標成已完成。</p></li><li><h3>第二次快速使用</h3><p>在同一個已確認專案的對話，直接說「幫我產生本週週報」。助理應沿用仍有效的專案與允許來源，只詢問缺少的資訊，重新讀取正文；週報的本週一至今天依執行當下的當地日期計算。也可說「更新一下專案」，但若上次成功更新截止日不明，助理仍須先問。</p></li></ol>
+<div class="callout warning"><span class="callout-title">固定日期只屬於下載案例</span>以上 2026 年 4 月日期只用於講義虛構練習檔及固定答案。若你自行建立新的 Google Meet 與 LINE 紀錄，請使用來源正文中的實際發生日期；工作期限、Skill 資料期間、週報期間與排程執行時間分開確認。期間不明就請助理詢問，不照抄講義日期，也不把未來紀錄寫成已發生。</div>
+<p>同專案設定可在你同意後，保存非敏感的專案名稱、來源參照、時區與已驗收的成功截止日；不同專案分開保存。更新失敗不能推進截止日。若無寫入權限，只沿用目前對話確實可確認的資訊。完整的<a href="../appendices/project-memory-skill.html#skill-daily-use">互動示範、設定保存與切換專案說明</a>在附錄。沒有 Skill 功能時，使用<a href="../appendices/project-memory-skill.html#kit-prompts">四份 Prompt 相容版</a>，原本的來源與衝突規則仍適用。</p>
 <h2>第三階段：設定跨來源週期排程</h2><p class="lede"><strong>Google Drive + Gmail [LINE紀錄] → ChatGPT → 跨來源工作記憶</strong></p><div class="callout warning"><span class="callout-title">確認排程設定介面</span>建立排程時，Prompt 必須明確描述排程意圖與執行頻率。如果只要求「更新工作記憶」，ChatGPT 可能將它視為一般的一次性任務。貼上本教材 Prompt 後，請確認畫面有出現「重複／每天／時間」等排程設定，本課示範設定為每天 <strong>15:00</strong>、時區 <code>Asia/Taipei</code> 後儲存。介面名稱與呈現方式可能隨版本調整。</div><ol class="steps"><li><h3>再次確認排程前提</h3><p>Drive 已有可讀取的會議完整逐字稿、Gmail 已有可讀取的 <code>[LINE紀錄]</code>，而且上一階段的專案主對話能實際讀取兩邊。任一項未完成就先回去排錯。</p></li><li><h3>在 Desktop App 開啟 Scheduled</h3><p>在 ChatGPT Desktop App 找到 <strong>Scheduled／排程</strong> 入口並開啟。若目前介面沒有此入口，可用相同帳號從 ChatGPT Web 備用入口查看；不同版本的入口位置與名稱請依目前介面為準。若兩邊都沒有，可能是帳號、plan、region、workspace、管理員政策或目前介面版本尚未提供；這不代表你操作錯誤，也不要改在 Codex 建立。</p></li><li><h3>建立新排程</h3><p>在 Scheduled 頁按建立新任務，或選 <strong>Try your own</strong>（實際名稱可能隨介面版本調整）→ 貼上下方 Prompt 3 → 把 <code>＿＿＿＿專案</code> 換成要持續追蹤的實際專案名稱 → 確認排程設定顯示重複、本課示範的每天 <strong>15:00</strong> 與 <code>Asia/Taipei</code> → 儲存；實際使用可自行調整時間與頻率。若系統先建立對話再讓你設定時間，依確認卡或時鐘按鈕完成排程。</p></li><li><h3>依需求設定任務通知</h3><p>儲存排程後，到 <strong>ChatGPT → 設定 → 通知 → 任務</strong>，依需求開啟<strong>推播</strong>、<strong>電子郵件</strong>或兩者。Prompt 負責定義任務要做什麼；Email／Push 屬於 ChatGPT 帳號層級的通知設定。兩者不是同一件事，可用的通知管道也可能依帳號、裝置與目前介面而異。</p><div class="callout"><span class="callout-title">通知不是 Prompt 控制</span><strong>A. Gmail Connector</strong>：用來讀取 <code>[LINE紀錄]</code> 等工作來源。<br><strong>B. ChatGPT Task Email Notification</strong>：由 ChatGPT 系統通知某次排程任務已有更新／結果。這不是透過課程中的 Gmail Connector 主動寄信，也不可因為 Prompt 寫了「通知」就假設 Email 或 Push 一定送達。</div></li><li><h3>確認排程管理入口</h3><p>建立後可回到左側欄的 <strong>Scheduled／排程</strong> 查看、編輯、暫停或刪除任務。若使用 ChatGPT Web 備用入口，另一條可能的路徑是 <strong>Settings／設定 → Notifications／通知 → Manage tasks／管理任務</strong>；從個別任務對話的更多選單也可能看到 <strong>See scheduled tasks／查看排程任務</strong>。</p></li></ol>
 <p>這是課程示範設定，不代表每個人都必須選擇下午三點。實際使用時，可以按照自己的工作習慣調整執行時間與頻率；若改動，Prompt 3 的週期與資料時間窗也要同步調整並重新核對。實際執行時間由排程設定控制；資料日期範圍由任務提示詞和來源紀錄決定，不要混為一談。</p>
 <div data-prompt-id="3"></div>

@@ -1,0 +1,4 @@
+interface:
+  display_name: "專案工作助理"
+  short_description: "用對話整理會議、決策、工作記憶與週報"
+  default_prompt: "$project-work-assistant"

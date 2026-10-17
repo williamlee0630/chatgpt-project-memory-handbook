@@ -1,34 +1,22 @@
 # 專案整理 Skill Kit
 
-這套教材把課程中的「會議 → 後續討論 → 最新工作記憶 → 週報」整理流程包成四個可重複使用的 Skill，同時提供四份可直接複製的 Prompt。以「國際研討會規劃專案」的模擬案例示範；案例不是你的真實專案資料。
+本教材以一個互動式 Codex Skill `project-work-assistant` 提供四種服務。啟動時輸入 `$project-work-assistant`，選擇服務，再回答當下缺少的專案、期間和來源問題。單一下載檔是 `../project-work-assistant-skill.zip`；ZIP 解壓後只有 `project-work-assistant/` 一個頂層資料夾。
 
-## 先選使用方式
+## 服務與 Prompt 相容版
 
-- **Prompt：全員可使用的核心版本。** 打開 `prompts/`，選一份對應工作情境的 Markdown，複製全文到目前專案對話，填入專案名稱、日期範圍與來源。
-- **Skill：同一套流程的進階封裝。** 若你的 ChatGPT／Codex 使用環境目前支援 Skill，依該環境的安裝入口匯入所需的 Skill 資料夾。介面、帳號權限與支援方式可能不同；若沒有 Skill 功能，直接用 Prompt 即可。
-
-Skill 不會替你取得沒有權限的資料，也不等於排程。先確認 ChatGPT Project 與來源設定、用 Prompt 跑過一次並人工核對，再視環境安裝 Skill。每次仍需指定專案與來源；需要週報時還要指定日期範圍。
-
-## 四種工作情境
-
-| 什麼時候用 | Skill 資料夾 | Prompt |
+| 服務 | Skill 規則 | 不使用 Skill 時 |
 | --- | --- | --- |
-| 一場會議後整理決議與待辦 | `skills/meeting-action-items/` | `prompts/01-會議決議與待辦整理.md` |
-| LINE／Email 等會後資料可能改變決策 | `skills/cross-source-decision-update/` | `prompts/02-跨來源決策更新.md` |
-| 更新指定專案的最新工作記憶 | `skills/project-memory-updater/` | `prompts/03-專案工作記憶更新.md` |
-| 整理指定一週的專案進度 | `skills/weekly-project-report/` | `prompts/04-專案進度週報.md` |
+| 會議決議與待辦 | `skills/project-work-assistant/references/meeting.md` | `prompts/01-會議決議與待辦整理.md` |
+| 跨來源決策變更 | `skills/project-work-assistant/references/decision-update.md` | `prompts/02-跨來源決策更新.md` |
+| 最新專案工作記憶 | `skills/project-work-assistant/references/memory-update.md` | `prompts/03-專案工作記憶更新.md` |
+| 指定期間週報 | `skills/project-work-assistant/references/weekly-report.md` | `prompts/04-專案進度週報.md` |
 
-每個 Skill 的 `SKILL.md` 說明使用時機、輸入、判斷與輸出；`references/example-input.md` 和 `references/example-output.md` 提供對照練習。專案工作記憶更新 Skill 另保留原版的來源規則、固定格式與範例。
+四份 Prompt 保留完整來源驗證、決策版本、衝突處理與輸出規則。沒有 Skill 功能的學生可在 ChatGPT Project 使用已授權的來源和對應 Prompt。
 
-## 跟著案例走一次
+## 來源與安全
 
-1. 讀取 9 月 15 日的 Google Meet 逐字稿：羅力辰確認優先研究日本與新加坡，黃詩陽負責住宿資料初稿。先用「會議決議與待辦整理」。
-2. 讀取 9 月 16 日的 LINE：「新加坡住宿太高，上次研究兩地的決定改成只研究日本。」用「跨來源決策更新」保留原決議與新決議的來源、時間。
-3. 用「專案工作記憶更新」形成目前版本：優先只研究日本，保留決策變更；負責人、期限或完成狀態沒有證據時不猜。
-4. 讀取同週 Email，再用「專案進度週報」整理本週完成與待辦。較早資料只能當背景，不算本週完成。
+Skill 共用 `references/source-rules.md`，只讀取本次指定專案和允許來源的正文，確認事件日期與專案歸屬；缺少資訊就詢問。較晚意見不自動成為有效決策，候選不算定案，既有工作記憶只用於同專案前後比較。Codex Skill 不會自動取得 ChatGPT Project、Google Drive 或 Gmail 權限。無法讀取時應請使用者提供檔案，不能假裝已讀。
 
-每步都只處理本次指定專案與實際讀取來源。較晚的意見不一定推翻舊決定；資訊衝突且無法判斷時，標示「存在資訊衝突，需要人工確認。」重要結果請回到原始來源人工核對。
+可選的 `references/settings.md` 僅在使用者同意且目前專案資料夾可寫入時保存非敏感設定。每次仍須重新讀取本次來源；更新失敗或未驗收，不推進上次成功截止日。Skill 不等於排程。
 
-## 本課的自動化範圍
-
-指定來源自動收集＋固定週期重新搜尋與整理＋形成最新版工作記憶。Tactiq 可把逐字稿送到 Google Drive，LINE Bot 可把新文字紀錄送到 Google Sheets／Gmail；ChatGPT 在取得權限後才能搜尋並整理。紙本筆記、單獨錄音、未轉文字的內容或無權存取的系統，須先數位化、轉錄或匯入可讀來源。結果不保證永久自動寫回 Project。
+講義入口為 `../../appendices/project-memory-skill.html`，課程練習見 `../../chapters/06-02.html`。
