@@ -370,14 +370,14 @@ test('Skill 附錄頁與下載連結在 390px 手機版可用', async t => {
   await page.close();
 });
 
-test('6-2 Skill 入口、示範提示詞與附錄完整安裝提示詞可在手機複製', async t => {
+test('6-2 三種日常 Skill 提示詞與附錄安裝、相容提示詞可在手機複製', async t => {
   if (!browser) return t.skip('執行環境未提供 Chromium；由靜態測試驗證內容');
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto(baseURL + '/chapters/06-02.html');
   const lessonWidths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
   assert.ok(lessonWidths.scroll <= lessonWidths.client + 1, `Lesson page horizontal overflow: ${JSON.stringify(lessonWidths)}`);
-  for (const target of ['skill-cross-source-demo', 'skill-weekly-demo']) {
+  for (const target of ['skill-cross-source-demo', 'skill-memory-update-demo', 'skill-weekly-demo']) {
     await page.locator(`[data-copy-target="${target}"]`).click();
     const expected = await page.locator(`#${target}`).innerText();
     assert.equal((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n'), expected.replace(/\r\n/g, '\n'));
@@ -385,7 +385,7 @@ test('6-2 Skill 入口、示範提示詞與附錄完整安裝提示詞可在手�
   await page.locator('a[href="../appendices/project-memory-skill.html#skill-one-click-install"]').click();
   await page.waitForURL(/project-memory-skill\.html#skill-one-click-install$/);
   assert.equal(await page.locator('#skill-one-click-install').count(), 1);
-  for (const target of ['skill-install-prompt', 'skill-verify-prompt', 'codex-file-practice-prompt']) {
+  for (const target of ['skill-install-prompt', 'skill-verify-prompt', 'codex-file-practice-prompt', 'kit-quick-cross-source', 'kit-quick-memory', 'kit-quick-weekly', 'kit-prompt-followup']) {
     await page.locator(`[data-copy-target="${target}"]`).click();
     const expected = await page.locator(`#${target}`).innerText();
     assert.equal((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n'), expected.replace(/\r\n/g, '\n'));
