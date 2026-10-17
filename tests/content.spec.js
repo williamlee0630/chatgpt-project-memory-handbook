@@ -692,7 +692,9 @@ test('跨來源工作記憶概念名稱仍保留，完成確認補在需要的�
     const match = text.match(/<h2>完成確認<\/h2><ul class="checklist">([\s\S]*?)<\/ul>/);
     assert.ok(match, `${relative}: 完成確認`);
     const count = (match[1].match(/<li>/g) || []).length;
-    assert.ok(count >= 2 && count <= 5, `${relative}: ${count} completion items`);
+    const minimum = relative === 'chapters/06-02.html' ? 6 : 2;
+    const maximum = relative === 'chapters/06-02.html' ? 8 : 5;
+    assert.ok(count >= minimum && count <= maximum, `${relative}: ${count} completion items`);
   }
 });
 
@@ -721,16 +723,21 @@ test('排程只在手動跨來源驗證成功後建立，且不依賴 Project �
   assert.doesNotMatch(text, /任務不能存取該 Project 中上傳或保存的檔案/);
 });
 
-test('版本變更使用明確標示的虛構工作案例，不像課程製作紀錄', () => {
-  const text = [
+test('早期虛構練習保留標示，第 6-2 章主要示範改為兩組錄影案例', () => {
+  const earlier = [
     read('chapters/01-02.html'), read('chapters/03-02.html'),
-    read('chapters/05-02.html'), read('chapters/06-02.html')
+    read('chapters/05-02.html')
   ].join('\n');
-  for (const phrase of ['練習案例', '活動籌備專案', '4/18', '4/21', '4/25']) {
-    assert.match(text, new RegExp(escapeRegExp(phrase)), phrase);
+  for (const phrase of ['練習案例', '活動籌備專案']) {
+    assert.match(earlier, new RegExp(escapeRegExp(phrase)), phrase);
   }
+  const legacy = read('downloads/lesson-06-02/01_meeting.txt') + read('downloads/lesson-06-02/02_line_email.txt');
+  for (const phrase of ['虛構練習資料', '2026-04-18', '2026-04-21', '2026-04-25']) assert.match(legacy, new RegExp(escapeRegExp(phrase)), phrase);
+  const finalLesson = read('chapters/06-02.html');
+  for (const phrase of ['2026-10-06', '2026-10-17', '活動籌備專案', '研討會討論專案', '2026-10-18 → 2026-10-12', '暫定 2026-10-31']) assert.match(finalLesson, new RegExp(escapeRegExp(phrase)), phrase);
+  assert.doesNotMatch(finalLesson, /2026-04-1[678]|2026-04-2[15]|4\/18 → 4\/21/);
   for (const phrase of ['小美', '10/20', '10/23', '10/30', '候選上架日']) {
-    assert.doesNotMatch(text, new RegExp(escapeRegExp(phrase)), phrase);
+    assert.doesNotMatch(earlier + finalLesson, new RegExp(escapeRegExp(phrase)), phrase);
   }
 });
 

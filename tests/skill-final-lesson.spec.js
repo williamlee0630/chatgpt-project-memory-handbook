@@ -44,14 +44,48 @@ test('appendix has one installation, verification, and launch prompt with separa
   assert.match(html, /id="kit-prompts"/);
 });
 
-test('fixed practice dates remain limited to downloadable case and real dates are explained', () => {
-  const meeting = read('downloads/lesson-06-02/01_meeting.txt');
-  const line = read('downloads/lesson-06-02/02_line_email.txt');
-  const html = read('chapters/06-02.html');
-  for (const phrase of ['2026-04-16', '2026-04-18']) assert.ok(meeting.includes(phrase));
-  for (const phrase of ['2026-04-17', '2026-04-21', '2026-04-25', '候選']) assert.ok(line.includes(phrase));
-  for (const phrase of ['01_meeting.txt', '02_line_email.txt', '實際發生日期', '工作期限', 'Skill 資料期間', '週報期間', '排程執行時間']) assert.ok(html.includes(phrase), phrase);
-  assert.doesNotMatch(copiedPrompt(html, 'skill-launch-command'), /2026-04-/);
+test('recorded LINE examples preserve timestamps, decisions, provisional status, and project isolation', () => {
+  const activity = read('downloads/lesson-06-02/activity-line-2026-10-06.txt');
+  const seminar = read('downloads/lesson-06-02/seminar-line-2026-10-17.txt');
+  for (const [source, project, date] of [[activity, '活動籌備專案', '2026-10-06'], [seminar, '研討會討論專案', '2026-10-17']]) {
+    for (const phrase of ['依實際課程測試紀錄改寫之匿名化教材', '不是完整逐字稿', `專案名稱：${project}`, '來源類型：LINE Bot 寄送的 Gmail 郵件正文', `紀錄發生日期：${date}`, '預期判斷：']) assert.ok(source.includes(phrase), `${project}: ${phrase}`);
+    assert.doesNotMatch(source, /[\w.+-]+@[\w.-]+|(?:group|user)[_-]?id\s*[:=]|(?:token|secret)\s*[:=]/i);
+  }
+  for (const line of [
+    '16:14　場地負責人：剛剛場地方有回覆了，原本預計 10/18 完成場地確認，但他們希望我們提早回覆，所以改成 10/12 前確認場地。',
+    '16:15　活動主持人：好，那場地確認的期限就改成 10/12，還是由原負責人跟場地方確認。',
+    '16:53　報名頁負責人：報名頁我這邊預計 10/15 可以準備好，如果場地 10/12 確定，公開報名可以排 10/16 上午 10 點。',
+    '16:53　活動主持人：可以，那就先確定 10/16 上午 10 點開放報名。',
+    '16:54　場地負責人：收到，我 10/12 前確認場地，確認後會在群組回報。',
+    '16:54　報名頁負責人：那我負責報名頁內容，10/15 前完成。',
+    '16:56　活動主持人：好。另外活動主視覺還沒決定，這個我們下次再確認。'
+  ]) assert.ok(activity.includes(line), line);
+  for (const phrase of ['2026-10-18 改為 2026-10-12', '原負責人維持不變', '2026-10-15 前完成', '計畫安排', '前置條件', '主視覺尚未決定', '不標示為已完成', '4 月 18 日', '需要人工確認', '不得寫成會議的 4/18 直接改為 10/12']) assert.ok(activity.includes(phrase), phrase);
+  for (const line of [
+    '12:36　研討會成員甲：我們下次討論的時間是什麼時候',
+    '12:36　研討會成員乙：10/31',
+    '12:37　研討會成員乙：可以先準備一下各自的內容',
+    '12:37　研討會成員甲：好 那就先暫定10/31',
+    '12:38　研討會成員乙：OK'
+  ]) assert.ok(seminar.includes(line), line);
+  for (const phrase of ['暫定 2026-10-31', '不能列為正式確認', '具體時間', '沒有具體分派的個人工作與期限']) assert.ok(seminar.includes(phrase), phrase);
+  assert.doesNotMatch(seminar, /場地負責人|報名頁負責人|2026-10-12|2026-10-15|2026-10-16/);
+  assert.doesNotMatch(activity, /研討會成員|2026-10-31/);
+});
+
+test('lesson and appendix teach the two recorded examples without claiming email proves Drive integration', () => {
+  const lesson = read('chapters/06-02.html');
+  const appendix = read('appendices/project-memory-skill.html');
+  for (const html of [lesson, appendix]) {
+    for (const file of ['activity-line-2026-10-06.txt', 'seminar-line-2026-10-17.txt']) assert.ok(html.includes(`../downloads/lesson-06-02/${file}`), file);
+    for (const phrase of ['活動籌備專案', '研討會討論專案', '2026-10-31', '暫定', 'Google Drive', 'Gmail', '人工確認']) assert.ok(html.includes(phrase), phrase);
+    assert.doesNotMatch(html, /4\/18 → 4\/21|4\/25 候選/);
+  }
+  for (const phrase of ['Tactiq My Meetings', 'Automatic Workflow', '會議原始紀錄', 'group_id', 'sent = TRUE', '同一專案', 'Drive 來源待補', '10/18 → 10/12 只由 10/6 LINE 郵件本身支持', '場地與報名頁都不可標成已完成']) assert.ok(lesson.includes(phrase), phrase);
+  assert.ok(lesson.includes('只有實際讀到<strong>同一專案</strong>的 Drive 會議文件和 Gmail LINE 郵件'));
+  assert.ok(lesson.includes('安裝 Codex Skill 不會自動讓這個 ChatGPT 排程使用它'));
+  assert.equal(copiedPrompt(lesson, 'skill-launch-command'), '$project-work-assistant');
+  assert.equal(copiedPrompt(appendix, 'skill-launch-command'), '$project-work-assistant');
 });
 
 test('Prompt route keeps four full copies and a short followup that rereads evidence', () => {

@@ -9,7 +9,7 @@
 <p class="eyebrow">工具箱｜選用進階工具</p>
 <h1>專案整理 Skill Kit</h1>
 <p class="lede">只需安裝一個互動式 <code>project-work-assistant</code> Skill，啟動後選擇會議、決策、工作記憶或週報服務，回答必要問題即可。沒有 Skill 功能時，仍可使用下方四份完整 Prompt 相容版。</p>
-<div class="meta-row"><span class="badge advanced">選用</span><span class="badge">1 個 Skill・4 種服務</span><span class="badge">4 份 Prompt 相容版</span><span class="badge">一組完整練習案例</span></div>
+<div class="meta-row"><span class="badge advanced">選用</span><span class="badge">1 個 Skill・4 種服務</span><span class="badge">4 份 Prompt 相容版</span><span class="badge">兩組匿名化錄影案例</span></div>
 <div class="callout success"><span class="callout-title">一次安裝，日常用簡短指令</span>Skill 已封裝專案範圍、來源驗證、決策版本、衝突處理與輸出格式。第一次確認專案、日期與允許來源後，同一對話可用「更新一下專案」或「幫我產生本週週報」繼續；只有資訊仍可確認時才省略重問。</div>
 <div class="callout warning"><span class="callout-title">Codex 與 ChatGPT Project 的來源分開</span>使用 Skill 時請切換到 Codex 工作區。Codex Skill 不會自動取得 ChatGPT Project、Google Drive 或 Gmail 的權限。請在 Codex 指定可讀取的檔案／資料夾；若要留在 ChatGPT Project 使用既有已授權來源，改用下方 Prompt 相容版。Skill 也不等於排程。</div>
 <p><a class="button-link" href="../downloads/project-work-assistant-skill.zip" download>下載專案工作助理 Skill ZIP</a><a class="button-link secondary" href="#skill-one-click-install">一鍵安裝</a><a class="button-link secondary" href="#kit-prompts">只使用 Prompt</a></p>
@@ -38,9 +38,10 @@
 
 <h2 id="skill-daily-use">3. 第一次啟動與互動示範</h2>
 <p>只輸入啟動指令時，助理會用文字詢問：「請問今天想完成什麼工作？」並列出 1 整理會議、2 確認決策變更、3 更新最新工作記憶、4 產生週報。輸入 <code>3</code>，即可開始工作記憶流程；直接說「幫我產生本週週報」則直接進入週報，不重問服務類型。</p>
-<div class="chapter-card"><h3>活動籌備專案：第一次使用</h3><ol class="steps"><li>你說：<strong>3</strong>。助理確認專案；若不知道，問「這次要整理哪個專案？」你回答「活動籌備專案」。</li><li>助理確認日期；若不知道，問「你想整理哪個期間？」可選本週、上週、從上次成功更新後到今天、從指定來源的實際紀錄日期辨識，或自訂日期。你選擇根據已指定來源的紀錄日期，再確認助理提出的範圍。</li><li>助理確認本次允許來源；若不知道，問「這次要使用哪些資料？」請指定 Codex 能讀的會議與 LINE 文字檔或資料夾。若無法讀取 ChatGPT Project 中的 Drive／Gmail，就提供<a href="../downloads/lesson-06-02/01_meeting.txt" download>01_meeting.txt</a> 和 <a href="../downloads/lesson-06-02/02_line_email.txt" download>02_line_email.txt</a>。</li><li>助理讀取兩份正文並輸出工作記憶。下載練習檔的固定答案是期限 2026-04-18 → 2026-04-21，活動窗口仍負責，2026-04-25 只是候選日；最後核對實際來源。</li></ol></div>
-<div class="chapter-card"><h3>國際研討會規劃專案：沿用的示例</h3><p>另一組示例在 Skill 的 <code>assets/examples/seminar.md</code>：會議當下決定<strong>研究日本＋新加坡</strong>，後續 LINE 明確改為<strong>只研究日本</strong>。助理須保留兩個版本與來源，不能因較晚的普通建議就推翻決定；示例資料不能當作你目前專案的真實紀錄。</p></div>
-<div class="callout warning"><span class="callout-title">新紀錄使用新日期</span>這些 2026 年 4 月日期只屬於講義虛構檔。自行建立 Google Meet 與 LINE 紀錄時，依來源正文的實際事件日期設定資料期間；工作期限、週報週期與排程時間分開確認。來源不明先問，不猜測未來紀錄。</div>
+<div class="chapter-card"><h3>示範 A｜2026-10-06 活動籌備專案</h3><ol class="steps"><li>啟動 <code>$project-work-assistant</code>，選 <strong>3. 更新最新專案工作記憶</strong>。助理詢問時，回答「活動籌備專案」，紀錄期間指定 2026-10-06。</li><li>來源指定本次可讀的 Gmail LINE Bot 郵件正文，或下載<a class="button-link secondary" href="../downloads/lesson-06-02/activity-line-2026-10-06.txt" download>活動籌備匿名化 TXT</a>後提供檔案。助理仍依原有互動流程詢問缺少的來源或更新起點。</li><li>核對輸出：場地期限 2026-10-18 → 2026-10-12，原負責人不變；報名頁預計 10/15 前完成；10/16 上午 10 點公開報名已由主持人確認為計畫安排，但以場地先確認為前提；主視覺未決，場地與報名頁不能標完成。</li></ol></div>
+<div class="chapter-card"><h3>示範 B｜2026-10-17 研討會討論專案</h3><ol class="steps"><li>再次使用同一個 Skill，選 <strong>3</strong> 並明確切換至「研討會討論專案」。重新指定 2026-10-17 的紀錄期間與來源，不沿用活動籌備的設定。</li><li>來源指定該專案 Gmail LINE Bot 郵件正文，或下載<a class="button-link secondary" href="../downloads/lesson-06-02/seminar-line-2026-10-17.txt" download>研討會討論匿名化 TXT</a>後提供檔案。</li><li>核對輸出：下一次討論<strong>暫定 2026-10-31</strong>，具體時間未確認；只是建議成員先準備各自內容，沒有具體個人分派或期限。活動籌備的場地、報名頁與日期不得進入這份工作記憶。</li></ol></div>
+<div class="callout warning"><span class="callout-title">LINE 練習與跨來源驗收分開</span>兩份下載檔依實際課程測試紀錄改寫，都是匿名化 LINE／Gmail 資料，不能單靠它們宣稱已讀到 Google Drive。若把 10/3 Tactiq 辨識的「4 月 18 日」與 10/6 LINE 的「10/18 改成 10/12」比較，須列來源差異與人工確認，不能寫成 4/18 → 10/12。詳細判斷由原 Skill 規則處理，學生不需另貼長篇 Prompt。</div>
+<details class="chapter-card"><summary><strong>進階虛構範例</strong>｜舊版下載檔與 Skill 內建示例</summary><p>舊版 <a href="../downloads/lesson-06-02/01_meeting.txt" download>01_meeting.txt</a>、<a href="../downloads/lesson-06-02/02_line_email.txt" download>02_line_email.txt</a> 是 2026 年 4 月的虛構練習，不是本節錄影紀錄。Skill 的 <code>assets/examples/seminar.md</code> 另有「國際研討會規劃專案」虛構示例：會議當下決定<strong>研究日本＋新加坡</strong>，後續 LINE 明確改為<strong>只研究日本</strong>。這些資料只作進階比對，不可視為目前專案的真實來源。</p></details>
 
 <h2>4. 同專案快速使用、換專案與設定</h2>
 <p>同一個已確認專案，第二次可直接說「更新一下專案」或「幫我產生本週週報」。助理只在必要資訊缺失時追問；每次仍重新讀本次允許來源正文。前次 AI 回答或既有工作記憶只能幫助比較，不是新事實。新對話或換專案時，重新確認專案、允許來源與日期範圍，不能混入舊專案。</p>
